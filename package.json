@@ -1,0 +1,56 @@
+{
+  "name": "blindtestwitch",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.32",
+    "@fortawesome/free-brands-svg-icons": "^5.15.1",
+    "@fortawesome/free-regular-svg-icons": "^5.15.1",
+    "@fortawesome/free-solid-svg-icons": "^5.15.1",
+    "@fortawesome/react-fontawesome": "^0.1.12",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.53",
+    "@types/react-dom": "^16.9.8",
+    "@types/tmi.js": "^1.8.0",
+    "react-router-dom": "^6.0.2",
+    "axios": "^0.21.0",
+    "bootstrap": "^4.5.3",
+    "node-sass": "4.14.1",
+    "react": "^17.0.1",
+    "react-bootstrap": "^2.0.2",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.0.3",
+    "web-vitals": "^0.2.4",
+    "yarn": "^1.22.17",
+    "class-transformer": "^0.5.1",
+    "tmi.js": "^1.8.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "plugin:testing-library/react"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^7.11.0"
+  }
+}
