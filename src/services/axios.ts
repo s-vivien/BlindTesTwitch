@@ -44,14 +44,19 @@ instance.interceptors.response.use(
                     config.headers.Authorization = `Bearer ${accessToken}`
                     return instance(config)
                 } catch (_error) {
+                    displayError(err);
                     return Promise.reject(_error)
                 }
             }
-            globalErrorCallback(err.response.status + (err.response.data && (' ' + JSON.stringify(err.response.data))));
+            displayError(err);
         }
         return Promise.reject(err);
     }
 )
+
+const displayError = (err: any) => {
+    globalErrorCallback(err.response.status + (err.response.data && (' ' + JSON.stringify(err.response.data))));
+}
 
 export const retrieveAccessToken = (access_code: string) => {
     const params = new URLSearchParams()

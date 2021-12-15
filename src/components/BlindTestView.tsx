@@ -1,6 +1,6 @@
 import { getStoredBlindTest, computeDistance, cleanValueLight, getSettings, setStoredBlindTest } from "helpers"
 import { useContext, useEffect, useState } from 'react'
-import { launchTrack, stopPlayer, setRepeatMode } from "../services/SpotifyAPI"
+import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Guessable } from "./data/BlindTestData"
@@ -44,6 +44,7 @@ const BlindTestView = () => {
   const [scores, setScores] = useState(bt.scores);
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [guesses, setGuesses] = useState<GuessType[]>([]);
   const [guessables, setGuessables] = useState<Guessable[]>([]);
   const [coverUri, setCoverUri] = useState('');
@@ -125,12 +126,14 @@ const BlindTestView = () => {
     setGuesses(newGuesses);
   }
 
-  const handleStop = () => {
-    backupState();
-    stopPlayer(settings.deviceId);
-    setGuessables([]);
-    setGuesses([]);
-    setPlaying(false);
+  const handlePause = () => {
+    pausePlayer(settings.deviceId);
+    setPaused(true);
+  }
+
+  const handleResume = () => {
+    resumePlayer(settings.deviceId);
+    setPaused(false);
   }
 
   const handleNextSong = async () => {
@@ -145,6 +148,7 @@ const BlindTestView = () => {
       setGuesses(new Array(track.artists.length + 1).fill({ guessed: false }));
       setCoverUri(track.img);
       setPlaying(true);
+      setPaused(false);
       setLoading(false);
     }).catch(() => {
       setLoading(false);
@@ -232,13 +236,22 @@ const BlindTestView = () => {
         </div>
         <div className="col-md-6">
           <div id="player" className="mb-2" style={{ display: 'flex' }}>
-            <Button style={{ flexGrow: 4 }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="outline-secondary" size="sm" onClick={handleNextSong} title="Next">
+            <Button style={{ width: '38%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="outline-secondary" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
             &nbsp;
-            <Button style={{ flexGrow: 4 }} id="stopButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handleStop} title="Stop">
-              <FontAwesomeIcon icon={['fas', 'stop']} color="#84BD00" size="sm" /> STOP
-            </Button>
+            {
+              paused &&
+              <Button style={{ width: '38%' }} id="resumeButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handleResume} title="Resume">
+                <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
+              </Button>
+            }
+            {
+              !paused &&
+              <Button style={{ width: '38%' }} id="pauseButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handlePause} title="Pause">
+                <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
+              </Button>
+            }
             &nbsp;
             <Button style={{ flexGrow: 1 }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="outline-secondary" size="sm" onClick={handleReveal} title="Reveal">
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
