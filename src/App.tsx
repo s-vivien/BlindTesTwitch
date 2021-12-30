@@ -4,7 +4,7 @@ import { useEffect, useState, createContext } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { setGlobalErrorCallback } from './services/axios';
+import { setAxiosErrorCallback } from './services/axios';
 import { getRefreshToken, getSettings, hasStoredBlindTest } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
@@ -26,7 +26,7 @@ function App() {
   const contextValue = { loggedIn, setLoggedIn, configured, setConfigured, ongoingBt, setOngoingBt, subtitle, setSubtitle };
 
   useEffect(() => {
-    setGlobalErrorCallback((msg: string) => { setErrorMessage(msg); });
+    setAxiosErrorCallback((msg: string) => { setErrorMessage(msg); });
   }, []);
 
   useEffect(() => {

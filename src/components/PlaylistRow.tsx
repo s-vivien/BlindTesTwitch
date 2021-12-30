@@ -1,8 +1,8 @@
 import TracksBaseData from "./data/TracksBaseData"
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { BlindTestData } from "./data/BlindTestData"
-import { setStoredBlindTest } from "../helpers"
+import { BlindTestTracks } from "./data/BlindTestData"
+import { setBlindTestTracks } from "../helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react"
 import { BlindTestContext } from "App"
@@ -14,8 +14,8 @@ const PlaylistRow = (props: any) => {
 
   const exportPlaylist = async () => {
     const tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
-    const bt = new BlindTestData(tracks);
-    setStoredBlindTest(bt);
+    const bt = new BlindTestTracks(tracks);
+    setBlindTestTracks(bt);
     setOngoingBt(true);
     navigate("/");
   }

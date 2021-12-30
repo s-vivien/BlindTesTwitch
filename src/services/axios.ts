@@ -7,10 +7,10 @@ const instance = axios.create({
     }
 });
 
-let globalErrorCallback: (msg: string) => void = () => { };
+let axiosErrorCallback: (msg: string) => void = () => { };
 
-export const setGlobalErrorCallback = (callback: (msg: string) => void) => {
-    globalErrorCallback = callback;
+export const setAxiosErrorCallback = (callback: (msg: string) => void) => {
+    axiosErrorCallback = callback;
 }
 
 instance.interceptors.response.use(
@@ -55,7 +55,7 @@ instance.interceptors.response.use(
 )
 
 const displayError = (err: any) => {
-    globalErrorCallback(err.response.status + (err.response.data && (' ' + JSON.stringify(err.response.data))));
+    axiosErrorCallback(err.response.status + (err.response.data && (' ' + JSON.stringify(err.response.data))));
 }
 
 export const retrieveAccessToken = (access_code: string) => {

@@ -1,4 +1,4 @@
-import { BlindTestData } from "components/data/BlindTestData"
+import { BlindTestTracks } from "components/data/BlindTestData"
 import { deserialize, serialize } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
@@ -51,7 +51,7 @@ export const removeAccessToken = () => {
 }
 
 export const hasStoredBlindTest = () => {
-  return localStorage.getItem("blind_test") !== null
+  return localStorage.getItem("blind_test_tracks") !== null
 }
 
 export const getSettings = () => {
@@ -66,18 +66,33 @@ export const setSettings = (data: SettingsData) => {
   localStorage.setItem("settings", serialize(data))
 }
 
-export const getStoredBlindTest = () => {
-  let bt = deserialize(BlindTestData, localStorage.getItem("blind_test") || "{}")
-  bt.scores = new Map(Object.entries(bt.scores)) // ugly workaround because class-transformer deserialize maps to plain objects ...
+export const getBlindTestScores = () => {
+  // ugly workaround because class-transformer deserialize maps to plain objects ...
+  let scores: Map<string, number> = new Map(Object.entries(JSON.parse(localStorage.getItem("blind_test_scores") || "{}")));
+  return scores;
+}
+
+export const removeBlindTestScores = () => {
+  localStorage.removeItem("blind_test_scores")
+}
+
+export const setBlindTestScores = (scores: Map<string, number>) => {
+  console.log(scores);
+  console.log(serialize(scores));
+  localStorage.setItem("blind_test_scores", serialize(scores));
+}
+
+export const getBlindTestTracks = () => {
+  let bt = deserialize(BlindTestTracks, localStorage.getItem("blind_test_tracks") || "{}")
   return bt
 }
 
-export const removeStoredBlindTest = () => {
-  localStorage.removeItem("blind_test")
+export const removeBlindTestTracks = () => {
+  localStorage.removeItem("blind_test_tracks")
 }
 
-export const setStoredBlindTest = (data: BlindTestData) => {
-  localStorage.setItem("blind_test", serialize(data))
+export const setBlindTestTracks = (data: BlindTestTracks) => {
+  localStorage.setItem("blind_test_tracks", serialize(data))
 }
 
 // light clean + trailing parts (- X || (X))

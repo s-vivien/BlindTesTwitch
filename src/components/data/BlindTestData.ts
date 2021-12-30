@@ -28,10 +28,9 @@ export class BlindTestTrack {
     }
 }
 
-export class BlindTestData {
+export class BlindTestTracks {
     tracks: BlindTestTrack[] = []
     doneTracks: number = 0
-    scores: Map<string, number> = new Map()
 
     constructor(spotTracks: any[]) {
         if (spotTracks) {

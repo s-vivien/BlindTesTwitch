@@ -1,4 +1,4 @@
-import { getStoredBlindTest, computeDistance, cleanValueLight, getSettings, setStoredBlindTest } from "helpers"
+import { getBlindTestTracks, getBlindTestScores, computeDistance, cleanValueLight, getSettings, setBlindTestTracks, setBlindTestScores } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button } from "react-bootstrap"
@@ -38,10 +38,10 @@ const BlindTestView = () => {
 
   const { setSubtitle } = useContext(BlindTestContext);
 
-  const [bt] = useState(() => getStoredBlindTest());
+  const [bt] = useState(() => getBlindTestTracks());
   const [settings] = useState(() => getSettings());
   const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
-  const [scores, setScores] = useState(bt.scores);
+  const [scores, setScores] = useState(() => getBlindTestScores());
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -67,9 +67,9 @@ const BlindTestView = () => {
   }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
 
   const backupState = () => {
-    bt.scores = scores;
     bt.doneTracks = doneTracks;
-    setStoredBlindTest(bt);
+    setBlindTestTracks(bt);
+    setBlindTestScores(scores);
   }
 
   const onProposition = (nick: string, message: string) => {
