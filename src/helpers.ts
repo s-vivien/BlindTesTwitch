@@ -90,6 +90,15 @@ export const cleanValueLight = (value: string) => {
   return value.toLowerCase().normalize("NFD").replaceAll(/\p{Diacritic}/gu, "").replaceAll(/[,!?:;.]/g, "").trim()
 }
 
+export const cleanSpoiler = (title: string, artists: string[]) => {
+  let cleaned = title;
+  for (let artist of artists) {
+    var regExp = new RegExp(` \\(.*${artist}.*\\)| - .*${artist}.*`, "gi");
+    cleaned = cleaned.replaceAll(regExp, "").trim();
+  }
+  return cleaned;
+}
+
 export const getMaxDist = (value: string) => {
   return Math.floor(Math.max(0, value.length - 3) / 6);
 }
