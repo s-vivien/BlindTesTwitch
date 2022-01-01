@@ -102,7 +102,7 @@ export const cleanValue = (value: string) => {
 
 // lower-case + remove diacritic + remove some special characters
 export const cleanValueLight = (value: string) => {
-  return value.toLowerCase().normalize("NFD").replaceAll(/\p{Diacritic}/gu, "").replaceAll(/[,!?:;.]/g, "").trim()
+  return value.toLowerCase().normalize("NFD").replaceAll(/\p{Diacritic}/gu, "").replaceAll(/[,!?:;.]/g, "").replaceAll("’", "'").trim()
 }
 
 export const cleanSpoiler = (title: string, artists: string[]) => {
