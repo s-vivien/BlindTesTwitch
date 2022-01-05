@@ -4,7 +4,7 @@ import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../servic
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Guessable } from "./data/BlindTestData"
-import { Client } from "tmi.js"
+import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
 
 type DisplayableScoreType = {
@@ -22,8 +22,15 @@ type GuessType = {
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 
-const twitchConnection = (chan: string) => {
-  twitchClient = new Client({ channels: [chan] });
+const twitchConnection = (chan: string, chatNotifications: boolean) => {
+  let opts: Options = { channels: [chan] };
+  if (chatNotifications) {
+    opts.identity = {
+      username: process.env.REACT_APP_TWITCH_USERNAME,
+      password: process.env.REACT_APP_TWITCH_OAUTH_TOKEN
+    }
+  }
+  twitchClient = new Client(opts);
   twitchClient.connect();
   twitchClient.on('message', (_channel: any, _tags: any, _message: any) => twitchCallback(_tags['display-name'], _message));
 }
@@ -50,7 +57,7 @@ const BlindTestView = () => {
   const [coverUri, setCoverUri] = useState('');
 
   useEffect(() => {
-    twitchConnection(settings.twitchChannel);
+    twitchConnection(settings.twitchChannel, settings.chatNotifications);
     return () => {
       twitchDisconnection();
     }
@@ -85,6 +92,7 @@ const BlindTestView = () => {
           const points = 1 + (guesses.find((g) => g.guessed && g.guessedBy === nick) ? 1 : 0);
           addPointToPlayer(nick, points);
           updateGuessState(i, nick, points);
+          twitchClient?.say(settings.twitchChannel, `✅ ${nick} correctly guessed [${guessable.toGuess}] +${points}`)
         }
       }
     }

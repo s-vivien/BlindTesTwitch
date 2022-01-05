@@ -23,7 +23,7 @@ const ResetGameButton = () => {
         <div className="spot-modal-bg">
           <Alert className="spot-modal" variant="secondary" >
             <p>
-              Do you want to keep scores ?
+              Do you want to keep the scores ?
             </p>
             <div className="d-flex justify-content-center">
               <Button className="mr-2" onClick={() => handleClick(true)} >

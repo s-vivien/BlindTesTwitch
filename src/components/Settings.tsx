@@ -17,6 +17,7 @@ const Settings = () => {
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
+  const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
   const [channel, setChannel] = useState(settings.twitchChannel || '');
 
@@ -36,7 +37,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setSettings(new SettingsData(channel, selectedDevice, addEveryUser));
+      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, chatNotifications));
       setConfigured(true);
       navigate("/");
     }
@@ -57,6 +58,9 @@ const Settings = () => {
               <option value="">Select device...</option>
               {devices.map((d) => <option key={d.id} value={d.id}>{d.name} ({d.type})</option>)}
             </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="formGroupChatNotifications">
+            <Form.Check disabled={!process.env.REACT_APP_TWITCH_OAUTH_TOKEN} type="checkbox" checked={process.env.REACT_APP_TWITCH_OAUTH_TOKEN !== '' && chatNotifications} label="Display guess notifications in the chat" onChange={(e) => { setChatNotifications(e.target.checked) }} />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAddEveryUser">
             <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked) }} />
