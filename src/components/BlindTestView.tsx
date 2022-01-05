@@ -1,7 +1,7 @@
 import { getBlindTestTracks, getBlindTestScores, computeDistance, cleanValueLight, getSettings, setBlindTestTracks, setBlindTestScores } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
-import { Button } from "react-bootstrap"
+import { Button, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Guessable } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
@@ -49,6 +49,7 @@ const BlindTestView = () => {
   const [settings] = useState(() => getSettings());
   const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
   const [scores, setScores] = useState(() => getBlindTestScores());
+  const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -186,10 +187,12 @@ const BlindTestView = () => {
   const computeFlatScores = () => {
     let flat: DisplayableScoreType[] = []
     scores.forEach((_val: number, _key: string) => {
-      flat.push({
-        nick: _key,
-        score: _val
-      })
+      if (!nickFilter || _key.toLowerCase().includes(nickFilter)) {
+        flat.push({
+          nick: _key,
+          score: _val
+        })
+      }
     })
     flat.sort((a, b) => a.nick.localeCompare(b.nick))
     flat.sort((a, b) => b.score - a.score)
@@ -245,26 +248,28 @@ const BlindTestView = () => {
         </div>
         <div className="col-md-6">
           <div id="player" className="mb-2" style={{ display: 'flex' }}>
-            <Button style={{ width: '38%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="outline-secondary" size="sm" onClick={handleNextSong} title="Next">
+            <Button style={{ width: '30%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="outline-secondary" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
             &nbsp;
             {
               paused &&
-              <Button style={{ width: '38%' }} id="resumeButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handleResume} title="Resume">
+              <Button style={{ width: '30%' }} id="resumeButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handleResume} title="Resume">
                 <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
               </Button>
             }
             {
               !paused &&
-              <Button style={{ width: '38%' }} id="pauseButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handlePause} title="Pause">
+              <Button style={{ width: '30%' }} id="pauseButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handlePause} title="Pause">
                 <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
               </Button>
             }
             &nbsp;
-            <Button style={{ flexGrow: 1 }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="outline-secondary" size="sm" onClick={handleReveal} title="Reveal">
+            <Button style={{ width: '30%' }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="outline-secondary" size="sm" onClick={handleReveal} title="Reveal">
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
+            &nbsp;
+            <FormControl value={nickFilter} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} className="border" />
           </div>
           <div id="leaderboard" className="p-3 bg-light border rounded-3">
             <table className="table-hover bt-t">
