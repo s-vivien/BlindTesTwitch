@@ -9,8 +9,9 @@ import { getRefreshToken, getSettings, hasStoredBlindTest } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import PlaylistTable from './components/PlaylistTable';
-import ResetGameButton from './components/ResetGameButton';
+import PlaylistsButton from './components/PlaylistsButton';
 import LogoutButton from './components/LogoutButton';
+import SettingsButton from 'components/SettingsButton';
 import BlindTestView from './components/BlindTestView';
 import LoginCallback from './components/LoginCallback';
 
@@ -66,8 +67,8 @@ function App() {
         }
         <header className="App-header">
           <div style={{ position: 'absolute', right: 0 }}>
-            {ongoingBt && <ResetGameButton />}
-            {loggedIn && <Button id="settingButton" className="topButtons" type="submit" variant="link" size="lg" onClick={() => { navigate('/settings'); }} title="Settings"><FontAwesomeIcon icon={['fas', 'cog']} size="lg" /></Button>}
+            {ongoingBt && <PlaylistsButton />}
+            {loggedIn && <SettingsButton />}
             {loggedIn && <LogoutButton />}
           </div>
           <h1>

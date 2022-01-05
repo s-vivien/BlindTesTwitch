@@ -1,18 +1,30 @@
 import TracksBaseData from "./data/TracksBaseData"
-import { Button } from "react-bootstrap"
+import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTracks } from "./data/BlindTestData"
-import { setBlindTestTracks } from "../helpers"
+import { setBlindTestTracks, removeBlindTestScores, getBlindTestScores } from "../helpers"
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { BlindTestContext } from "App"
 
 const PlaylistRow = (props: any) => {
 
   const { setOngoingBt } = useContext(BlindTestContext);
+  const [confirmationDisplayed, setConfirmationDisplayed] = useState(false);
   const navigate = useNavigate();
 
-  const exportPlaylist = async () => {
+  const selectPlaylist = async () => {
+    if (getBlindTestScores().size > 0) {
+      setConfirmationDisplayed(true);
+    } else {
+      loadPlaylist(false);
+    }
+  }
+
+  const loadPlaylist = async (keepScores: boolean) => {
+    if (!keepScores) {
+      removeBlindTestScores();
+    }
     const tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     const bt = new BlindTestTracks(tracks);
     setBlindTestTracks(bt);
@@ -43,18 +55,40 @@ const PlaylistRow = (props: any) => {
   );
 
   return (
-    <tr key={playlist.uri}>
-      <td>{MusicIcon}</td>
-      <td><a href={playlist.uri}>{playlist.name}</a></td>
-      <td><a href={playlist.owner.uri}>{playlist.owner.display_name}</a></td>
-      <td>{playlist.tracks.total}</td>
-      <td>{renderTickCross(playlist.public)}</td>
-      <td className="text-right">
-        <Button type="submit" variant="primary" onClick={exportPlaylist} className="text-nowrap btn-xs">
-          <FontAwesomeIcon icon={['fas', 'play-circle']} size="sm" /> Select
-        </Button>
-      </td>
-    </tr>
+    <>
+      {confirmationDisplayed &&
+        <div className="spot-modal-bg">
+          <Alert className="spot-modal" variant="secondary" >
+            <p>
+              Do you want to reset the leaderboard scores ?
+            </p>
+            <div className="d-flex justify-content-center">
+              <Button className="mr-2" onClick={() => loadPlaylist(false)} >
+                Yes
+              </Button>
+              <Button className="mr-2" onClick={() => loadPlaylist(true)} variant="danger">
+                No
+              </Button>
+              <Button onClick={() => setConfirmationDisplayed(false)} variant="secondary">
+                Cancel
+              </Button>
+            </div>
+          </Alert>
+        </div>
+      }
+      <tr key={playlist.uri}>
+        <td>{MusicIcon}</td>
+        <td><a href={playlist.uri}>{playlist.name}</a></td>
+        <td><a href={playlist.owner.uri}>{playlist.owner.display_name}</a></td>
+        <td>{playlist.tracks.total}</td>
+        <td>{renderTickCross(playlist.public)}</td>
+        <td className="text-right">
+          <Button type="submit" variant="primary" onClick={selectPlaylist} className="text-nowrap btn-xs">
+            <FontAwesomeIcon icon={['fas', 'play-circle']} size="sm" /> Select
+          </Button>
+        </td>
+      </tr>
+    </>
   );
 };
 
