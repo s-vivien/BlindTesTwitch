@@ -191,6 +191,7 @@ const BlindTestView = () => {
         score: _val
       })
     })
+    flat.sort((a, b) => a.nick.localeCompare(b.nick))
     flat.sort((a, b) => b.score - a.score)
     let rank = 0
     for (let i = 0; i < flat.length; i++) {
