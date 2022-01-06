@@ -1,4 +1,4 @@
-import { getSettings, setSettings } from "helpers"
+import { getSettings, getTwitchOAuthToken, setSettings, getAppHomeURL, setTwitchOAuthToken, getHashParam, removeTwitchOAuthToken } from "helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react'
 import { getDevices } from "services/SpotifyAPI"
@@ -17,11 +17,27 @@ const Settings = () => {
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
+  const [loggedInTwitch, setLoggedInTwitch] = useState<boolean>(() => getTwitchOAuthToken() !== null);
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
   const [channel, setChannel] = useState(settings.twitchChannel || '');
 
+  const twitchLoginURI = "https://id.twitch.tv/oauth2/authorize" +
+    "?client_id=" + process.env.REACT_APP_TWITCH_CLIENT_ID +
+    "&redirect_uri=" + getAppHomeURL() + "/settings" +
+    "&scope=chat:read+chat:edit+channel:moderate+whispers:read+whispers:edit+channel_editor" +
+    "&response_type=token";
+
   useEffect(() => {
+    console.log("main useEffect");
+    // Twitch logging callback
+    const token = getHashParam('access_token')
+    if (token) {
+      setTwitchOAuthToken(token);
+      setLoggedInTwitch(true);
+      navigate("/settings");
+    }
+
     setSubtitle('Settings');
     getDevices().then(response => {
       setDevices(response.data.devices);
@@ -32,6 +48,11 @@ const Settings = () => {
       setInitialized(true);
     })
   }, []);
+
+  const twitchLogout = () => {
+    removeTwitchOAuthToken();
+    setLoggedInTwitch(false);
+  }
 
   const submit = (e: any) => {
     e.preventDefault();
@@ -60,7 +81,21 @@ const Settings = () => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupChatNotifications">
-            <Form.Check disabled={!process.env.REACT_APP_TWITCH_OAUTH_TOKEN} type="checkbox" checked={process.env.REACT_APP_TWITCH_OAUTH_TOKEN !== '' && chatNotifications} label="Display guess notifications in the chat" onChange={(e) => { setChatNotifications(e.target.checked) }} />
+            <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Display guess notifications in the chat" onChange={(e) => { setChatNotifications(e.target.checked) }} />
+            {process.env.REACT_APP_TWITCH_CLIENT_ID &&
+              <>
+                {!loggedInTwitch &&
+                  <Form.Text id="twitchLoginBlock" muted>
+                    You need to log in to twitch to use that feature. <a href={twitchLoginURI}>Click here to log in</a>
+                  </Form.Text>
+                }
+                {loggedInTwitch &&
+                  <Form.Text id="twitchLogoutBlock" onClick={twitchLogout} muted>
+                    <a href="#">Log out from twitch</a>
+                  </Form.Text>
+                }
+              </>
+            }
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAddEveryUser">
             <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked) }} />

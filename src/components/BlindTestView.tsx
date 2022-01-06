@@ -1,4 +1,4 @@
-import { getBlindTestTracks, getBlindTestScores, computeDistance, cleanValueLight, getSettings, setBlindTestTracks, setBlindTestScores } from "helpers"
+import { getBlindTestTracks, getBlindTestScores, computeDistance, cleanValueLight, getSettings, setBlindTestTracks, setBlindTestScores, getTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, FormControl } from "react-bootstrap"
@@ -26,8 +26,8 @@ const twitchConnection = (chan: string, chatNotifications: boolean) => {
   let opts: Options = { channels: [chan] };
   if (chatNotifications) {
     opts.identity = {
-      username: process.env.REACT_APP_TWITCH_USERNAME,
-      password: process.env.REACT_APP_TWITCH_OAUTH_TOKEN
+      username: 'foo',
+      password: getTwitchOAuthToken() || ""
     }
   }
   twitchClient = new Client(opts);

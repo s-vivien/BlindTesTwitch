@@ -8,9 +8,17 @@ export const getAppHomeURL = () => {
 }
 
 export const getQueryParam = (name: string) => {
+  return getParam(name, window.location.search);
+}
+
+export const getHashParam = (name: string) => {
+  return getParam(name, window.location.hash);
+}
+
+const getParam = (name: string, value: string) => {
   name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]")
-  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-    results = regex.exec(window.location.search)
+  var regex = new RegExp("[\\?&#]" + name + "=([^&#]*)"),
+    results = regex.exec(value)
   return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
 }
 
@@ -24,6 +32,19 @@ export const consumePkcePair = () => {
   const codePair: PKCECodePair = deserialize(PKCECodePair, localStorage.getItem("pkce_pair") || "{}")
   localStorage.removeItem("pkce_pair")
   return codePair
+}
+
+export const getTwitchOAuthToken = () => {
+  console.log("getTwitchOAuthToken");
+  return localStorage.getItem("twitch_oauth_token");
+}
+
+export const setTwitchOAuthToken = (twitch_oauth_token: any) => {
+  localStorage.setItem("twitch_oauth_token", twitch_oauth_token)
+}
+
+export const removeTwitchOAuthToken = () => {
+  localStorage.removeItem("twitch_oauth_token")
 }
 
 export const getRefreshToken = () => {
@@ -77,8 +98,6 @@ export const removeBlindTestScores = () => {
 }
 
 export const setBlindTestScores = (scores: Map<string, number>) => {
-  console.log(scores);
-  console.log(serialize(scores));
   localStorage.setItem("blind_test_scores", serialize(scores));
 }
 
