@@ -72,7 +72,7 @@ function App() {
             {loggedIn && <LogoutButton />}
           </div>
           <h1>
-            <FontAwesomeIcon icon={['fab', 'spotify']} color="#84BD00" size="sm" /> <a href="/">BlindTesTwitch</a>
+            <FontAwesomeIcon icon={['fab', 'spotify']} color="#84BD00" size="sm" /> <a href={process.env.PUBLIC_URL}>BlindTesTwitch</a>
           </h1>
 
           <p id="subtitle" className="lead text-secondary">
@@ -81,8 +81,8 @@ function App() {
         </header>
         <Routes>
           <Route path="/" element={view} />
-          <Route path="callback" element={<LoginCallback />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="/callback" element={<LoginCallback />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </BlindTestContext.Provider>

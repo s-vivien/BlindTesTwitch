@@ -29,7 +29,6 @@ const Settings = () => {
     "&response_type=token";
 
   useEffect(() => {
-    console.log("main useEffect");
     // Twitch logging callback
     const token = getHashParam('access_token')
     if (token) {

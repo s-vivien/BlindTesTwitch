@@ -4,7 +4,7 @@ import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
 
 export const getAppHomeURL = () => {
-  return new URL(window.location.href).origin
+  return new URL(window.location.href).origin + process.env.PUBLIC_URL;
 }
 
 export const getQueryParam = (name: string) => {
@@ -35,7 +35,6 @@ export const consumePkcePair = () => {
 }
 
 export const getTwitchOAuthToken = () => {
-  console.log("getTwitchOAuthToken");
   return localStorage.getItem("twitch_oauth_token");
 }
 
