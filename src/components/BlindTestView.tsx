@@ -186,21 +186,26 @@ const BlindTestView = () => {
 
   const computeFlatScores = () => {
     let flat: DisplayableScoreType[] = []
+    let distinctScores: number[] = [];
     scores.forEach((_val: number, _key: string) => {
-      if (!nickFilter || _key.toLowerCase().includes(nickFilter)) {
-        flat.push({
-          nick: _key,
-          score: _val
-        })
+      flat.push({
+        nick: _key,
+        score: _val
+      })
+      if (!distinctScores.includes(_val)) {
+        distinctScores.push(_val);
       }
     })
+    distinctScores.sort((a, b) => b - a);
     flat.sort((a, b) => a.nick.localeCompare(b.nick))
     flat.sort((a, b) => b.score - a.score)
-    let rank = 0
+    if (nickFilter) {
+      flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
+    }
+    // Display rank only for the first of each group
     for (let i = 0; i < flat.length; i++) {
       if (i === 0 || flat[i].score !== flat[i - 1].score) {
-        rank++
-        flat[i].rank = rank
+        flat[i].rank = 1 + distinctScores.indexOf(flat[i].score);
       }
     }
     return flat;
