@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/BlindTesTwitch/static/css/main.c3c6a1f9.chunk.css",
+    "main.js": "/BlindTesTwitch/static/js/main.2adfa8de.chunk.js",
+    "runtime-main.js": "/BlindTesTwitch/static/js/runtime-main.fa18c12f.js",
+    "static/js/2.545118e5.chunk.js": "/BlindTesTwitch/static/js/2.545118e5.chunk.js",
+    "static/js/3.bca2b8a3.chunk.js": "/BlindTesTwitch/static/js/3.bca2b8a3.chunk.js",
+    "index.html": "/BlindTesTwitch/index.html",
+    "static/js/2.545118e5.chunk.js.LICENSE.txt": "/BlindTesTwitch/static/js/2.545118e5.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.fa18c12f.js",
+    "static/js/2.545118e5.chunk.js",
+    "static/css/main.c3c6a1f9.chunk.css",
+    "static/js/main.2adfa8de.chunk.js"
+  ]
+}
