@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/BlindTesTwitch/static/css/main.624ad30a.chunk.css",
-    "main.js": "/BlindTesTwitch/static/js/main.60d2a2c0.chunk.js",
-    "main.js.map": "/BlindTesTwitch/static/js/main.60d2a2c0.chunk.js.map",
+    "main.js": "/BlindTesTwitch/static/js/main.d88795bd.chunk.js",
+    "main.js.map": "/BlindTesTwitch/static/js/main.d88795bd.chunk.js.map",
     "runtime-main.js": "/BlindTesTwitch/static/js/runtime-main.fa18c12f.js",
     "runtime-main.js.map": "/BlindTesTwitch/static/js/runtime-main.fa18c12f.js.map",
     "static/js/2.545118e5.chunk.js": "/BlindTesTwitch/static/js/2.545118e5.chunk.js",
@@ -17,6 +17,6 @@
     "static/js/runtime-main.fa18c12f.js",
     "static/js/2.545118e5.chunk.js",
     "static/css/main.624ad30a.chunk.css",
-    "static/js/main.60d2a2c0.chunk.js"
+    "static/js/main.d88795bd.chunk.js"
   ]
 }
