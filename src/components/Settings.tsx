@@ -25,7 +25,7 @@ const Settings = () => {
   const twitchLoginURI = "https://id.twitch.tv/oauth2/authorize" +
     "?client_id=" + process.env.REACT_APP_TWITCH_CLIENT_ID +
     "&redirect_uri=" + getAppHomeURL() + "/settings" +
-    "&scope=chat:read+chat:edit+channel:moderate+whispers:read+whispers:edit+channel_editor" +
+    "&scope=chat:read+chat:edit" +
     "&response_type=token";
 
   useEffect(() => {
