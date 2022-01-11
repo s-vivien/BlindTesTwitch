@@ -22,8 +22,8 @@ const getParam = (name: string, value: string) => {
   return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
 }
 
-export const computePkcePair = () => {
-  const codePair: PKCECodePair = createPKCECodes()
+export const computePkcePair = async () => {
+  const codePair: PKCECodePair = await createPKCECodes()
   localStorage.setItem("pkce_pair", serialize(codePair))
   return codePair
 }

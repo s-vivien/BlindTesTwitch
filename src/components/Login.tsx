@@ -12,7 +12,7 @@ const Login = () => {
     setSubtitle('Play Blind-Test on Twitch !');
   }, [setSubtitle]);
 
-  const authorize = () => {
+  const authorize = async () => {
     const pkcePair = computePkcePair()
     window.location.href = "https://accounts.spotify.com/authorize" +
       "?client_id=" + process.env.REACT_APP_SPOTIFY_CLIENT_ID +
@@ -20,7 +20,7 @@ const Login = () => {
       "&scope=playlist-read-private%20user-modify-playback-state%20user-read-playback-state" +
       "&response_type=code" +
       "&code_challenge_method=S256" +
-      "&code_challenge=" + pkcePair.codeChallenge +
+      "&code_challenge=" + (await pkcePair).codeChallenge +
       "&show_dialog=true";
   }
 
