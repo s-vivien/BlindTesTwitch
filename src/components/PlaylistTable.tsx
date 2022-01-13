@@ -1,5 +1,3 @@
-import './PlaylistTable.scss'
-
 import { useContext, useEffect, useState } from 'react'
 import { FormControl, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"

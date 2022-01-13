@@ -1,11 +1,10 @@
-import './App.scss';
 import './icons';
 import { useEffect, useState, createContext } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/axios';
-import { getRefreshToken, getSettings, hasStoredBlindTest } from './helpers';
+import { getRefreshToken, getSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import PlaylistTable from './components/PlaylistTable';
@@ -18,6 +17,7 @@ import LoginCallback from './components/LoginCallback';
 function App() {
   const navigate = useNavigate();
 
+  const [theme, setTheme] = useState(() => getStoredTheme());
   const [loggedIn, setLoggedIn] = useState(() => getRefreshToken() !== null);
   const [configured, setConfigured] = useState(() => getSettings().isInitialized());
   const [ongoingBt, setOngoingBt] = useState(() => hasStoredBlindTest());
@@ -42,14 +42,26 @@ function App() {
     }
   }, [navigate, loggedIn, configured, ongoingBt]);
 
+  useEffect(() => {
+    for (let name of themeNames) {
+      document.documentElement.classList.remove(name);
+    }
+    document.documentElement.classList.add(themeNames[theme]);
+  }, [theme]);
+
   const onPopupClose = () => {
     setErrorMessage('');
     navigate('/');
   };
 
+  const toggleTheme = () => {
+    setStoredTheme(1 - theme);
+    setTheme(1 - theme);
+  }
+
   return (
     <BlindTestContext.Provider value={contextValue}>
-      <div className="App container">
+      <div className={"App container"} >
         {errorMessage &&
           <div className="spot-modal-bg">
             <Alert className="spot-modal" variant="danger" >
@@ -67,6 +79,9 @@ function App() {
         }
         <header className="App-header">
           <div style={{ position: 'absolute', right: 0 }}>
+            <Button id="toggleButton" className="topButtons" type="submit" variant="link" size="lg" onClick={toggleTheme} title="Switch theme">
+              <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
+            </Button>
             {ongoingBt && <PlaylistsButton />}
             {loggedIn && <SettingsButton />}
             {loggedIn && <LogoutButton />}
@@ -85,7 +100,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
-    </BlindTestContext.Provider>
+    </BlindTestContext.Provider >
   );
 }
 

@@ -34,6 +34,16 @@ export const consumePkcePair = () => {
   return codePair
 }
 
+export const getStoredTheme = () => {
+  return +(localStorage.getItem("theme") || 0);
+}
+
+export const themeNames = ['light', 'dark'];
+
+export const setStoredTheme = (theme: any) => {
+  localStorage.setItem("theme", theme)
+}
+
 export const getTwitchOAuthToken = () => {
   return localStorage.getItem("twitch_oauth_token");
 }

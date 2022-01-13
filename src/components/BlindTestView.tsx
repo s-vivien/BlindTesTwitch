@@ -11,35 +11,16 @@ type DisplayableScoreType = {
   nick: string,
   rank?: number,
   score: number
-}
+};
 
 type GuessType = {
   guessed: boolean,
   guessedBy?: string,
   points?: number
-}
+};
 
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
-
-const twitchConnection = (chan: string, chatNotifications: boolean) => {
-  let opts: Options = { channels: [chan] };
-  if (chatNotifications) {
-    opts.identity = {
-      username: 'foo',
-      password: getTwitchOAuthToken() || ""
-    }
-  }
-  twitchClient = new Client(opts);
-  twitchClient.connect();
-  twitchClient.on('message', (_channel: any, _tags: any, _message: any) => twitchCallback(_tags['display-name'], _message));
-}
-
-const twitchDisconnection = () => {
-  if (twitchClient !== null) {
-    twitchClient.disconnect();
-  }
-}
 
 const BlindTestView = () => {
 
@@ -73,6 +54,27 @@ const BlindTestView = () => {
       setSubtitle('Blind-test is finished !');
     }
   }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
+
+  const twitchConnection = (chan: string, chatNotifications: boolean) => {
+    console.log("Twitch connection");
+    let opts: Options = { channels: [chan] };
+    if (chatNotifications) {
+      opts.identity = {
+        username: 'foo',
+        password: getTwitchOAuthToken() || ""
+      }
+    }
+    twitchClient = new Client(opts);
+    twitchClient.connect();
+    twitchClient.on('message', (_channel: any, _tags: any, _message: any) => twitchCallback(_tags['display-name'], _message));
+  }
+  
+  const twitchDisconnection = () => {
+    console.log("Twitch DISconnection");
+    if (twitchClient !== null) {
+      twitchClient.disconnect();
+    }
+  }
 
   const backupState = () => {
     bt.doneTracks = doneTracks;
@@ -215,8 +217,8 @@ const BlindTestView = () => {
     <div id="blindtest">
       <div className="row align-items-md-stretch mb-4">
         <div className="col-md-6">
-          <div id="title" className="p-3 mb-2 bg-light border rounded-3" >
-            <div id="cover">
+          <div id="title" className="p-3 mb-2 bt-panel border rounded-3" >
+            <div id="cover" className="cover">
               {allGuessed() &&
                 <img id="cover-image" src={coverUri} alt="album cover" />
               }
@@ -228,7 +230,7 @@ const BlindTestView = () => {
               }
             </div>
           </div>
-          <div id="title" className="p-3 mb-2 bg-light border rounded-3" >
+          <div id="title" className="p-3 mb-2 bt-panel border rounded-3" >
             <div className="bt-h">
               <h2>TITLE</h2>
             </div>
@@ -238,7 +240,7 @@ const BlindTestView = () => {
               </div>
             }
           </div>
-          <div id="artists" className="p-3 mb-2 bg-light border rounded-3" >
+          <div id="artists" className="p-3 mb-2 bt-panel border rounded-3" >
             <div className="bt-h">
               <h2>ARTIST(S)</h2>
             </div>
@@ -253,30 +255,30 @@ const BlindTestView = () => {
         </div>
         <div className="col-md-6">
           <div id="player" className="mb-2" style={{ display: 'flex' }}>
-            <Button style={{ width: '30%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="outline-secondary" size="sm" onClick={handleNextSong} title="Next">
+            <Button style={{ width: '30%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="secondary" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
             &nbsp;
             {
               paused &&
-              <Button style={{ width: '30%' }} id="resumeButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handleResume} title="Resume">
+              <Button style={{ width: '30%' }} id="resumeButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handleResume} title="Resume">
                 <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
               </Button>
             }
             {
               !paused &&
-              <Button style={{ width: '30%' }} id="pauseButton" disabled={!playing} type="submit" variant="outline-secondary" size="sm" onClick={handlePause} title="Pause">
+              <Button style={{ width: '30%' }} id="pauseButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handlePause} title="Pause">
                 <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
               </Button>
             }
             &nbsp;
-            <Button style={{ width: '30%' }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="outline-secondary" size="sm" onClick={handleReveal} title="Reveal">
+            <Button style={{ width: '30%' }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="secondary" size="sm" onClick={handleReveal} title="Reveal">
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
             &nbsp;
-            <FormControl value={nickFilter} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} className="border" />
+            <FormControl value={nickFilter} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
           </div>
-          <div id="leaderboard" className="p-3 bg-light border rounded-3">
+          <div id="leaderboard" className="p-3 bt-panel border rounded-3">
             <table className="table-hover bt-t">
               <thead>
                 <tr>
