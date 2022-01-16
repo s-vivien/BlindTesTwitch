@@ -1,22 +1,13 @@
 {
   "files": {
-    "main.css": "/BlindTesTwitch/static/css/main.624ad30a.chunk.css",
-    "main.js": "/BlindTesTwitch/static/js/main.898c1753.chunk.js",
-    "main.js.map": "/BlindTesTwitch/static/js/main.898c1753.chunk.js.map",
-    "runtime-main.js": "/BlindTesTwitch/static/js/runtime-main.fa18c12f.js",
-    "runtime-main.js.map": "/BlindTesTwitch/static/js/runtime-main.fa18c12f.js.map",
-    "static/js/2.545118e5.chunk.js": "/BlindTesTwitch/static/js/2.545118e5.chunk.js",
-    "static/js/2.545118e5.chunk.js.map": "/BlindTesTwitch/static/js/2.545118e5.chunk.js.map",
-    "static/js/3.bca2b8a3.chunk.js": "/BlindTesTwitch/static/js/3.bca2b8a3.chunk.js",
-    "static/js/3.bca2b8a3.chunk.js.map": "/BlindTesTwitch/static/js/3.bca2b8a3.chunk.js.map",
+    "main.css": "/BlindTesTwitch/static/css/main.3e18e418.css",
+    "main.js": "/BlindTesTwitch/static/js/main.7bcf1d4d.js",
     "index.html": "/BlindTesTwitch/index.html",
-    "static/css/main.624ad30a.chunk.css.map": "/BlindTesTwitch/static/css/main.624ad30a.chunk.css.map",
-    "static/js/2.545118e5.chunk.js.LICENSE.txt": "/BlindTesTwitch/static/js/2.545118e5.chunk.js.LICENSE.txt"
+    "main.3e18e418.css.map": "/BlindTesTwitch/static/css/main.3e18e418.css.map",
+    "main.7bcf1d4d.js.map": "/BlindTesTwitch/static/js/main.7bcf1d4d.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.fa18c12f.js",
-    "static/js/2.545118e5.chunk.js",
-    "static/css/main.624ad30a.chunk.css",
-    "static/js/main.898c1753.chunk.js"
+    "static/css/main.3e18e418.css",
+    "static/js/main.7bcf1d4d.js"
   ]
 }
