@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "react-bootstrap";
+
 const Paginator = (props: any) => {
 
   const nextClick = (e: any) => {
@@ -15,23 +18,15 @@ const Paginator = (props: any) => {
   }
 
   return (
-    <nav className="paginator text-right">
-      <ul className="pagination pagination-sm">
-        <li className={props.currentPage <= 1 ? 'page-item disabled' : 'page-item'}>
-          { /* eslint-disable-next-line  */}
-          <a className="page-link" href="#" aria-label="Previous" onClick={prevClick}>
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        <li className={props.currentPage >= totalPages() ? 'page-item disabled' : 'page-item'}>
-          { /* eslint-disable-next-line  */}
-          <a className="page-link" href="#" aria-label="Next" onClick={nextClick}>
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <div className="mr-2">
+      <Button disabled={props.currentPage <= 1} variant="primary" onClick={prevClick} className="ml-1 btn-xs" style={{ height: '100%' }}>
+        <FontAwesomeIcon icon={['fas', 'chevron-left']} size="sm" />
+      </Button>
+      <Button disabled={props.currentPage >= totalPages()} variant="primary" onClick={nextClick} className="ml-1 btn-xs" style={{ height: '100%' }}>
+        <FontAwesomeIcon icon={['fas', 'chevron-right']} size="sm" />
+      </Button>
+    </div>
   )
 }
 
-export default Paginator
+export default Paginator;

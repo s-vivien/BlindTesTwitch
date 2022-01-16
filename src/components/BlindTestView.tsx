@@ -68,7 +68,7 @@ const BlindTestView = () => {
     twitchClient.connect();
     twitchClient.on('message', (_channel: any, _tags: any, _message: any) => twitchCallback(_tags['display-name'], _message));
   }
-  
+
   const twitchDisconnection = () => {
     console.log("Twitch DISconnection");
     if (twitchClient !== null) {
@@ -254,7 +254,7 @@ const BlindTestView = () => {
           </div>
         </div>
         <div className="col-md-6">
-          <div id="player" className="mb-2" style={{ display: 'flex' }}>
+          <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
             <Button style={{ width: '30%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="secondary" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
@@ -289,8 +289,8 @@ const BlindTestView = () => {
                 </tr>
               </thead>
               <tbody>
-                {computeFlatScores().map((sc, index) => {
-                  return <tr key={"score_" + index}>
+                {computeFlatScores().map((sc) => {
+                  return <tr key={sc.nick}>
                     <td>{sc.rank}</td>
                     <td>{sc.nick}</td>
                     <td>{sc.score}</td>

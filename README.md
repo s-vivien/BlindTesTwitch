@@ -3,7 +3,7 @@
 A **Blind-Test** web-application written in React, using Spotify/Twitch APIs
 
 <kbd>
-    <img src="https://i.imgur.com/9tq4Xqp.gif" />
+    <img src="https://i.imgur.com/4FUPqW1.gif" />
 </kbd>
 
 ## Description
@@ -24,7 +24,3 @@ The Spotify app is mandatory : https://developer.spotify.com/dashboard/ (set red
 The Twitch app is optional (the chat notifications won't be available, but that does not prevent the application from working) : https://dev.twitch.tv/console/apps (set redirect URI to `https://<domain>/BlindTesTwitch/settings`)   
 
 Note : The application can be deployed on Github Pages, thanks to https://github.com/rafgraph/spa-github-pages
-
-## TODO
-- Dark/Light mode
-- Edit view to change/add inputs to guess

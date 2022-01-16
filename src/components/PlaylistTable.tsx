@@ -4,21 +4,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import PlaylistsData from "./data/PlaylistsData"
 import PlaylistRow from "./PlaylistRow"
-import Paginator from "./Paginator"
 import { BlindTestContext } from 'App'
+import Paginator from './Paginator'
 
 const PlaylistTable = () => {
   const PAGE_SIZE = 20;
-  const playlistsData = new PlaylistsData(); // TODO put cache in state
 
   const { setSubtitle } = useContext(BlindTestContext);
-  
+
+  const [playlistsData] = useState(() => new PlaylistsData(PAGE_SIZE));
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchSubmitted, setSearchSubmitted] = useState(false);
   const [query, setQuery] = useState("");
   const [initialized, setInitialized] = useState(false);
   const [playlists, setPlaylists] = useState<any[]>([]);
   const [playlistCount, setPlaylistCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const min = ((currentPage - 1) * PAGE_SIZE) + 1;
@@ -40,7 +40,7 @@ const PlaylistTable = () => {
       setPlaylistCount(playlists.length);
       setCurrentPage(1);
 
-      if (playlists.length === playlistsData.SEARCH_LIMIT) {
+      if (playlists.length === PAGE_SIZE) {
         setSubtitle(`First ${playlists.length} results with "${query}" in playlist name`)
       } else {
         setSubtitle(`${playlists.length} results with "${query}" in playlist name`)
@@ -68,10 +68,6 @@ const PlaylistTable = () => {
     setPlaylistCount(count);
   }
 
-  const handlePageChanged = (page: number) => {
-    setCurrentPage(page);
-  }
-
   const handleSearchKeyDown = (event: any) => {
     event.stopPropagation()
     if (event.key === 'Enter') {
@@ -80,6 +76,10 @@ const PlaylistTable = () => {
     } else if (event.key === 'Escape') {
       playlistSearchCancel()
     }
+  }
+
+  const handlePageChanged = (page: number) => {
+    setCurrentPage(page);
   }
 
   if (initialized) {
@@ -94,7 +94,7 @@ const PlaylistTable = () => {
           <Paginator currentPage={currentPage} pageLimit={PAGE_SIZE} totalRecords={playlistCount} onPageChanged={handlePageChanged} />
           <Form className={className}>
             <InputGroup>
-              <FormControl value={query} type="text" role="searchbox" placeholder="Search" size="sm" onChange={(e) => setQuery(e.target.value)} onKeyDown={handleSearchKeyDown} className="border-right-0 border"/>
+              <FormControl value={query} type="text" role="searchbox" placeholder="Search" size="sm" onChange={(e) => setQuery(e.target.value)} onKeyDown={handleSearchKeyDown} className="border-right-0" />
               <InputGroup.Text className="bg-transparent">
                 {icon}
               </InputGroup.Text>

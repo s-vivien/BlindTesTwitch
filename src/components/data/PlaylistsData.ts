@@ -2,66 +2,68 @@ import { getPlaylists } from "services/SpotifyAPI"
 
 // Handles cached loading of all or subsets of playlist data
 class PlaylistsData {
-  PLAYLIST_LIMIT = 50
-  SEARCH_LIMIT = 20
+  PAGE_SIZE = 20;
 
-  data: any[]
-  dataInitialized = false
+  data: any[];
+  pageSize: number;
+  dataInitialized = false;
 
-  constructor() {
-    this.data = []
+  constructor(pageSize: number) {
+    console.log('PlaylistsData constructor');
+    this.pageSize = pageSize;
+    this.data = [];
   }
 
   async total() {
     if (!this.dataInitialized) {
-      await this.loadSlice()
+      await this.loadSlice();
     }
 
-    return this.data.length
+    return this.data.length;
   }
 
   async slice(start: number, end: number) {
-    await this.loadSlice(start, end)
-    return this.data.slice(start, end)
+    await this.loadSlice(start, end);
+    return this.data.slice(start, end);
   }
 
   async search(query: string) {
-    await this.loadAll()
+    await this.loadAll();
     // Case-insensitive search in playlist name
     return this.data
       .filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, this.SEARCH_LIMIT)
+      .slice(0, this.pageSize);
   }
 
   async loadAll() {
-    await this.loadSlice()
+    await this.loadSlice();
 
     // Get the rest of them if necessary
-    for (var offset = this.PLAYLIST_LIMIT; offset < this.data.length; offset = offset + this.PLAYLIST_LIMIT) {
-      await this.loadSlice(offset, offset + this.PLAYLIST_LIMIT)
+    for (var offset = this.pageSize; offset < this.data.length; offset = offset + this.pageSize) {
+      await this.loadSlice(offset, offset + this.pageSize);
     }
   }
 
-  async loadSlice(start = 0, end = start + this.PLAYLIST_LIMIT) {
+  async loadSlice(start = 0, end = start + this.pageSize) {
     if (this.dataInitialized) {
-      const loadedData = this.data.slice(start, end)
+      const loadedData = this.data.slice(start, end);
 
       if (loadedData.filter(i => !i).length === 0) {
-        return loadedData
+        return loadedData;
       }
     }
 
-    const playlistsResponse = await getPlaylists(start, this.PLAYLIST_LIMIT)
+    const playlistsResponse = await getPlaylists(start, this.pageSize);
     if (playlistsResponse.status !== 200) return;
-    const playlistsData = playlistsResponse.data
+    const playlistsData = playlistsResponse.data;
 
     if (!this.dataInitialized) {
-      this.data = Array(playlistsData.total).fill(null)
-      this.dataInitialized = true
+      this.data = Array(playlistsData.total).fill(null);
+      this.dataInitialized = true;
     }
 
-    this.data.splice(start, playlistsData.items.length, ...playlistsData.items)
+    this.data.splice(start, playlistsData.items.length, ...playlistsData.items);
   }
 }
 
-export default PlaylistsData
+export default PlaylistsData;
