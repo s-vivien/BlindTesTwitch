@@ -108,7 +108,7 @@ const PlaylistTable = () => {
               <th>Name</th>
               <th style={{ width: "150px" }}>Owner</th>
               <th style={{ width: "100px" }}>Tracks</th>
-              <th style={{ width: "120px" }}>Public?</th>
+              <th style={{ width: "120px" }}>Private</th>
               <th style={{ width: "100px" }}> </th>
             </tr>
           </thead>
@@ -121,7 +121,7 @@ const PlaylistTable = () => {
             })}
           </tbody>
         </table>
-        <div id="playlistsFooter">
+        <div id="playlistsFooter" className="mb-5">
           <Paginator currentPage={currentPage} pageLimit={PAGE_SIZE} totalRecords={playlistCount} onPageChanged={handlePageChanged} />
         </div>
       </div>

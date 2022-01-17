@@ -34,9 +34,9 @@ const PlaylistRow = (props: any) => {
 
   const renderTickCross = (condition: boolean) => {
     if (condition) {
-      return <FontAwesomeIcon icon={['far', 'check-circle']} size="sm" />
+      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{color: "green"}} />
     } else {
-      return <FontAwesomeIcon icon={['far', 'times-circle']} size="sm" style={{ color: '#ECEBE8' }} />
+      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{color: "red"}} />
     }
   };
 
@@ -49,7 +49,7 @@ const PlaylistRow = (props: any) => {
       <td>{MusicIcon}</td>
       <td>{playlist.name}</td>
       <td colSpan={2}>This playlist is not supported</td>
-      <td>{renderTickCross(playlist.public)}</td>
+      <td>{renderTickCross(!playlist.public)}</td>
       <td>&nbsp;</td>
     </tr>
   );
@@ -81,7 +81,7 @@ const PlaylistRow = (props: any) => {
         <td><a href={playlist.uri}>{playlist.name}</a></td>
         <td><a href={playlist.owner.uri}>{playlist.owner.display_name}</a></td>
         <td>{playlist.tracks.total}</td>
-        <td>{renderTickCross(playlist.public)}</td>
+        <td>{renderTickCross(!playlist.public)}</td>
         <td className="text-right">
           <Button type="submit" variant="primary" onClick={selectPlaylist} className="text-nowrap btn-xs">
             <FontAwesomeIcon icon={['fas', 'play-circle']} size="sm" /> Select

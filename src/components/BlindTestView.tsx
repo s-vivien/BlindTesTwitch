@@ -22,6 +22,8 @@ type GuessType = {
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 
+const DISPLAYED_USER_LIMIT = 70;
+
 const BlindTestView = () => {
 
   const { setSubtitle } = useContext(BlindTestContext);
@@ -30,6 +32,7 @@ const BlindTestView = () => {
   const [settings] = useState(() => getSettings());
   const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
   const [scores, setScores] = useState(() => getBlindTestScores());
+  const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScoreType[]>([]);
   const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -55,8 +58,34 @@ const BlindTestView = () => {
     }
   }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
 
+  useEffect(() => {
+    let flat: DisplayableScoreType[] = []
+    let distinctScores: number[] = [];
+    scores.forEach((_val: number, _key: string) => {
+      flat.push({
+        nick: _key,
+        score: _val
+      })
+      if (!distinctScores.includes(_val)) {
+        distinctScores.push(_val);
+      }
+    })
+    distinctScores.sort((a, b) => b - a);
+    flat.sort((a, b) => a.nick.localeCompare(b.nick))
+    flat.sort((a, b) => b.score - a.score)
+    if (nickFilter) {
+      flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
+    }
+    // Display rank only for the first of each group
+    for (let i = 0; i < flat.length; i++) {
+      if (i === 0 || flat[i].score !== flat[i - 1].score) {
+        flat[i].rank = 1 + distinctScores.indexOf(flat[i].score);
+      }
+    }
+    setLeaderboardRows(flat);
+  }, [nickFilter, scores]);
+
   const twitchConnection = (chan: string, chatNotifications: boolean) => {
-    console.log("Twitch connection");
     let opts: Options = { channels: [chan] };
     if (chatNotifications) {
       opts.identity = {
@@ -70,7 +99,6 @@ const BlindTestView = () => {
   }
 
   const twitchDisconnection = () => {
-    console.log("Twitch DISconnection");
     if (twitchClient !== null) {
       twitchClient.disconnect();
     }
@@ -186,33 +214,6 @@ const BlindTestView = () => {
     }
   }
 
-  const computeFlatScores = () => {
-    let flat: DisplayableScoreType[] = []
-    let distinctScores: number[] = [];
-    scores.forEach((_val: number, _key: string) => {
-      flat.push({
-        nick: _key,
-        score: _val
-      })
-      if (!distinctScores.includes(_val)) {
-        distinctScores.push(_val);
-      }
-    })
-    distinctScores.sort((a, b) => b - a);
-    flat.sort((a, b) => a.nick.localeCompare(b.nick))
-    flat.sort((a, b) => b.score - a.score)
-    if (nickFilter) {
-      flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
-    }
-    // Display rank only for the first of each group
-    for (let i = 0; i < flat.length; i++) {
-      if (i === 0 || flat[i].score !== flat[i - 1].score) {
-        flat[i].rank = 1 + distinctScores.indexOf(flat[i].score);
-      }
-    }
-    return flat;
-  }
-
   return (
     <div id="blindtest">
       <div className="row align-items-md-stretch mb-4">
@@ -289,7 +290,7 @@ const BlindTestView = () => {
                 </tr>
               </thead>
               <tbody>
-                {computeFlatScores().map((sc) => {
+                {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => {
                   return <tr key={sc.nick}>
                     <td>{sc.rank}</td>
                     <td>{sc.nick}</td>
@@ -305,6 +306,11 @@ const BlindTestView = () => {
                     </td>
                   </tr>
                 })}
+                {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
+                  <tr style={{ textAlign: "center" }}>
+                    <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
