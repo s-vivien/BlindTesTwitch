@@ -9,7 +9,6 @@ class PlaylistsData {
   dataInitialized = false;
 
   constructor(pageSize: number) {
-    console.log('PlaylistsData constructor');
     this.pageSize = pageSize;
     this.data = [];
   }

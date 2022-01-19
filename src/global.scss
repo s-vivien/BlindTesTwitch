@@ -19,7 +19,7 @@ body {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
-  transition: all 0.10s linear;
+  transition: all 0.1s linear;
 }
 
 input:-webkit-autofill {
@@ -39,8 +39,10 @@ svg {
 
 .bt-t {
   font-weight: 700;
+  width: 100%;
+  table-layout: fixed;
   text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #989898;
   letter-spacing: 0.9px;
   th {
@@ -49,6 +51,9 @@ svg {
   td {
     text-transform: none;
     font-weight: initial;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   button {
     font-size: 0.6rem;
@@ -73,11 +78,18 @@ svg {
 .bt-panel {
   background-color: $panel-bg;
   border: 1px solid $panel-border-color !important;
+  // border: none !important;
   border-radius: 0.3rem;
 }
 
-.bt-orig,
-.bt-tg,
+.bt-left-panel {
+  @extend .bt-panel;
+  display: flex;
+  position: sticky;
+  top: 20px;
+}
+
+.bt-guess,
 .bt-gb {
   letter-spacing: 0.6px;
 }
@@ -87,14 +99,8 @@ svg {
   line-height: 15px;
 }
 
-.bt-orig {
+.bt-guess {
   display: inline-block;
-}
-
-.bt-tg {
-  color: rgb(134, 134, 134);
-  font-size: italic;
-  float: right;
 }
 
 .spot-modal-bg {
@@ -157,12 +163,11 @@ svg {
 
 .cover {
   color: rgb(49, 49, 49);
-  height: 200px;
-  width: 200px;
+  height: 300px;
+  width: 300px;
   background-color: rgb(167, 167, 167);
   border: solid black 1px;
-  margin: 0 auto;
-  line-height: 200px;
+  line-height: 300px;
   text-align: center;
   font-size: 80px;
   img {

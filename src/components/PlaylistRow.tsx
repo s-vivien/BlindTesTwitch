@@ -34,9 +34,9 @@ const PlaylistRow = (props: any) => {
 
   const renderTickCross = (condition: boolean) => {
     if (condition) {
-      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{color: "green"}} />
+      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{ color: "green" }} />
     } else {
-      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{color: "red"}} />
+      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{ color: "red" }} />
     }
   };
 
@@ -63,13 +63,13 @@ const PlaylistRow = (props: any) => {
               Do you want to reset the leaderboard scores ?
             </p>
             <div className="d-flex justify-content-center">
-              <Button className="mr-2" onClick={() => loadPlaylist(false)} >
+              <Button className="mr-2" onClick={() => loadPlaylist(false)}>
                 Yes
               </Button>
-              <Button className="mr-2" onClick={() => loadPlaylist(true)} variant="danger">
+              <Button className="mr-2" onClick={() => loadPlaylist(true)}>
                 No
               </Button>
-              <Button onClick={() => setConfirmationDisplayed(false)} variant="secondary">
+              <Button onClick={() => setConfirmationDisplayed(false)}>
                 Cancel
               </Button>
             </div>

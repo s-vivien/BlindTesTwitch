@@ -86,7 +86,12 @@ const BlindTestView = () => {
   }, [nickFilter, scores]);
 
   const twitchConnection = (chan: string, chatNotifications: boolean) => {
-    let opts: Options = { channels: [chan] };
+    let opts: Options = {
+      options: {
+        skipUpdatingEmotesets: true
+      },
+      channels: [chan]
+    };
     if (chatNotifications) {
       opts.identity = {
         username: 'foo',
@@ -202,24 +207,23 @@ const BlindTestView = () => {
     const guessable: Guessable = props.guessable
     const guess: GuessType = props.guess
     if (guess.guessed) {
-      return <div className="pb-3">
-        <div className="bt-orig">{guess.guessedBy ? CheckEmoji : CrossEmoji} {guessable.original}</div>
-        <div className="bt-tg">[<i>{guessable.toGuess}</i>]</div>
+      return <div className="mb-3">
+        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy ? CheckEmoji : CrossEmoji} {guessable.original}</div>
         {guess.guessedBy && <div className="bt-gb">{BubbleEmoji} {guess.guessedBy} <b>[+{guess.points}]</b></div>}
       </div>
     } else {
-      return <div className="pb-3">
-        {CrossEmoji}<div className="bt-orig" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
+      return <div className="mb-3">
+        {CrossEmoji}<div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
       </div>
     }
   }
 
   return (
     <div id="blindtest">
-      <div className="row align-items-md-stretch mb-4">
-        <div className="col-md-6">
-          <div id="title" className="p-3 mb-2 bt-panel border rounded-3" >
-            <div id="cover" className="cover">
+      <div className="row mb-4">
+        <div className="col-md-8">
+          <div className="p-3 mb-2 bt-left-panel border rounded-3" >
+            <div id="cover" className="cover ">
               {allGuessed() &&
                 <img id="cover-image" src={coverUri} alt="album cover" />
               }
@@ -230,63 +234,69 @@ const BlindTestView = () => {
                 <FontAwesomeIcon icon={['fas', 'volume-mute']} size="sm" />
               }
             </div>
-          </div>
-          <div id="title" className="p-3 mb-2 bt-panel border rounded-3" >
-            <div className="bt-h">
-              <h2>TITLE</h2>
-            </div>
             {playing &&
-              <div>
-                <GuessableView key="guess_0" guessable={guessables[0]} guess={guesses[0]} />
+              <div style={{ flex: 1 }}>
+                <div className="px-3 mb-2" >
+                  <div className="bt-h">
+                    <h2>TITLE</h2>
+                  </div>
+                  {playing &&
+                    <div>
+                      <GuessableView key="guess_0" guessable={guessables[0]} guess={guesses[0]} />
+                    </div>
+                  }
+                </div>
+                <div className="px-3 pt-3 mb-2" >
+                  <div className="bt-h">
+                    <h2>ARTIST(S)</h2>
+                  </div>
+                  {playing &&
+                    <div>
+                      {guessables.slice(1).map((guessable: Guessable, index: number) => {
+                        return <GuessableView key={"guess_" + (index + 1)} guessable={guessable} guess={guesses[index + 1]} />
+                      })}
+                    </div>
+                  }
+                </div>
               </div>
             }
-          </div>
-          <div id="artists" className="p-3 mb-2 bt-panel border rounded-3" >
-            <div className="bt-h">
-              <h2>ARTIST(S)</h2>
-            </div>
-            {playing &&
-              <div>
-                {guessables.slice(1).map((guessable: Guessable, index: number) => {
-                  return <GuessableView key={"guess_" + (index + 1)} guessable={guessable} guess={guesses[index + 1]} />
-                })}
-              </div>
+            {!playing &&
+              <div style={{ margin: 'auto' }}><i>Click NEXT to start playing</i></div>
             }
           </div>
         </div>
-        <div className="col-md-6">
+        <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button style={{ width: '30%' }} id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="secondary" size="sm" onClick={handleNextSong} title="Next">
+            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="secondary" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
             &nbsp;
             {
               paused &&
-              <Button style={{ width: '30%' }} id="resumeButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handleResume} title="Resume">
+              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handleResume} title="Resume">
                 <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
               </Button>
             }
             {
               !paused &&
-              <Button style={{ width: '30%' }} id="pauseButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handlePause} title="Pause">
+              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handlePause} title="Pause">
                 <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
               </Button>
             }
             &nbsp;
-            <Button style={{ width: '30%' }} id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="secondary" size="sm" onClick={handleReveal} title="Reveal">
+            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="secondary" size="sm" onClick={handleReveal} title="Reveal">
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
-            &nbsp;
-            <FormControl value={nickFilter} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
           </div>
           <div id="leaderboard" className="p-3 bt-panel border rounded-3">
+            <FormControl value={nickFilter} className={"mb-2"} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
             <table className="table-hover bt-t">
               <thead>
                 <tr>
-                  <th style={{ width: "60px" }}>Rank</th>
-                  <th style={{ width: "270px" }}>Nick</th>
-                  <th style={{ width: "60px" }}>Score</th>
-                  <th style={{ width: "100px" }}></th>
+                  <th style={{ width: "12%" }}>#</th>
+                  <th style={{ width: "55%" }}>Nick</th>
+                  <th style={{ width: "12%" }}>Score</th>
+                  <th style={{ width: "21%" }}></th>
                 </tr>
               </thead>
               <tbody>
