@@ -32,8 +32,6 @@ const Settings = () => {
     "&response_type=token";
 
   useEffect(() => {
-    console.log(`loggedInTwitch=${loggedInTwitch}`);
-
     // Twitch logging callback
     const token = getHashParam('access_token')
     if (token) {
@@ -76,7 +74,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, chatNotifications));
+      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications));
       setConfigured(true);
       navigate("/");
     }

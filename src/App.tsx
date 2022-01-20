@@ -13,6 +13,7 @@ import LogoutButton from './components/LogoutButton';
 import SettingsButton from 'components/SettingsButton';
 import BlindTestView from './components/BlindTestView';
 import LoginCallback from './components/LoginCallback';
+import Help from 'components/Help';
 
 function App() {
   const navigate = useNavigate();
@@ -78,6 +79,9 @@ function App() {
           </div>
         }
         <header className="App-header">
+          <div style={{ position: 'absolute', left: 0 }}>
+            <Help />
+          </div>
           <div style={{ position: 'absolute', right: 0 }}>
             <Button id="toggleButton" className="topButtons" type="submit" variant="link" size="lg" onClick={toggleTheme} title="Switch theme">
               <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
