@@ -3,7 +3,7 @@ import { useEffect, useState, createContext } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { setAxiosErrorCallback } from './services/axios';
+import { setAxiosErrorCallback } from './services/SpotifyAPI';
 import { getRefreshToken, getSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';

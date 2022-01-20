@@ -1,8 +1,7 @@
 import { setAccessToken, setRefreshToken, getQueryParam } from "helpers"
 import { useNavigate } from "react-router-dom";
-import { retrieveAccessToken } from 'services/axios'
+import instance, { retrieveAccessToken } from 'services/SpotifyAPI'
 import { useContext, useEffect } from 'react'
-import instance from "../services/axios";
 import { BlindTestContext } from "App";
 
 const LoginCallback = () => {

@@ -6,6 +6,7 @@ import { SettingsData } from "./data/SettingsData";
 import Form from 'react-bootstrap/Form'
 import { Button } from "react-bootstrap";
 import { BlindTestContext } from "App";
+import { validateToken } from "services/TwitchAPI";
 
 const Settings = () => {
 
@@ -18,6 +19,7 @@ const Settings = () => {
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
   const [loggedInTwitch, setLoggedInTwitch] = useState<boolean>(() => getTwitchOAuthToken() !== null);
+  const [twitchNick, setTwitchNick] = useState("");
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
   const [channel, setChannel] = useState(settings.twitchChannel || '');
@@ -26,9 +28,12 @@ const Settings = () => {
     "?client_id=" + process.env.REACT_APP_TWITCH_CLIENT_ID +
     "&redirect_uri=" + getAppHomeURL() + "/settings" +
     "&scope=chat:read+chat:edit" +
+    "&force_verify=true" +
     "&response_type=token";
 
   useEffect(() => {
+    console.log(`loggedInTwitch=${loggedInTwitch}`);
+
     // Twitch logging callback
     const token = getHashParam('access_token')
     if (token) {
@@ -47,6 +52,20 @@ const Settings = () => {
       setInitialized(true);
     })
   }, []);
+
+  useEffect(() => {
+    if (loggedInTwitch) {
+      const twitchToken = getTwitchOAuthToken() || '';
+      validateToken(twitchToken).then(response => {
+        if (response.status != 200) {
+          removeTwitchOAuthToken();
+          setLoggedInTwitch(false);
+        } else {
+          response.json().then(body => setTwitchNick(body['login']));
+        }
+      });
+    }
+  }, [loggedInTwitch]);
 
   const twitchLogout = () => {
     removeTwitchOAuthToken();
@@ -90,7 +109,7 @@ const Settings = () => {
                 }
                 {loggedInTwitch &&
                   <Form.Text id="twitchLogoutBlock" onClick={twitchLogout} muted>
-                    <a href="#">Log out from twitch</a>
+                    <a href="#">Log out from twitch [{twitchNick}]</a>
                   </Form.Text>
                 }
               </>
