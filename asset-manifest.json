@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/BlindTesTwitch/static/css/main.ad17734c.css",
-    "main.js": "/BlindTesTwitch/static/js/main.bd30cd46.js",
+    "main.js": "/BlindTesTwitch/static/js/main.58892bfe.js",
     "index.html": "/BlindTesTwitch/index.html",
     "main.ad17734c.css.map": "/BlindTesTwitch/static/css/main.ad17734c.css.map",
-    "main.bd30cd46.js.map": "/BlindTesTwitch/static/js/main.bd30cd46.js.map"
+    "main.58892bfe.js.map": "/BlindTesTwitch/static/js/main.58892bfe.js.map"
   },
   "entrypoints": [
     "static/css/main.ad17734c.css",
-    "static/js/main.bd30cd46.js"
+    "static/js/main.58892bfe.js"
   ]
 }
