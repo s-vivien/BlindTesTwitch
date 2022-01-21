@@ -1,7 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { faComment, faCheckCircle, faTimesCircle } from '@fortawesome/free-regular-svg-icons'
-import { faVolumeMute, faQuestion, faQuestionCircle, faChevronRight, faChevronLeft, faCheck, faMinus, faEye, faPlus, faAdjust, faMusic, faPlayCircle, faList, faStepForward, faPause, faPlay, faCog, faSearch, faTimes, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faVolumeMute, faQuestion, faQuestionCircle, faExclamationTriangle, faChevronRight, faChevronLeft, faCheck, faMinus, faEye, faPlus, faAdjust, faMusic, faPlayCircle, faList, faStepForward, faPause, faPlay, faCog, faSearch, faTimes, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
   fab,
@@ -10,6 +10,7 @@ library.add(
   faMinus,
   faChevronLeft,
   faChevronRight,
+  faExclamationTriangle,
   faPlus,
   faAdjust,
   faQuestion,
