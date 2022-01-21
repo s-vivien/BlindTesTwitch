@@ -43,7 +43,7 @@ export class BlindTestTracks {
           t.artists.map((a: { name: string }) => computeGuessable(a.name)),
           t.album.uri,
           t.track_number - 1,
-          t.album.images[1].url
+          t.album.images[1]?.url || ""
         ));
       }
     }

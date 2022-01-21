@@ -225,7 +225,7 @@ const BlindTestView = () => {
           <div className="p-3 mb-2 bt-left-panel border rounded-3" >
             <div id="cover" className="cover ">
               {allGuessed() &&
-                <img id="cover-image" src={coverUri} alt="album cover" />
+                <img id="cover-image" src={coverUri} alt="cover" />
               }
               {(playing || loading) && !allGuessed() &&
                 <FontAwesomeIcon icon={['fas', 'question']} size="sm" />
