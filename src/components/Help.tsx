@@ -25,7 +25,6 @@ const PlaylistRow = (props: any) => {
                 <ul>
                   <li>Featurings, version/remix information, subtitles, ..., are removed</li>
                   <li>Accents are removed</li>
-                  <li>Punctuation <b>,!?:;.</b> is removed</li>
                 </ul>
               </li>
               <li>Ask the streamer to hover over the answer to see what exactly was asked to validate the point</li>
