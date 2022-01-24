@@ -26,6 +26,7 @@ const DISPLAYED_USER_LIMIT = 70;
 
 const BlindTestView = () => {
 
+  
   const { setSubtitle } = useContext(BlindTestContext);
 
   const [bt] = useState(() => getBlindTestTracks());
@@ -261,7 +262,7 @@ const BlindTestView = () => {
               </div>
             }
             {!playing &&
-              <div style={{ margin: 'auto' }}><i>Click NEXT to start playing</i></div>
+              <div style={{ margin: 'auto', color: 'grey' }}><i>Click NEXT to start playing</i></div>
             }
           </div>
         </div>

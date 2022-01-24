@@ -20,11 +20,12 @@ const PlaylistRow = (props: any) => {
               <li><b>No registration/prerequisite is needed to play</b> : just type in the chat to play !</li>
               <li>You'll be added automatically to the leaderboard</li>
               <li>There is a (small) <b>typo tolerance</b>, don't be afraid to type fast 😃</li>
-              <li>Propositions are <b>case insensitive</b></li>
-              <li><b>Titles are cleaned</b> :
+              <li>The syntax is the one used by Spotify. Example : <i>AC/DC</i> (<del>ACDC</del>), <i>Polo & Pan</i> (<del>Polo and Pan</del>), <i>The Police</i> (<del>Police</del>)</li>
+              <li>Artists/titles and propositions are <b>cleaned before comparison</b> :
                 <ul>
-                  <li>Featurings, version/remix information, subtitles, ..., are removed</li>
                   <li>Accents are removed</li>
+                  <li>Trailing <b>!?.</b> are removed</li>
+                  <li>Lower-cased (i.e. propositions are case-insensitive)</li>
                 </ul>
               </li>
               <li>Ask the streamer to hover over the answer to see what exactly was asked to validate the point</li>
