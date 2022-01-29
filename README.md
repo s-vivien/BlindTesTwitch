@@ -3,7 +3,7 @@
 A **Blind-Test** web-application written in React, using Spotify/Twitch APIs
 
 <kbd>
-    <img src="https://i.imgur.com/ZKUNtdV.gif" />
+    <img src="https://i.imgur.com/EkIW17l.gif" />
 </kbd>
 
 ## Description

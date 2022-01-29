@@ -62,7 +62,25 @@ function App() {
 
   return (
     <BlindTestContext.Provider value={contextValue}>
-      <div className={"App container"} >
+      <header className="app-header">
+        <div style={{ position: 'absolute', left: 0, fontSize: '1.3333rem', padding: '4px' }}>
+          <FontAwesomeIcon icon={['fab', 'spotify']} color="#84BD00" size="sm" />
+          <a href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
+        </div>
+        <div style={{ position: 'absolute', right: 0 }}>
+          {ongoingBt && <PlaylistsButton />}
+          <Button id="toggleButton" type="submit" variant="link" size="sm" onClick={toggleTheme} title="Switch theme">
+            <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
+          </Button>
+          {loggedIn && <SettingsButton />}
+          <Help />
+          {loggedIn && <LogoutButton />}
+        </div>
+        <p id="subtitle" className="lead text-secondary">
+          {subtitle}
+        </p>
+      </header>
+      <div className={"app container"} >
         {errorMessage &&
           <div className="spot-modal-bg">
             <Alert className="spot-modal" variant="danger" >
@@ -78,26 +96,6 @@ function App() {
             </Alert>
           </div>
         }
-        <header className="App-header">
-          <div style={{ position: 'absolute', left: 0 }}>
-            <Help />
-          </div>
-          <div style={{ position: 'absolute', right: 0 }}>
-            <Button id="toggleButton" className="topButtons" type="submit" variant="link" size="lg" onClick={toggleTheme} title="Switch theme">
-              <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
-            </Button>
-            {ongoingBt && <PlaylistsButton />}
-            {loggedIn && <SettingsButton />}
-            {loggedIn && <LogoutButton />}
-          </div>
-          <h1>
-            <FontAwesomeIcon icon={['fab', 'spotify']} color="#84BD00" size="sm" /> <a href={process.env.PUBLIC_URL}>BlindTesTwitch</a>
-          </h1>
-
-          <p id="subtitle" className="lead text-secondary">
-            {subtitle}
-          </p>
-        </header>
         <Routes>
           <Route path="/" element={view} />
           <Route path="/callback" element={<LoginCallback />} />

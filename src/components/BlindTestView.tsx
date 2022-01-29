@@ -22,10 +22,9 @@ type GuessType = {
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 
-const DISPLAYED_USER_LIMIT = 70;
+const DISPLAYED_USER_LIMIT = 150;
 
 const BlindTestView = () => {
-
   
   const { setSubtitle } = useContext(BlindTestContext);
 
@@ -268,24 +267,24 @@ const BlindTestView = () => {
         </div>
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" variant="secondary" size="sm" onClick={handleNextSong} title="Next">
+            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong} title="Next">
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
             </Button>
             &nbsp;
             {
               paused &&
-              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handleResume} title="Resume">
+              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" size="sm" onClick={handleResume} title="Resume">
                 <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
               </Button>
             }
             {
               !paused &&
-              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" variant="secondary" size="sm" onClick={handlePause} title="Pause">
+              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" size="sm" onClick={handlePause} title="Pause">
                 <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
               </Button>
             }
             &nbsp;
-            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" variant="secondary" size="sm" onClick={handleReveal} title="Reveal">
+            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal} title="Reveal">
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
           </div>

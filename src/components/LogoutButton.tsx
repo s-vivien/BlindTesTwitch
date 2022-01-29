@@ -23,7 +23,7 @@ const LogoutButton = () => {
   }
 
   return (
-    <Button id="logoutButton" className="topButtons" type="submit" variant="link" size="lg" onClick={handleClick} title="Logout">
+    <Button id="logoutButton" className="topButtons" type="submit" variant="link" size="sm" onClick={handleClick} title="Logout">
       <FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" />
     </Button>
   )

@@ -14,7 +14,7 @@ const PlaylistsButton = () => {
   }
 
   return (
-    <Button id="listButton" className="topButtons" type="submit" variant="link" size="lg" onClick={handleClick} title="Playlists">
+    <Button id="listButton" className="topButtons" type="submit" variant="link" size="sm" onClick={handleClick} title="Playlists">
       <FontAwesomeIcon icon={['fas', 'list']} size="lg" />
     </Button>
   )

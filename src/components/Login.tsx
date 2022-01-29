@@ -9,7 +9,7 @@ const Login = () => {
   const { setSubtitle } = useContext(BlindTestContext);
 
   useEffect(() => {
-    setSubtitle('Play Blind-Test on Twitch !');
+    setSubtitle('');
   }, [setSubtitle]);
 
   const authorize = async () => {
@@ -25,7 +25,7 @@ const Login = () => {
   }
 
   return (
-    <Button id="loginButton" type="submit" variant="outline-secondary" size="lg" onClick={authorize}>
+    <Button id="loginButton" style={{ display: 'block', margin: '0 auto' }} type="submit" variant="outline-secondary" size="lg" onClick={authorize}>
       <FontAwesomeIcon icon={['far', 'check-circle']} size="sm" /> Login with Spotify
     </Button>
   )

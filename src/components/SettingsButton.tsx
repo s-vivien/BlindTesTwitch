@@ -11,7 +11,7 @@ const LogoutButton = () => {
   }
 
   return (
-    <Button id="settingButton" className="topButtons" type="submit" variant="link" size="lg" onClick={handleClick} title="Settings">
+    <Button id="settingButton" className="topButtons" type="submit" variant="link" size="sm" onClick={handleClick} title="Settings">
       <FontAwesomeIcon icon={['fas', 'cog']} size="lg" />
     </Button>
   )

@@ -17,8 +17,7 @@ const PlaylistRow = (props: any) => {
           <Alert className="spot-modal" variant="secondary">
             <h2>How to play</h2>
             <ul>
-              <li><b>No registration/prerequisite is needed to play</b> : just type in the chat to play !</li>
-              <li>You'll be added automatically to the leaderboard</li>
+              <li><b>No registration/prerequisite needed </b> : just type in the chat to play ! You'll be added automatically to the leaderboard</li>
               <li>There is a (small) <b>typo tolerance</b>, don't be afraid to type fast 😃</li>
               <li>The syntax is the one used by Spotify. Example : <i>AC/DC</i> (<del>ACDC</del>), <i>Polo & Pan</i> (<del>Polo and Pan</del>), <i>The Police</i> (<del>Police</del>)</li>
               <li>Artists/titles and propositions are <b>cleaned before comparison</b> :
@@ -41,14 +40,15 @@ const PlaylistRow = (props: any) => {
               <li>Any additional correct answer on a track by the same player will give them <b>2 points</b> !</li>
             </ul>
             <div className="d-flex justify-content-center">
-              <Button onClick={() => setHelpDisplayed(false)}>
+              <Button style={{ color: 'white', width: '60px' }} onClick={() => setHelpDisplayed(false)}>
                 Ok
               </Button>
             </div>
+            <a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">https://github.com/s-vivien/BlindTesTwitch</a>
           </Alert>
         </div>
       }
-      <Button id="helpButton" className="topButtons" type="submit" variant="link" size="lg" onClick={handleClick} title="Help">
+      <Button id="helpButton" className="topButtons" type="submit" variant="link" size="sm" onClick={handleClick} title="Help">
         <FontAwesomeIcon icon={['fas', 'question-circle']} size="lg" />
       </Button>
     </>
