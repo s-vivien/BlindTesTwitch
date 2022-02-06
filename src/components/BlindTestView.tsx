@@ -7,37 +7,44 @@ import { Guessable } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
 
-type DisplayableScoreType = {
+type DisplayableScore = {
   nick: string,
   rank?: number,
   score: number
 };
 
-type GuessType = {
+type Guesser = {
+  nick: string,
+  points: number
+}
+
+type Guess = {
   guessed: boolean,
-  guessedBy?: string,
-  points?: number
+  guessedBy: Guesser[]
 };
 
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
+let endGuess: (index: number) => void = () => { };
+let guessTimeouts: NodeJS.Timeout[] = [];
 
 const DISPLAYED_USER_LIMIT = 150;
+const DISPLAYED_GUESS_NICK_LIMIT = 5;
 
 const BlindTestView = () => {
-  
+
   const { setSubtitle } = useContext(BlindTestContext);
 
   const [bt] = useState(() => getBlindTestTracks());
   const [settings] = useState(() => getSettings());
   const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
   const [scores, setScores] = useState(() => getBlindTestScores());
-  const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScoreType[]>([]);
+  const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [guesses, setGuesses] = useState<GuessType[]>([]);
+  const [guesses, setGuesses] = useState<Guess[]>([]);
   const [guessables, setGuessables] = useState<Guessable[]>([]);
   const [coverUri, setCoverUri] = useState('');
 
@@ -59,7 +66,7 @@ const BlindTestView = () => {
   }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
 
   useEffect(() => {
-    let flat: DisplayableScoreType[] = []
+    let flat: DisplayableScore[] = []
     let distinctScores: number[] = [];
     scores.forEach((_val: number, _key: string) => {
       flat.push({
@@ -120,20 +127,35 @@ const BlindTestView = () => {
     if (playing) {
       const proposition = cleanValueLight(message)
       for (let i = 0; i < guessables.length; i++) {
-        const guess = guesses[i]
-        if (guess.guessed) continue
-        const guessable = guessables[i]
+        const guess = guesses[i];
+        if (guess.guessed) continue; // guess is no longer active
+        if (guess.guessedBy.find((g) => g.nick === nick)) continue; // the player already guessed this item
+        const guessable = guessables[i];
         const d = computeDistance(proposition, guessable.toGuess)
         if (d <= guessable.maxDistance || (proposition.includes(guessable.toGuess) && proposition.length <= 1.6 * guessable.toGuess.length)) {
-          const points = 1 + (guesses.find((g) => g.guessed && g.guessedBy === nick) ? 1 : 0);
+          let points = 1;
+          if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
+          for (let g of guesses) {
+            if (g.guessedBy.find((gb) => gb.nick === nick)) {
+              points += 1; // this player already guessed something else on this track
+              break;
+            }
+          }
           addPointToPlayer(nick, points);
           updateGuessState(i, nick, points);
-          twitchClient?.say(settings.twitchChannel, `✅ ${nick} correctly guessed [${guessable.toGuess}] +${points}`)
+          break;
         }
       }
     }
   }
   twitchCallback = onProposition;
+
+  endGuess = (index: number) => {
+    let newGuesses = [...guesses];
+    newGuesses[index].guessed = true;
+    twitchClient?.say(settings.twitchChannel, `✅ [${guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`);
+    setGuesses(newGuesses);
+  }
 
   const addPlayerIfUnknown = (nick: string) => {
     if (settings.addEveryUser && !scores.get(nick)) {
@@ -148,25 +170,27 @@ const BlindTestView = () => {
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
-    let newGuesses = new Array<GuessType>()
-    guesses.forEach((oldGuess: GuessType, i: number) => {
-      if (i === index) {
-        newGuesses.push({ guessed: true, guessedBy: nick, points: points })
-      } else {
-        newGuesses.push({ guessed: oldGuess.guessed, guessedBy: oldGuess.guessedBy, points: oldGuess.points })
-      }
-    })
+    let newGuesses = [...guesses];
+    if (settings.acceptanceDelay === 0) {
+      endGuess(index);
+    } else if (guesses[index].guessedBy.length == 0) {
+      const to = setTimeout(() => {
+        endGuess(index);
+      }, settings.acceptanceDelay * 1000);
+      guessTimeouts.push(to);
+    }
+    newGuesses[index].guessedBy.push({ nick: nick, points: points });
     setGuesses(newGuesses);
   }
 
   const allGuessed = () => {
-    return playing && guesses.reduce((prev, curr) => prev && curr.guessed, true)
+    return playing && guesses.reduce((prev, curr) => prev && curr.guessed, true);
   }
 
   const handleReveal = () => {
     backupState()
-    let newGuesses = new Array<GuessType>()
-    guesses.forEach((oldGuess: GuessType) => { newGuesses.push({ guessed: true, guessedBy: oldGuess.guessedBy, points: oldGuess.points }) })
+    let newGuesses = [...guesses];
+    guesses.forEach((g: Guess) => { g.guessed = true; });
     setGuesses(newGuesses);
   }
 
@@ -181,7 +205,9 @@ const BlindTestView = () => {
   }
 
   const handleNextSong = async () => {
-    backupState()
+    backupState();
+    for (let to of guessTimeouts) { clearTimeout(to); }
+    guessTimeouts = [];
     let track = bt.tracks[doneTracks]
     setPlaying(false);
     setLoading(true);
@@ -189,7 +215,9 @@ const BlindTestView = () => {
       setRepeatMode(true, settings.deviceId);
       setDoneTracks(doneTracks + 1);
       setGuessables([track.title, ...track.artists]);
-      setGuesses(new Array(track.artists.length + 1).fill({ guessed: false }));
+      const newGuesses = [];
+      for (let i = 0; i < track.artists.length + 1; i++) { newGuesses.push({ guessed: false, guessedBy: [] }); }
+      setGuesses(newGuesses);
       setCoverUri(track.img);
       setPlaying(true);
       setPaused(false);
@@ -205,11 +233,26 @@ const BlindTestView = () => {
 
   const GuessableView = (props: any) => {
     const guessable: Guessable = props.guessable
-    const guess: GuessType = props.guess
+    const guess: Guess = props.guess
     if (guess.guessed) {
       return <div className="mb-3">
-        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy ? CheckEmoji : CrossEmoji} {guessable.original}</div>
-        {guess.guessedBy && <div className="bt-gb">{BubbleEmoji} {guess.guessedBy} <b>[+{guess.points}]</b></div>}
+        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy.length > 0 ? CheckEmoji : CrossEmoji} {guessable.original}</div>
+        {guess.guessedBy.length > 0 &&
+          <div className="bt-gb">
+            {BubbleEmoji}&nbsp;
+            {guess.guessedBy.slice(0, DISPLAYED_GUESS_NICK_LIMIT).map((gb, i) => {
+              return <span key={"gb_" + i}>
+                {i > 0 && <>, </>}
+                {gb.nick} <b>[+{gb.points}]</b>
+              </span>
+            })}
+            {guess.guessedBy.length > DISPLAYED_GUESS_NICK_LIMIT && <span>, and {guess.guessedBy.length - DISPLAYED_GUESS_NICK_LIMIT} more</span>}
+          </div>
+        }
+      </div>
+    } else if (guess.guessedBy.length > 0) {
+      return <div className="mb-3">
+        {CheckEmoji}<div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
       </div>
     } else {
       return <div className="mb-3">

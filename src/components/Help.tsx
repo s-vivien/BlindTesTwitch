@@ -1,14 +1,17 @@
 import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react"
+import { getSettings } from "helpers";
 
-const PlaylistRow = (props: any) => {
+const Help = () => {
 
   const [helpDisplayed, setHelpDisplayed] = useState(false);
 
   const handleClick = () => {
     setHelpDisplayed(true);
   }
+
+  const settings = getSettings();
 
   return (
     <>
@@ -36,8 +39,16 @@ const PlaylistRow = (props: any) => {
             </p>
             <h2>Scoring</h2>
             <ul>
-              <li><b>1 point</b> is awarded each time someone is <i>the first</i> to find the title or one of the artists.</li>
-              <li>Any additional correct answer on a track by the same player will give them <b>2 points</b> !</li>
+              {settings.acceptanceDelay === 0 &&
+                <li><b>1 point</b> is awarded each time someone is <i>the first</i> to find the title or one of the artists</li>
+              }
+              {settings.acceptanceDelay > 0 &&
+                <>
+                  <li><b>2 points</b> are awarded each time someone is <i>the first</i> to find the title or one of the artists</li>
+                  <li>Every other player who finds the same answer within {settings.acceptanceDelay} second(s) will be rewarded with <b>1 point</b></li>
+                </>
+              }
+              <li>Each player who answers correctly more than once on a track will receive <b>1 extra point</b> per<br />answer in addition to the points mentioned above</li>
             </ul>
             <div className="d-flex justify-content-center">
               <Button style={{ color: 'white', width: '60px' }} onClick={() => setHelpDisplayed(false)}>
@@ -55,4 +66,4 @@ const PlaylistRow = (props: any) => {
   );
 };
 
-export default PlaylistRow
+export default Help

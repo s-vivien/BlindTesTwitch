@@ -22,6 +22,7 @@ const Settings = () => {
   const [twitchNick, setTwitchNick] = useState("");
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
+  const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay || 0);
   const [channel, setChannel] = useState(settings.twitchChannel || '');
 
   const twitchLoginURI = "https://id.twitch.tv/oauth2/authorize" +
@@ -74,7 +75,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications));
+      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay));
       setConfigured(true);
       navigate("/");
     }
@@ -96,6 +97,11 @@ const Settings = () => {
               {devices.map((d) => <option key={d.id} value={d.id}>{d.name} ({d.type})</option>)}
             </Form.Select>
           </Form.Group>
+          <Form.Group className="mb-3" controlId="formGroupAcceptance">
+            <Form.Label>Acceptance delay</Form.Label>
+            <Form.Range onChange={(e) => setAcceptanceDelay(e.target.valueAsNumber)} value={acceptanceDelay} style={{ width: '100%' }} min={0} max={10} />
+            <Form.Label style={{ width: '100%', textAlign: 'center', marginTop: '-10px' }}><i>{acceptanceDelay} second{acceptanceDelay > 1 ? 's' : ''}</i></Form.Label>
+          </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupChatNotifications">
             <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Display guess notifications in the chat" onChange={(e) => { setChatNotifications(e.target.checked) }} />
             {process.env.REACT_APP_TWITCH_CLIENT_ID &&
@@ -107,7 +113,7 @@ const Settings = () => {
                 }
                 {loggedInTwitch &&
                   <Form.Text id="twitchLogoutBlock" onClick={twitchLogout} muted>
-                    <a href="#">Log out from twitch [{twitchNick}]</a>
+                    Using {twitchNick} account. <a href="#">Log out from twitch.</a>
                   </Form.Text>
                 }
               </>
