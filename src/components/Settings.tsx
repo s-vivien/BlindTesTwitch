@@ -99,7 +99,7 @@ const Settings = () => {
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAcceptance">
             <Form.Label>Acceptance delay</Form.Label>
-            <Form.Range onChange={(e) => setAcceptanceDelay(e.target.valueAsNumber)} value={acceptanceDelay} style={{ width: '100%' }} min={0} max={10} />
+            <Form.Range onChange={(e) => setAcceptanceDelay(e.target.valueAsNumber)} value={acceptanceDelay} style={{ width: '100%' }} min={0} max={30} />
             <Form.Label style={{ width: '100%', textAlign: 'center', marginTop: '-10px' }}><i>{acceptanceDelay} second{acceptanceDelay > 1 ? 's' : ''}</i></Form.Label>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupChatNotifications">

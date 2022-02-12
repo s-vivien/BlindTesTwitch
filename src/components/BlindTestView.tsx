@@ -159,13 +159,14 @@ const BlindTestView = () => {
 
   const addPlayerIfUnknown = (nick: string) => {
     if (settings.addEveryUser && !scores.get(nick)) {
-      addPointToPlayer(nick, 0)
+      addPointToPlayer(nick, 0);
     }
   }
 
   const addPointToPlayer = (nick: string, points: number) => {
-    let newScores: Map<string, number> = new Map(scores)
-    newScores.set(nick, (newScores.get(nick) || 0) + points)
+    let newScores: Map<string, number> = new Map(scores);
+    newScores.set(nick, (newScores.get(nick) || 0) + points);
+    if (points !== 0) setBlindTestScores(newScores);
     setScores(newScores);
   }
 
@@ -188,7 +189,7 @@ const BlindTestView = () => {
   }
 
   const handleReveal = () => {
-    backupState()
+    backupState();
     let newGuesses = [...guesses];
     guesses.forEach((g: Guess) => { g.guessed = true; });
     setGuesses(newGuesses);
