@@ -3,14 +3,16 @@ export class SettingsData {
   deviceId: string
   addEveryUser: boolean
   chatNotifications: boolean
+  previewGuessNumber: boolean
   acceptanceDelay: number
 
-  constructor(twitchChannel: string, deviceId: string, addEveryUser: boolean, chatNotifications: boolean, acceptanceDelay: number) {
-    this.twitchChannel = twitchChannel
-    this.deviceId = deviceId
-    this.addEveryUser = addEveryUser
-    this.chatNotifications = chatNotifications
-    this.acceptanceDelay = acceptanceDelay
+  constructor(twitchChannel: string, deviceId: string, addEveryUser: boolean, chatNotifications: boolean, acceptanceDelay: number, previewGuessNumber: boolean) {
+    this.twitchChannel = twitchChannel;
+    this.deviceId = deviceId;
+    this.addEveryUser = addEveryUser;
+    this.chatNotifications = chatNotifications;
+    this.acceptanceDelay = acceptanceDelay;
+    this.previewGuessNumber = previewGuessNumber;
   }
 
   isInitialized(): boolean {

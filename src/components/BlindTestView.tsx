@@ -25,7 +25,7 @@ type Guess = {
 
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
-let endGuess: (index: number) => void = () => { };
+let endGuess: (index: number, nick: string, points: number) => void = () => { };
 let guessTimeouts: NodeJS.Timeout[] = [];
 
 const DISPLAYED_USER_LIMIT = 150;
@@ -141,7 +141,6 @@ const BlindTestView = () => {
               break;
             }
           }
-          addPointToPlayer(nick, points);
           updateGuessState(i, nick, points);
           break;
         }
@@ -150,11 +149,12 @@ const BlindTestView = () => {
   }
   twitchCallback = onProposition;
 
-  endGuess = (index: number) => {
+  endGuess = (index: number, nick: string, points: number) => {
     let newGuesses = [...guesses];
     newGuesses[index].guessed = true;
     twitchClient?.say(settings.twitchChannel, `✅ [${guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`);
     setGuesses(newGuesses);
+    addPointToPlayer(nick, points);
   }
 
   const addPlayerIfUnknown = (nick: string) => {
@@ -171,16 +171,17 @@ const BlindTestView = () => {
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
+    const firstGuess = guesses[index].guessedBy.length == 0;
     let newGuesses = [...guesses];
+    newGuesses[index].guessedBy.push({ nick: nick, points: points });
     if (settings.acceptanceDelay === 0) {
-      endGuess(index);
-    } else if (guesses[index].guessedBy.length == 0) {
+      endGuess(index, nick, points);
+    } else if (firstGuess) {
       const to = setTimeout(() => {
-        endGuess(index);
+        endGuess(index, nick, points);
       }, settings.acceptanceDelay * 1000);
       guessTimeouts.push(to);
     }
-    newGuesses[index].guessedBy.push({ nick: nick, points: points });
     setGuesses(newGuesses);
   }
 
@@ -251,7 +252,7 @@ const BlindTestView = () => {
           </div>
         }
       </div>
-    } else if (guess.guessedBy.length > 0) {
+    } else if (guess.guessedBy.length > 0 && settings.previewGuessNumber) {
       return <div className="mb-3">
         {CheckEmoji}<div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
       </div>
