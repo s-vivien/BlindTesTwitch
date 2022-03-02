@@ -10,6 +10,7 @@ import { BlindTestContext } from "App"
 type DisplayableScore = {
   nick: string,
   rank?: number,
+  displayedRank?: number,
   score: number
 };
 
@@ -86,9 +87,11 @@ const BlindTestView = () => {
     }
     // Display rank only for the first of each group
     for (let i = 0; i < flat.length; i++) {
+      const rank = 1 + distinctScores.indexOf(flat[i].score);
       if (i === 0 || flat[i].score !== flat[i - 1].score) {
-        flat[i].rank = 1 + distinctScores.indexOf(flat[i].score);
+        flat[i].displayedRank = rank;
       }
+      flat[i].rank = rank;
     }
     setLeaderboardRows(flat);
   }, [nickFilter, scores]);
@@ -125,7 +128,12 @@ const BlindTestView = () => {
 
   const onProposition = (nick: string, message: string) => {
     addPlayerIfUnknown(nick);
-    if (playing) {
+    if (message === "!score") {
+      const rank = leaderboardRows.find(row => row.nick === nick);
+      if (rank !== undefined) {
+        twitchClient?.say(settings.twitchChannel, `@${nick} : Your score is ${rank.score} and your rank is #${rank.rank}`);
+      }
+    } else if (playing) {
       const proposition = cleanValueLight(message)
       for (let i = 0; i < guessables.length; i++) {
         const guess = guesses[i];
@@ -365,7 +373,7 @@ const BlindTestView = () => {
               <tbody>
                 {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => {
                   return <tr key={sc.nick}>
-                    <td>{sc.rank}</td>
+                    <td>{sc.displayedRank}</td>
                     <td>{sc.nick}</td>
                     <td>{sc.score}</td>
                     <td className="text-right">

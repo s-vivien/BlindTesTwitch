@@ -143,6 +143,7 @@ export const cleanValueLight = (value: string) => {
     .normalize("NFD")
     .replaceAll(/\p{Diacritic}/gu, "")
     .replaceAll(/[!?.]+$/g, "")
+    .replaceAll(/^[!?.]+/g, "")
     .replaceAll(/[¿¡]/g, "")
     .replaceAll("’", "'")
     .trim();
