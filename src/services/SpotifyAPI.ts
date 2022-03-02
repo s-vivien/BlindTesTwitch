@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getRefreshToken, setRefreshToken, removeAccessToken, getAccessToken, setAccessToken, consumePkcePair, getAppHomeURL } from 'helpers';
+import { getRefreshToken, setRefreshToken, removeAccessToken, getAccessToken, setAccessToken, consumePkcePair, getAppHomeURL, getUserCountry } from 'helpers';
 
 const instance = axios.create({
   headers: {
@@ -80,12 +80,17 @@ if (accessToken) {
   instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
 }
 
+export const getUserProfile = () => {
+  return instance.get(`https://api.spotify.com/v1/me`)
+}
+
 export const getPlaylists = (offset: number, limit: number) => {
   return instance.get(`https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`)
 }
 
 export const getPlaylistTracks = (playlist_id: string, offset: number, limit: number) => {
-  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&fields=items(track(track_number,name,artists(name),album(uri,images)))`)
+  const market = getUserCountry();
+  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),album(images)))`)
 }
 
 export const setRepeatMode = (enabled: boolean, device_id: string) => {

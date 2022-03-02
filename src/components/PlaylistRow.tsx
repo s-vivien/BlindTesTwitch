@@ -25,8 +25,9 @@ const PlaylistRow = (props: any) => {
     if (!keepScores) {
       removeBlindTestScores();
     }
-    const tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
-    const bt = new BlindTestTracks(tracks);
+    let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
+    tracks = tracks.filter(t => t.track.is_playable);
+    const bt = new BlindTestTracks(tracks, props.playlist.uri);
     setBlindTestTracks(bt);
     setOngoingBt(true);
     navigate("/");

@@ -15,14 +15,12 @@ export class Guessable {
 export class BlindTestTrack {
   title: Guessable
   artists: Guessable[]
-  uri: string
   img: string
   offset: number
 
-  constructor(title: Guessable, artists: Guessable[], uri: string, offset: number, img: string) {
+  constructor(title: Guessable, artists: Guessable[], offset: number, img: string) {
     this.title = title;
     this.artists = artists;
-    this.uri = uri;
     this.offset = offset;
     this.img = img;
   }
@@ -30,10 +28,13 @@ export class BlindTestTrack {
 
 export class BlindTestTracks {
   tracks: BlindTestTrack[] = []
+  playlistUri: string
   doneTracks: number = 0
 
-  constructor(spotTracks: any[]) {
+  constructor(spotTracks: any[], playlistUri: string) {
+    this.playlistUri = playlistUri;
     if (spotTracks) {
+      let offset = 0;
       for (let spotTrack of spotTracks) {
         let t = spotTrack.track;
         let artists = t.artists.map((a: any) => a.name);
@@ -41,8 +42,7 @@ export class BlindTestTracks {
         this.tracks.push(new BlindTestTrack(
           computeGuessable(title),
           t.artists.map((a: { name: string }) => computeGuessable(a.name)),
-          t.album.uri,
-          t.track_number - 1,
+          offset++,
           t.album.images[1]?.url || ""
         ));
       }

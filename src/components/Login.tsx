@@ -17,7 +17,7 @@ const Login = () => {
     window.location.href = "https://accounts.spotify.com/authorize" +
       "?client_id=" + process.env.REACT_APP_SPOTIFY_CLIENT_ID +
       "&redirect_uri=" + getAppHomeURL() + "/callback" +
-      "&scope=playlist-read-private%20user-modify-playback-state%20user-read-playback-state" +
+      "&scope=playlist-read-private%20user-modify-playback-state%20user-read-playback-state%20user-read-private" +
       "&response_type=code" +
       "&code_challenge_method=S256" +
       "&code_challenge=" + (await pkcePair).codeChallenge +

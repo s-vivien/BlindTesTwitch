@@ -1,6 +1,6 @@
-import { setAccessToken, setRefreshToken, getQueryParam } from "helpers"
+import { setAccessToken, setRefreshToken, getQueryParam, setUserCountry } from "helpers"
 import { useNavigate } from "react-router-dom";
-import instance, { retrieveAccessToken } from 'services/SpotifyAPI'
+import instance, { getUserProfile, retrieveAccessToken } from 'services/SpotifyAPI'
 import { useContext, useEffect } from 'react'
 import { BlindTestContext } from "App";
 
@@ -18,6 +18,9 @@ const LoginCallback = () => {
         setAccessToken(accessToken);
         instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         setLoggedIn(true);
+        getUserProfile().then(response => {
+          setUserCountry(response.data.country);
+        });
         navigate("/");
       })
     } else {

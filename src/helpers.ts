@@ -68,6 +68,14 @@ export const removeRefreshToken = () => {
   localStorage.removeItem("refresh_token")
 }
 
+export const getUserCountry = () => {
+  return localStorage.getItem("user_country")
+}
+
+export const setUserCountry = (user_country: any) => {
+  localStorage.setItem("user_country", user_country)
+}
+
 export const getAccessToken = () => {
   return localStorage.getItem("access_token")
 }

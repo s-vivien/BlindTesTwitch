@@ -213,7 +213,7 @@ const BlindTestView = () => {
     let track = bt.tracks[doneTracks]
     setPlaying(false);
     setLoading(true);
-    launchTrack(track.uri, track.offset, settings.deviceId).then(() => {
+    launchTrack(bt.playlistUri, track.offset, settings.deviceId).then(() => {
       setRepeatMode(true, settings.deviceId);
       setDoneTracks(doneTracks + 1);
       setGuessables([track.title, ...track.artists]);
