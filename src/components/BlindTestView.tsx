@@ -25,7 +25,8 @@ type Guess = {
 
 let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
-let endGuess: (index: number, nick: string, points: number) => void = () => { };
+let endGuess: (index: number, delayed: boolean) => void = () => { };
+let delayedPoints: Map<string, number>[] = [];
 let guessTimeouts: NodeJS.Timeout[] = [];
 
 const DISPLAYED_USER_LIMIT = 150;
@@ -149,12 +150,20 @@ const BlindTestView = () => {
   }
   twitchCallback = onProposition;
 
-  endGuess = (index: number, nick: string, points: number) => {
+  endGuess = (index: number, delayed: boolean) => {
     let newGuesses = [...guesses];
     newGuesses[index].guessed = true;
     twitchClient?.say(settings.twitchChannel, `✅ [${guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`);
     setGuesses(newGuesses);
-    addPointToPlayer(nick, points);
+    if (delayed) {
+      const points = delayedPoints[index];
+      let newScores: Map<string, number> = new Map(scores);
+      points.forEach((value: number, nick: string) => {
+        newScores.set(nick, (newScores.get(nick) || 0) + value);
+      });
+      setBlindTestScores(newScores);
+      setScores(newScores);
+    }
   }
 
   const addPlayerIfUnknown = (nick: string) => {
@@ -175,12 +184,16 @@ const BlindTestView = () => {
     let newGuesses = [...guesses];
     newGuesses[index].guessedBy.push({ nick: nick, points: points });
     if (settings.acceptanceDelay === 0) {
-      endGuess(index, nick, points);
-    } else if (firstGuess) {
-      const to = setTimeout(() => {
-        endGuess(index, nick, points);
-      }, settings.acceptanceDelay * 1000);
-      guessTimeouts.push(to);
+      endGuess(index, false);
+      addPointToPlayer(nick, points);
+    } else {
+      if (firstGuess) {
+        const to = setTimeout(() => {
+          endGuess(index, true);
+        }, settings.acceptanceDelay * 1000);
+        guessTimeouts.push(to);
+      }
+      delayedPoints[index].set(nick, (delayedPoints[index].get(nick) || 0) + points);
     }
     setGuesses(newGuesses);
   }
@@ -191,6 +204,7 @@ const BlindTestView = () => {
 
   const handleReveal = () => {
     backupState();
+    for (let to of guessTimeouts) { clearTimeout(to); }
     let newGuesses = [...guesses];
     guesses.forEach((g: Guess) => { g.guessed = true; });
     setGuesses(newGuesses);
@@ -218,7 +232,11 @@ const BlindTestView = () => {
       setDoneTracks(doneTracks + 1);
       setGuessables([track.title, ...track.artists]);
       const newGuesses = [];
-      for (let i = 0; i < track.artists.length + 1; i++) { newGuesses.push({ guessed: false, guessedBy: [] }); }
+      delayedPoints = [];
+      for (let i = 0; i < track.artists.length + 1; i++) {
+        newGuesses.push({ guessed: false, guessedBy: [] });
+        delayedPoints.push(new Map<string, number>());
+      }
       setGuesses(newGuesses);
       setCoverUri(track.img);
       setPlaying(true);
