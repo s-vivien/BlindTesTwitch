@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { removeRefreshToken, removeAccessToken, removeBlindTestTracks, removeBlindTestScores, removeSettings } from "helpers"
+import { removeRefreshToken, removeAccessToken, removeBlindTestTracks, removeBlindTestScores, removeSettings, removeTwitchOAuthToken } from "helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { BlindTestContext } from "App";
@@ -15,6 +15,7 @@ const LogoutButton = () => {
     removeAccessToken();
     removeBlindTestTracks();
     removeBlindTestScores();
+    removeTwitchOAuthToken();
     removeSettings();
     setLoggedIn(false);
     setOngoingBt(false);

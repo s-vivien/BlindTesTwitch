@@ -32,6 +32,7 @@ let guessTimeouts: NodeJS.Timeout[] = [];
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
+const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 
 const BlindTestView = () => {
 
@@ -111,7 +112,11 @@ const BlindTestView = () => {
     }
     twitchClient = new Client(opts);
     twitchClient.connect();
-    twitchClient.on('message', (_channel: any, _tags: any, _message: any) => twitchCallback(_tags['display-name'], _message));
+    twitchClient.on('message', (_channel: any, _tags: any, _message: any) => {
+      if (_tags['message-type'] !== "whisper") {
+        return twitchCallback(_tags['display-name'], _message);
+      }
+    });
   }
 
   const twitchDisconnection = () => {
@@ -128,10 +133,10 @@ const BlindTestView = () => {
 
   const onProposition = (nick: string, message: string) => {
     addPlayerIfUnknown(nick);
-    if (message === "!score") {
+    if (settings.chatNotifications && message === "!score") {
       const rank = leaderboardRows.find(row => row.nick === nick);
       if (rank !== undefined) {
-        twitchClient?.say(settings.twitchChannel, `@${nick} : Your score is ${rank.score} and your rank is #${rank.rank}`);
+        twitchClient?.whisper(nick, `Your score is ${rank.score} and your rank is #${rank.rank}`);
       }
     } else if (playing) {
       const proposition = cleanValueLight(message)
@@ -161,7 +166,11 @@ const BlindTestView = () => {
   endGuess = (index: number, delayed: boolean) => {
     let newGuesses = [...guesses];
     newGuesses[index].guessed = true;
-    twitchClient?.say(settings.twitchChannel, `✅ [${guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`);
+    if (settings.chatNotifications) {
+      let msg = `✅ [${guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
+      if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
+      twitchClient?.say(settings.twitchChannel, msg);
+    }
     setGuesses(newGuesses);
     if (delayed) {
       const points = delayedPoints[index];

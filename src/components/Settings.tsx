@@ -29,7 +29,7 @@ const Settings = () => {
   const twitchLoginURI = "https://id.twitch.tv/oauth2/authorize" +
     "?client_id=" + process.env.REACT_APP_TWITCH_CLIENT_ID +
     "&redirect_uri=" + getAppHomeURL() + "/settings" +
-    "&scope=chat:read+chat:edit" +
+    "&scope=chat:read+chat:edit+whispers:edit" +
     "&force_verify=true" +
     "&response_type=token";
 
@@ -107,7 +107,7 @@ const Settings = () => {
             <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked) }} />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupChatNotifications">
-            <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Display guess notifications in the chat" onChange={(e) => { setChatNotifications(e.target.checked) }} />
+            <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Twitch chat complete integration (display guesses in the chat + !score command)" onChange={(e) => { setChatNotifications(e.target.checked) }} />
             {process.env.REACT_APP_TWITCH_CLIENT_ID &&
               <>
                 {!loggedInTwitch &&
