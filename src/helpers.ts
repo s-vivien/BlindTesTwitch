@@ -133,7 +133,10 @@ export const setBlindTestTracks = (data: BlindTestTracks) => {
 
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
-  return cleanValueLight(value).replaceAll(/ \(.+\).*| -.+/g, "").trim()
+  return cleanValueLight(value)
+  .replaceAll(/ \(.+\).*| -.+/g, "")
+  .replaceAll(/ & /g, " and ")
+  .trim();
 }
 
 // lower-case + remove diacritic + remove some special characters
@@ -144,15 +147,19 @@ export const cleanValueLight = (value: string) => {
     .replaceAll(/\p{Diacritic}/gu, "")
     .replaceAll(/[!?.]+$/g, "")
     .replaceAll(/^[!?.]+/g, "")
-    .replaceAll(/[¿¡]/g, "")
+    .replaceAll(/[¿¡*,]/g, "")
     .replaceAll("’", "'")
+    .replaceAll("œ", "oe")
+    .replaceAll(/[$]/g, "s")
+    .replaceAll(/[ø]/g, "o")
     .trim();
 }
 
 export const cleanSpoiler = (title: string, artists: string[]) => {
   let cleaned = title;
   for (let artist of artists) {
-    var regExp = new RegExp(` \\(.*${artist}.*\\)| \\[.*${artist}.*\\]| - .*${artist}.*`, "gi");
+    var escapedArtist = artist.replace(/(.)/g, '\\$1');
+    var regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, "gi");
     cleaned = cleaned.replaceAll(regExp, "").trim();
   }
   return cleaned;
