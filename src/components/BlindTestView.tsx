@@ -25,6 +25,7 @@ type Guess = {
 };
 
 let twitchClient: Client | null = null;
+let lastJoinedChannel = '';
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 let endGuess: (index: number, delayed: boolean) => void = () => { };
 let delayedPoints: Map<string, number>[] = [];
@@ -52,9 +53,15 @@ const BlindTestView = () => {
   const [coverUri, setCoverUri] = useState('');
 
   useEffect(() => {
-    twitchConnection(settings.twitchChannel, settings.chatNotifications);
-    return () => {
-      twitchDisconnection();
+    console.log(`Twitch channel changed to ${settings.twitchChannel}`);
+    if (twitchClient !== null && lastJoinedChannel === settings.twitchChannel) {
+      console.log('Already connected...');
+    } else {
+      if (twitchClient !== null) {
+        twitchClient.disconnect();
+      }
+      console.log(`Connecting to ${settings.twitchChannel} twitch channel...`);
+      twitchConnection(settings.twitchChannel, settings.chatNotifications);
     }
   }, [settings.twitchChannel]);
 
@@ -112,17 +119,13 @@ const BlindTestView = () => {
     }
     twitchClient = new Client(opts);
     twitchClient.connect();
-    twitchClient.on('message', (_channel: any, _tags: any, _message: any) => {
+    twitchClient.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
+      if (_self) return;
       if (_tags['message-type'] !== "whisper") {
         return twitchCallback(_tags['display-name'], _message);
       }
     });
-  }
-
-  const twitchDisconnection = () => {
-    if (twitchClient !== null) {
-      twitchClient.disconnect();
-    }
+    lastJoinedChannel = chan;
   }
 
   const backupState = () => {
@@ -132,11 +135,13 @@ const BlindTestView = () => {
   }
 
   const onProposition = (nick: string, message: string) => {
+    // console.log(`${new Date()} : ${nick} said ${message}`);
     addPlayerIfUnknown(nick);
     if (settings.chatNotifications && message === "!score") {
       const rank = leaderboardRows.find(row => row.nick === nick);
       if (rank !== undefined) {
-        twitchClient?.whisper(nick, `Your score is ${rank.score} and your rank is #${rank.rank}`);
+        // twitchClient?.say(settings.twitchChannel, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+        twitchClient?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
       }
     } else if (playing) {
       const proposition = cleanValueLight(message)
@@ -184,7 +189,7 @@ const BlindTestView = () => {
   }
 
   const addPlayerIfUnknown = (nick: string) => {
-    if (settings.addEveryUser && !scores.get(nick)) {
+    if (settings.addEveryUser && scores.get(nick) === undefined) {
       addPointToPlayer(nick, 0);
     }
   }
