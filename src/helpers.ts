@@ -158,7 +158,7 @@ export const cleanValueLight = (value: string) => {
 export const cleanSpoiler = (title: string, artists: string[]) => {
   let cleaned = title;
   for (let artist of artists) {
-    var escapedArtist = artist.replace(/(.)/g, '\\$1');
+    var escapedArtist = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     var regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, "gi");
     cleaned = cleaned.replaceAll(regExp, "").trim();
   }
