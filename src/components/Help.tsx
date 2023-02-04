@@ -26,7 +26,9 @@ const Help = () => {
               <li>Artists/titles and propositions are <b>cleaned before comparison</b> :
                 <ul>
                   <li>Accents are removed</li>
-                  <li>Trailing <b>!?.</b> are removed</li>
+                  <li>The following characters are removed/ignored : <b>¿ ¡ * , .</b></li>
+                  <li>Some characters are replaced (e.g. <b>$</b> is replaced by <b>s</b>)</li>
+                  <li>The characters <b>!</b> and <b>?</b> are removed when they are at the beginning or the end of a word</li>
                   <li>Lower-cased (i.e. propositions are case-insensitive)</li>
                 </ul>
               </li>
