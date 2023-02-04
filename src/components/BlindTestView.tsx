@@ -197,7 +197,7 @@ const BlindTestView = () => {
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
-    const firstGuess = guesses[index].guessedBy.length == 0;
+    const firstGuess = guesses[index].guessedBy.length === 0;
     let newGuesses = [...guesses];
     newGuesses[index].guessedBy.push({ nick: nick, points: points });
     if (settings.acceptanceDelay === 0) {

@@ -57,7 +57,7 @@ const Settings = () => {
     if (loggedInTwitch) {
       const twitchToken = getTwitchOAuthToken() || '';
       validateToken(twitchToken).then(response => {
-        if (response.status != 200) {
+        if (response.status !== 200) {
           removeTwitchOAuthToken();
           setLoggedInTwitch(false);
         } else {
