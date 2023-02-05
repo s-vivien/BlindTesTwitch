@@ -2,7 +2,7 @@ import { getSettings, getTwitchOAuthToken, setSettings, getAppHomeURL, setTwitch
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react'
 import { getDevices } from "services/SpotifyAPI"
-import { SettingsData } from "./data/SettingsData";
+import { SettingsData, TwitchMode } from "./data/SettingsData";
 import Form from 'react-bootstrap/Form'
 import { Button } from "react-bootstrap";
 import { BlindTestContext } from "App";
@@ -23,6 +23,7 @@ const Settings = () => {
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
   const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay || 0);
+  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode || TwitchMode.Disabled);
   const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settings.previewGuessNumber || false);
   const [channel, setChannel] = useState(settings.twitchChannel || '');
 
@@ -76,7 +77,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0));
+      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0, scoreCommandMode));
       setConfigured(true);
       navigate("/");
     }
@@ -87,6 +88,9 @@ const Settings = () => {
     return (
       <div style={{ width: '600px', margin: 'auto' }}>
         <Form noValidate validated={validated} onSubmit={submit}>
+
+          <h3>Global</h3>
+
           <Form.Group className="mb-3" controlId="formGroupTwitch">
             <Form.Label>Twitch channel on which you'll stream</Form.Label>
             <Form.Control required value={channel} onChange={(e) => { setChannel(e.target.value) }} type="text" placeholder="Enter twitch channel" />
@@ -106,26 +110,41 @@ const Settings = () => {
           <Form.Group className="mb-3" controlId="formPreviewGuessNumber">
             <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked) }} />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formGroupChatNotifications">
-            <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Twitch chat complete integration (display guesses in the chat + !score command)" onChange={(e) => { setChatNotifications(e.target.checked) }} />
-            {process.env.REACT_APP_TWITCH_CLIENT_ID &&
-              <>
-                {!loggedInTwitch &&
-                  <Form.Text id="twitchLoginBlock" muted>
-                    You need to connect a twitch account to use that feature. <a href={twitchLoginURI}>Click here to connect an account.</a>
-                  </Form.Text>
-                }
-                {loggedInTwitch &&
-                  <Form.Text id="twitchLogoutBlock" onClick={twitchLogout} muted>
-                    Messages will be sent with {twitchNick} account. <a href="#">Disconnect account.</a>
-                  </Form.Text>
-                }
-              </>
-            }
-          </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAddEveryUser">
             <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked) }} />
           </Form.Group>
+
+          <br></br>
+          <h3>Twitch integration</h3>
+
+          {process.env.REACT_APP_TWITCH_CLIENT_ID &&
+            <>
+              {!loggedInTwitch &&
+                <Form.Text id="twitchLoginBlock" muted>
+                  Connect your twitch account to unlock more features. <a href={twitchLoginURI}>Click here to connect an account.</a>
+                </Form.Text>
+              }
+              {loggedInTwitch &&
+                <Form.Text id="twitchLogoutBlock" onClick={twitchLogout} muted>
+                  Connected on {twitchNick} account. <a href="#">Disconnect account.</a>
+                </Form.Text>
+              }
+              <br></br>
+
+              <Form.Group className="mb-3" controlId="formGroupScoreCommandMode">
+                <Form.Label>Score command mode (<i>!score</i>)</Form.Label>
+                <Form.Select disabled={!loggedInTwitch} required className="form-control" value={scoreCommandMode} onChange={(e) => { setScoreCommandMode(+(e.target.value)) }}>
+                  <option value={TwitchMode.Disabled} selected={!loggedInTwitch}>Disabled</option>
+                  <option value={TwitchMode.Channel}>The bot will respond in the channel</option>
+                  <option value={TwitchMode.Whisper}>The bot will respond in DM</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formGroupChatNotifications">
+                <Form.Check disabled={!loggedInTwitch} type="checkbox" checked={loggedInTwitch && chatNotifications} label="Channel notifications (display guesses in the chat)" onChange={(e) => { setChatNotifications(e.target.checked) }} />
+              </Form.Group>
+            </>
+          }
+
           <Button variant="primary" type="submit">
             Save
           </Button>

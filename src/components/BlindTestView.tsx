@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Guessable } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
+import { TwitchMode } from "./data/SettingsData"
 
 type DisplayableScore = {
   nick: string,
@@ -137,11 +138,16 @@ const BlindTestView = () => {
   const onProposition = (nick: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
     addPlayerIfUnknown(nick);
-    if (settings.chatNotifications && message === "!score") {
-      const rank = leaderboardRows.find(row => row.nick === nick);
-      if (rank !== undefined) {
-        // twitchClient?.say(settings.twitchChannel, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
-        twitchClient?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+    if (message === "!score") {
+      if (settings.scoreCommandMode !== TwitchMode.Disabled) {
+        const rank = leaderboardRows.find(row => row.nick === nick);
+        if (rank !== undefined) {
+          if (settings.scoreCommandMode === TwitchMode.Whisper) {
+            twitchClient?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+          } else {
+            twitchClient?.say(settings.twitchChannel, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+          }
+        }
       }
     } else if (playing) {
       const proposition = cleanValueLight(message)
