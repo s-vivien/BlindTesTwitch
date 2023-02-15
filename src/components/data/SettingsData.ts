@@ -1,7 +1,7 @@
 export enum TwitchMode {
-  Disabled= 0,
-  Channel=1,
-  Whisper=2
+  Disabled = 0,
+  Channel = 1,
+  Whisper = 2
 }
 
 export class SettingsData {

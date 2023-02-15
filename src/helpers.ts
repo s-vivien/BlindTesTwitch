@@ -1,5 +1,5 @@
 import { BlindTestTracks } from "components/data/BlindTestData"
-import { deserialize, serialize } from 'class-transformer'
+import { plainToInstance, serialize } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
 
@@ -29,9 +29,10 @@ export const computePkcePair = async () => {
 }
 
 export const consumePkcePair = () => {
-  const codePair: PKCECodePair = deserialize(PKCECodePair, localStorage.getItem("pkce_pair") || "{}")
-  localStorage.removeItem("pkce_pair")
-  return codePair
+  const plain: PKCECodePair = JSON.parse(localStorage.getItem("pkce_pair") || "{}");
+  const codePair: PKCECodePair = plainToInstance(PKCECodePair, plain);
+  localStorage.removeItem("pkce_pair");
+  return codePair;
 }
 
 export const getStoredTheme = () => {
@@ -93,7 +94,8 @@ export const hasStoredBlindTest = () => {
 }
 
 export const getSettings = () => {
-  return deserialize(SettingsData, localStorage.getItem("settings") || "{}")
+  const plain: SettingsData = JSON.parse(localStorage.getItem("settings") || "{}");
+  return plainToInstance(SettingsData, plain);
 }
 
 export const removeSettings = () => {
@@ -119,8 +121,8 @@ export const setBlindTestScores = (scores: Map<string, number>) => {
 }
 
 export const getBlindTestTracks = () => {
-  let bt = deserialize(BlindTestTracks, localStorage.getItem("blind_test_tracks") || "{}")
-  return bt
+  const plain: BlindTestTracks = JSON.parse(localStorage.getItem("blind_test_tracks") || "{}");
+  return plainToInstance(BlindTestTracks, plain);
 }
 
 export const removeBlindTestTracks = () => {
@@ -134,9 +136,9 @@ export const setBlindTestTracks = (data: BlindTestTracks) => {
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
   return cleanValueLight(value)
-  .replaceAll(/ \(.+\).*| -.+/g, "")
-  .replaceAll(/ & /g, " and ")
-  .trim();
+    .replaceAll(/ \(.+\).*| -.+/g, "")
+    .replaceAll(/ & /g, " and ")
+    .trim();
 }
 
 // lower-case + remove diacritic + remove some special characters
