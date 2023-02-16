@@ -2,7 +2,7 @@ import TracksBaseData from "./data/TracksBaseData"
 import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTracks } from "./data/BlindTestData"
-import { setBlindTestTracks, removeBlindTestScores, getBlindTestScores } from "../helpers"
+import { setStoredBlindTestTracks, deleteStoredBlindTestScores, getStoredBlindTestScores } from "../helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react"
 import { BlindTestContext } from "App"
@@ -14,7 +14,7 @@ const PlaylistRow = (props: any) => {
   const navigate = useNavigate();
 
   const selectPlaylist = async () => {
-    if (getBlindTestScores().size > 0) {
+    if (getStoredBlindTestScores().size > 0) {
       setConfirmationDisplayed(true);
     } else {
       loadPlaylist(false);
@@ -23,12 +23,12 @@ const PlaylistRow = (props: any) => {
 
   const loadPlaylist = async (keepScores: boolean) => {
     if (!keepScores) {
-      removeBlindTestScores();
+      deleteStoredBlindTestScores();
     }
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     tracks = tracks.filter(t => t.track.is_playable);
     const bt = new BlindTestTracks(tracks, props.playlist.uri);
-    setBlindTestTracks(bt);
+    setStoredBlindTestTracks(bt);
     setOngoingBt(true);
     navigate("/");
   }

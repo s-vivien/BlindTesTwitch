@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { removeBlindTestTracks } from "helpers"
+import { deleteStoredBlindTestTracks } from "helpers"
 import { useContext } from "react";
 import { BlindTestContext } from "App";
 
@@ -9,7 +9,7 @@ const PlaylistsButton = () => {
   const { setOngoingBt } = useContext(BlindTestContext);
 
   const handleClick = () => {
-    removeBlindTestTracks();
+    deleteStoredBlindTestTracks();
     setOngoingBt(false);
   }
 

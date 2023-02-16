@@ -1,5 +1,5 @@
 import { BlindTestTracks } from "components/data/BlindTestData"
-import { plainToInstance, serialize } from 'class-transformer'
+import { instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
 
@@ -23,9 +23,9 @@ const getParam = (name: string, value: string) => {
 }
 
 export const computePkcePair = async () => {
-  const codePair: PKCECodePair = await createPKCECodes()
-  localStorage.setItem("pkce_pair", serialize(codePair))
-  return codePair
+  const codePair: PKCECodePair = await createPKCECodes();
+  localStorage.setItem("pkce_pair", JSON.stringify(instanceToPlain(codePair)));
+  return codePair;
 }
 
 export const consumePkcePair = () => {
@@ -45,47 +45,47 @@ export const setStoredTheme = (theme: any) => {
   localStorage.setItem("theme", theme)
 }
 
-export const getTwitchOAuthToken = () => {
+export const getStoredTwitchOAuthToken = () => {
   return localStorage.getItem("twitch_oauth_token");
 }
 
-export const setTwitchOAuthToken = (twitch_oauth_token: any) => {
+export const setStoredTwitchOAuthToken = (twitch_oauth_token: any) => {
   localStorage.setItem("twitch_oauth_token", twitch_oauth_token)
 }
 
-export const removeTwitchOAuthToken = () => {
+export const deleteStoredTwitchOAuthToken = () => {
   localStorage.removeItem("twitch_oauth_token")
 }
 
-export const getRefreshToken = () => {
+export const getStoredRefreshToken = () => {
   return localStorage.getItem("refresh_token")
 }
 
-export const setRefreshToken = (refresh_token: any) => {
+export const setStoredRefreshToken = (refresh_token: any) => {
   localStorage.setItem("refresh_token", refresh_token)
 }
 
-export const removeRefreshToken = () => {
+export const deleteStoredRefreshToken = () => {
   localStorage.removeItem("refresh_token")
 }
 
-export const getUserCountry = () => {
+export const getStoredUserCountry = () => {
   return localStorage.getItem("user_country")
 }
 
-export const setUserCountry = (user_country: any) => {
+export const setStoredUserCountry = (user_country: any) => {
   localStorage.setItem("user_country", user_country)
 }
 
-export const getAccessToken = () => {
+export const getStoredAccessToken = () => {
   return localStorage.getItem("access_token")
 }
 
-export const setAccessToken = (access_token: any) => {
+export const setStoredAccessToken = (access_token: any) => {
   localStorage.setItem("access_token", access_token)
 }
 
-export const removeAccessToken = () => {
+export const deleteStoredAccessToken = () => {
   localStorage.removeItem("access_token")
 }
 
@@ -93,44 +93,43 @@ export const hasStoredBlindTest = () => {
   return localStorage.getItem("blind_test_tracks") !== null
 }
 
-export const getSettings = () => {
+export const getStoredSettings = () => {
   const plain: SettingsData = JSON.parse(localStorage.getItem("settings") || "{}");
   return plainToInstance(SettingsData, plain);
 }
 
-export const removeSettings = () => {
+export const deleteStoredSettings = () => {
   localStorage.removeItem("settings")
 }
 
-export const setSettings = (data: SettingsData) => {
-  localStorage.setItem("settings", serialize(data))
+export const setStoredSettings = (data: SettingsData) => {
+  localStorage.setItem("settings", JSON.stringify(instanceToPlain(data)))
 }
 
-export const getBlindTestScores = () => {
-  // ugly workaround because class-transformer deserialize maps to plain objects ...
-  let scores: Map<string, number> = new Map(Object.entries(JSON.parse(localStorage.getItem("blind_test_scores") || "{}")));
-  return scores;
+export const getStoredBlindTestScores = () => {
+  const plain: Map<string, number> = JSON.parse(localStorage.getItem("blind_test_scores") || "{}");
+  return plainToInstance(Map<string, number>, plain);
 }
 
-export const removeBlindTestScores = () => {
+export const deleteStoredBlindTestScores = () => {
   localStorage.removeItem("blind_test_scores")
 }
 
-export const setBlindTestScores = (scores: Map<string, number>) => {
-  localStorage.setItem("blind_test_scores", serialize(scores));
+export const setStoredBlindTestScores = (scores: Map<string, number>) => {
+  localStorage.setItem("blind_test_scores", JSON.stringify(instanceToPlain(scores)));
 }
 
-export const getBlindTestTracks = () => {
+export const getStoredBlindTestTracks = () => {
   const plain: BlindTestTracks = JSON.parse(localStorage.getItem("blind_test_tracks") || "{}");
   return plainToInstance(BlindTestTracks, plain);
 }
 
-export const removeBlindTestTracks = () => {
+export const deleteStoredBlindTestTracks = () => {
   localStorage.removeItem("blind_test_tracks")
 }
 
-export const setBlindTestTracks = (data: BlindTestTracks) => {
-  localStorage.setItem("blind_test_tracks", serialize(data))
+export const setStoredBlindTestTracks = (data: BlindTestTracks) => {
+  localStorage.setItem("blind_test_tracks", JSON.stringify(instanceToPlain(data)))
 }
 
 // light clean + trailing parts (- X || (X))

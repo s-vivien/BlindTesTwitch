@@ -1,7 +1,7 @@
 import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react"
-import { getSettings } from "helpers";
+import { getStoredSettings } from "helpers";
 
 const Help = () => {
 
@@ -11,7 +11,7 @@ const Help = () => {
     setHelpDisplayed(true);
   }
 
-  const settings = getSettings();
+  const settings = getStoredSettings();
 
   return (
     <>

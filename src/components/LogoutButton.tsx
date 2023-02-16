@@ -1,6 +1,6 @@
 import { Button } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { removeRefreshToken, removeAccessToken, removeBlindTestTracks, removeBlindTestScores, removeSettings, removeTwitchOAuthToken } from "helpers"
+import { deleteStoredRefreshToken, deleteStoredAccessToken, deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredSettings, deleteStoredTwitchOAuthToken } from "helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { BlindTestContext } from "App";
@@ -11,12 +11,12 @@ const LogoutButton = () => {
   const navigate = useNavigate()
 
   const handleClick = () => {
-    removeRefreshToken();
-    removeAccessToken();
-    removeBlindTestTracks();
-    removeBlindTestScores();
-    removeTwitchOAuthToken();
-    removeSettings();
+    deleteStoredRefreshToken();
+    deleteStoredAccessToken();
+    deleteStoredBlindTestTracks();
+    deleteStoredBlindTestScores();
+    deleteStoredTwitchOAuthToken();
+    deleteStoredSettings();
     setLoggedIn(false);
     setOngoingBt(false);
     setConfigured(false);

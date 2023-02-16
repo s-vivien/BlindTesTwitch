@@ -1,4 +1,4 @@
-import { getBlindTestTracks, getBlindTestScores, computeDistance, cleanValueLight, getSettings, setBlindTestTracks, setBlindTestScores, getTwitchOAuthToken } from "helpers"
+import { getStoredBlindTestTracks, getStoredBlindTestScores, computeDistance, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, FormControl } from "react-bootstrap"
@@ -40,10 +40,10 @@ const BlindTestView = () => {
 
   const { setSubtitle } = useContext(BlindTestContext);
 
-  const [bt] = useState(() => getBlindTestTracks());
-  const [settings] = useState(() => getSettings());
+  const [bt] = useState(() => getStoredBlindTestTracks());
+  const [settings] = useState(() => getStoredSettings());
   const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
-  const [scores, setScores] = useState(() => getBlindTestScores());
+  const [scores, setScores] = useState(() => getStoredBlindTestScores());
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
@@ -114,7 +114,7 @@ const BlindTestView = () => {
     if (chatNotifications) {
       opts.identity = {
         username: 'foo',
-        password: getTwitchOAuthToken() || ""
+        password: getStoredTwitchOAuthToken() || ""
       }
     }
     twitchClient = new Client(opts);
@@ -130,8 +130,8 @@ const BlindTestView = () => {
 
   const backupState = () => {
     bt.doneTracks = doneTracks;
-    setBlindTestTracks(bt);
-    setBlindTestScores(scores);
+    setStoredBlindTestTracks(bt);
+    setStoredBlindTestScores(scores);
   }
 
   const onProposition = (nick: string, message: string) => {
@@ -188,7 +188,7 @@ const BlindTestView = () => {
       points.forEach((value: number, nick: string) => {
         newScores.set(nick, (newScores.get(nick) || 0) + value);
       });
-      setBlindTestScores(newScores);
+      setStoredBlindTestScores(newScores);
       setScores(newScores);
     }
   }
@@ -202,7 +202,7 @@ const BlindTestView = () => {
   const addPointToPlayer = (nick: string, points: number) => {
     let newScores: Map<string, number> = new Map(scores);
     newScores.set(nick, (newScores.get(nick) || 0) + points);
-    if (points !== 0) setBlindTestScores(newScores);
+    if (points !== 0) setStoredBlindTestScores(newScores);
     setScores(newScores);
   }
 

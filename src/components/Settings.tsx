@@ -1,4 +1,4 @@
-import { getSettings, getTwitchOAuthToken, setSettings, getAppHomeURL, setTwitchOAuthToken, getHashParam, removeTwitchOAuthToken } from "helpers"
+import { getStoredSettings, getStoredTwitchOAuthToken, setStoredSettings, getAppHomeURL, setStoredTwitchOAuthToken, getHashParam, deleteStoredTwitchOAuthToken } from "helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react'
 import { getDevices } from "services/SpotifyAPI"
@@ -13,12 +13,12 @@ const Settings = () => {
   const { setConfigured, setSubtitle } = useContext(BlindTestContext);
   const navigate = useNavigate();
 
-  const [settings] = useState(() => getSettings());
+  const [settings] = useState(() => getStoredSettings());
   const [validated, setValidated] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
-  const [loggedInTwitch, setLoggedInTwitch] = useState<boolean>(() => getTwitchOAuthToken() !== null);
+  const [loggedInTwitch, setLoggedInTwitch] = useState<boolean>(() => getStoredTwitchOAuthToken() !== null);
   const [twitchNick, setTwitchNick] = useState("");
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || false);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || false);
@@ -38,7 +38,7 @@ const Settings = () => {
     // Twitch logging callback
     const token = getHashParam('access_token')
     if (token) {
-      setTwitchOAuthToken(token);
+      setStoredTwitchOAuthToken(token);
       setLoggedInTwitch(true);
       navigate("/settings");
     }
@@ -56,10 +56,10 @@ const Settings = () => {
 
   useEffect(() => {
     if (loggedInTwitch) {
-      const twitchToken = getTwitchOAuthToken() || '';
+      const twitchToken = getStoredTwitchOAuthToken() || '';
       validateToken(twitchToken).then(response => {
         if (response.status !== 200) {
-          removeTwitchOAuthToken();
+          deleteStoredTwitchOAuthToken();
           setLoggedInTwitch(false);
         } else {
           response.json().then(body => setTwitchNick(body['login']));
@@ -69,7 +69,7 @@ const Settings = () => {
   }, [loggedInTwitch]);
 
   const twitchLogout = () => {
-    removeTwitchOAuthToken();
+    deleteStoredTwitchOAuthToken();
     setLoggedInTwitch(false);
   }
 
@@ -77,7 +77,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0, scoreCommandMode));
+      setStoredSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0, scoreCommandMode));
       setConfigured(true);
       navigate("/");
     }

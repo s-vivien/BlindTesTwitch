@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getRefreshToken, setRefreshToken, removeAccessToken, getAccessToken, setAccessToken, consumePkcePair, getAppHomeURL, getUserCountry } from 'helpers';
+import { getStoredRefreshToken, setStoredRefreshToken, deleteStoredAccessToken, getStoredAccessToken, setStoredAccessToken, consumePkcePair, getAppHomeURL, getStoredUserCountry } from 'helpers';
 
 const instance = axios.create({
   headers: {
@@ -24,12 +24,12 @@ instance.interceptors.response.use(
       // Access Token was expired
       if (err.response.status === 401 && !config._retry) {
         delete instance.defaults.headers.common.Authorization
-        removeAccessToken()
+        deleteStoredAccessToken()
         config._retry = true
         try {
           const params = new URLSearchParams()
           params.append('grant_type', 'refresh_token')
-          params.append('refresh_token', getRefreshToken() || "")
+          params.append('refresh_token', getStoredRefreshToken() || "")
           params.append('client_id', process.env.REACT_APP_SPOTIFY_CLIENT_ID || "")
           const rs = await instance.post('https://accounts.spotify.com/api/token',
             params, {
@@ -37,9 +37,9 @@ instance.interceptors.response.use(
               "Content-Type": "application/x-www-form-urlencoded",
             }
           })
-          setRefreshToken(rs.data.refresh_token)
+          setStoredRefreshToken(rs.data.refresh_token)
           const accessToken = rs.data.access_token
-          setAccessToken(accessToken)
+          setStoredAccessToken(accessToken)
           instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
           config.headers.Authorization = `Bearer ${accessToken}`
           return instance(config)
@@ -75,7 +75,7 @@ export const retrieveAccessToken = (access_code: string) => {
   })
 }
 
-const accessToken = getAccessToken()
+const accessToken = getStoredAccessToken()
 if (accessToken) {
   instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
 }
@@ -89,7 +89,7 @@ export const getPlaylists = (offset: number, limit: number) => {
 }
 
 export const getPlaylistTracks = (playlist_id: string, offset: number, limit: number) => {
-  const market = getUserCountry();
+  const market = getStoredUserCountry();
   return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),album(images)))`)
 }
 

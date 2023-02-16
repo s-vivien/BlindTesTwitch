@@ -4,7 +4,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { getRefreshToken, getSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
+import { getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import PlaylistTable from './components/PlaylistTable';
@@ -19,8 +19,8 @@ function App() {
   const navigate = useNavigate();
 
   const [theme, setTheme] = useState(() => getStoredTheme());
-  const [loggedIn, setLoggedIn] = useState(() => getRefreshToken() !== null);
-  const [configured, setConfigured] = useState(() => getSettings().isInitialized());
+  const [loggedIn, setLoggedIn] = useState(() => getStoredRefreshToken() !== null);
+  const [configured, setConfigured] = useState(() => getStoredSettings().isInitialized());
   const [ongoingBt, setOngoingBt] = useState(() => hasStoredBlindTest());
   const [view, setView] = useState(<div />);
   const [subtitle, setSubtitle] = useState('');

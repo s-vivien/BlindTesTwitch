@@ -1,4 +1,4 @@
-import { setAccessToken, setRefreshToken, getQueryParam, setUserCountry } from "helpers"
+import { setStoredAccessToken, setStoredRefreshToken, getQueryParam, setStoredUserCountry } from "helpers"
 import { useNavigate } from "react-router-dom";
 import instance, { getUserProfile, retrieveAccessToken } from 'services/SpotifyAPI'
 import { useContext, useEffect } from 'react'
@@ -13,13 +13,13 @@ const LoginCallback = () => {
     const code = getQueryParam('code')
     if (code) {
       retrieveAccessToken(code).then(response => {
-        setRefreshToken(response.data.refresh_token);
+        setStoredRefreshToken(response.data.refresh_token);
         const accessToken = response.data.access_token;
-        setAccessToken(accessToken);
+        setStoredAccessToken(accessToken);
         instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         setLoggedIn(true);
         getUserProfile().then(response => {
-          setUserCountry(response.data.country);
+          setStoredUserCountry(response.data.country);
         });
         navigate("/");
       })
