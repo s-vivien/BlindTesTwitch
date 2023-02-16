@@ -26,7 +26,6 @@ type Guess = {
 };
 
 let twitchClient: Client | null = null;
-let lastJoinedChannel = '';
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 let endGuess: (index: number, delayed: boolean) => void = () => { };
 let delayedPoints: Map<string, number>[] = [];
@@ -54,14 +53,9 @@ const BlindTestView = () => {
 
   useEffect(() => {
     console.log(`Twitch channel changed to ${settings.twitchChannel}`);
-    if (twitchClient !== null && lastJoinedChannel === settings.twitchChannel) {
-      console.log('Already connected...');
-    } else {
-      if (twitchClient !== null) {
-        twitchClient.disconnect();
-      }
-      console.log(`Connecting to ${settings.twitchChannel} twitch channel...`);
-      twitchConnection(settings.twitchChannel, settings.chatNotifications);
+    twitchConnection(settings.twitchChannel, settings.chatNotifications);
+    return () => {
+      twitchDisconnection();
     }
   }, [settings.twitchChannel]);
 
@@ -104,6 +98,13 @@ const BlindTestView = () => {
     setLeaderboardRows(flat);
   }, [nickFilter, scores]);
 
+  const twitchDisconnection = () => {
+    console.log('Disconnecting from Twitch...');
+    if (twitchClient !== null) {
+      twitchClient.disconnect();
+    }
+  }
+
   const twitchConnection = (chan: string, chatNotifications: boolean) => {
     let opts: Options = {
       options: {
@@ -125,7 +126,6 @@ const BlindTestView = () => {
         return twitchCallback(_tags['display-name'], _message);
       }
     });
-    lastJoinedChannel = chan;
   }
 
   const backupState = () => {

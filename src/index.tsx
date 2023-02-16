@@ -10,9 +10,9 @@ require('array.prototype.flatmap').shim()
 const root = createRoot(document.getElementById('root')!);
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <BrowserRouter basename={process.env.PUBLIC_URL}>
       <App />
     </BrowserRouter>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

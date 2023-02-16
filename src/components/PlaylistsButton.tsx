@@ -9,6 +9,7 @@ const PlaylistsButton = () => {
   const { setOngoingBt } = useContext(BlindTestContext);
 
   const handleClick = () => {
+    // TODO modal warning
     deleteStoredBlindTestTracks();
     setOngoingBt(false);
   }
