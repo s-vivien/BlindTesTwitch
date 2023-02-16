@@ -145,8 +145,11 @@ const Settings = () => {
             </>
           }
 
-          <Button variant="primary" type="submit">
+          <Button className="mr-2" variant="primary" type="submit">
             Save
+          </Button>
+          <Button className="mr-2" variant="secondary" onClick={() => navigate("/")}>
+            Cancel
           </Button>
         </Form>
       </div>

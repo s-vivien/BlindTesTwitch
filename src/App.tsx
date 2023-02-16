@@ -4,16 +4,13 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
+import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoredAccessToken, deleteStoredRefreshToken, getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
-import PlaylistTable from './components/PlaylistTable';
-import PlaylistsButton from './components/PlaylistsButton';
-import LogoutButton from './components/LogoutButton';
-import SettingsButton from 'components/SettingsButton';
 import BlindTestView from './components/BlindTestView';
 import LoginCallback from './components/LoginCallback';
 import Help from 'components/Help';
+import PlaylistView from 'components/PlaylistView';
 
 function App() {
   const navigate = useNavigate();
@@ -37,7 +34,7 @@ function App() {
     } else if (!configured) {
       navigate('/settings');
     } else if (!ongoingBt) {
-      setView(<PlaylistTable />);
+      navigate('/playlist');
     } else {
       setView(<BlindTestView />);
     }
@@ -60,6 +57,19 @@ function App() {
     setTheme(1 - theme);
   }
 
+  const logout = () => {
+    deleteStoredRefreshToken();
+    deleteStoredAccessToken();
+    deleteStoredBlindTestTracks();
+    deleteStoredBlindTestScores();
+    deleteStoredTwitchOAuthToken();
+    deleteStoredSettings();
+    setLoggedIn(false);
+    setOngoingBt(false);
+    setConfigured(false);
+    navigate("/");
+  }
+
   return (
     <BlindTestContext.Provider value={contextValue}>
       <header className="app-header">
@@ -68,13 +78,22 @@ function App() {
           <a href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
         </div>
         <div style={{ position: 'absolute', right: 0 }}>
-          {ongoingBt && <PlaylistsButton />}
+          {loggedIn && ongoingBt && <Button id="playButton" type="submit" variant="link" size="sm" onClick={() => navigate("/")} title="Play">
+            <FontAwesomeIcon icon={['fas', 'music']} size="lg" />
+          </Button>}
+          {loggedIn && <Button id="listButton" type="submit" variant="link" size="sm" onClick={() => navigate("/playlist")} title="Playlists">
+            <FontAwesomeIcon icon={['fas', 'list']} size="lg" />
+          </Button>}
           <Button id="toggleButton" type="submit" variant="link" size="sm" onClick={toggleTheme} title="Switch theme">
             <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
           </Button>
-          {loggedIn && <SettingsButton />}
+          {loggedIn && <Button id="settingButton" type="submit" variant="link" size="sm" onClick={() => navigate("/settings")} title="Settings">
+            <FontAwesomeIcon icon={['fas', 'cog']} size="lg" />
+          </Button>}
           <Help />
-          {loggedIn && <LogoutButton />}
+          {loggedIn && <Button id="logoutButton" type="submit" variant="link" size="sm" onClick={logout} title="Logout">
+            <FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" />
+          </Button>}
         </div>
         <p id="subtitle" className="lead text-secondary">
           {subtitle}
@@ -98,6 +117,7 @@ function App() {
         }
         <Routes>
           <Route path="/" element={view} />
+          <Route path="/playlist" element={<PlaylistView />} />
           <Route path="/callback" element={<LoginCallback />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
