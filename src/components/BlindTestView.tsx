@@ -254,23 +254,23 @@ const BlindTestView = () => {
     let track = bt.tracks[doneTracks]
     setPlaying(false);
     setLoading(true);
-    // launchTrack(bt.playlistUri, track.offset, settings.deviceId).then(() => {
-    //   setRepeatMode(true, settings.deviceId);
-    setDoneTracks(doneTracks + 1);
-    setCurrentTrack(track);
-    const newGuesses = [];
-    delayedPoints = [];
-    for (let guessable of track.guessables) {
-      newGuesses.push({ guessed: guessable.disabled, guessedBy: [] });
-      delayedPoints.push(new Map<string, number>());
-    }
-    setGuesses(newGuesses);
-    setPlaying(true);
-    setPaused(false);
-    setLoading(false);
-    // }).catch(() => {
-    //   setLoading(false);
-    // });
+    launchTrack(bt.playlistUri, track.offset, settings.deviceId).then(() => {
+      setRepeatMode(true, settings.deviceId);
+      setDoneTracks(doneTracks + 1);
+      setCurrentTrack(track);
+      const newGuesses = [];
+      delayedPoints = [];
+      for (let guessable of track.guessables) {
+        newGuesses.push({ guessed: guessable.disabled, guessedBy: [] });
+        delayedPoints.push(new Map<string, number>());
+      }
+      setGuesses(newGuesses);
+      setPlaying(true);
+      setPaused(false);
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
   }
 
   const CrossEmoji = <FontAwesomeIcon color="#de281b" icon={['fas', 'times']} size="lg" />;
@@ -343,8 +343,8 @@ const BlindTestView = () => {
                   {playing &&
                     <div>
                       {currentTrack.mapGuessables(GuessableType.Artist, (guessable: Guessable, index: number) => {
-                          return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
-                        })}
+                        return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
+                      })}
                     </div>
                   }
                 </div>
