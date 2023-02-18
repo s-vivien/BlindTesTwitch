@@ -14,12 +14,15 @@ $input-btn-line-height-xs: 1.3 !default;
   );
 }
 
+button {
+  border-radius: 1rem !important;
+}
+
 body {
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none; /* Standard */
-  transition: all 0.1s linear;
 }
 
 input:-webkit-autofill {
@@ -132,7 +135,60 @@ svg {
   display: inline-block;
 }
 
-.spot-modal-bg {
+.playlist-load-button {
+  text-align: center;
+}
+
+.edition-cover {
+  height: 80px;
+  width: 80px;
+  border: solid black 1px;
+  img {
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+  }
+}
+
+.edition-buttons {
+  button {
+    margin-left: 5px;
+  }
+}
+
+.edition-form-left-buttons {
+  margin-right: auto !important;
+}
+
+.edition-form-row {
+  div {
+    margin: auto;
+  }
+}
+
+.edition-row {
+  display: flex;
+  * {
+    margin: auto;
+  }
+}
+
+.edition-row-disabled {
+  pointer-events: none;
+  filter: brightness(40%);
+}
+
+.edition-row-number {
+  font-size: x-large;
+  width: 3em;
+  opacity: 40%;
+}
+
+.alert-modal-c-p {
+  text-align: center;
+}
+
+.alert-modal-bg {
   position: fixed;
   top: 0;
   left: 0;
@@ -142,7 +198,7 @@ svg {
   z-index: 2147483646;
 }
 
-.spot-modal {
+.alert-modal {
   position: fixed;
   width: fit-content;
   height: fit-content;
@@ -159,6 +215,17 @@ svg {
   padding: 20px;
   li {
     text-align: left;
+  }
+}
+
+.popover {
+  background-color: $body-bg;
+}
+
+.modal-content {
+  background-color: $modal-background-color;
+  div {
+    border: 0;
   }
 }
 

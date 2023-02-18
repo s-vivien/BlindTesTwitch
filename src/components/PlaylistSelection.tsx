@@ -3,11 +3,11 @@ import { FormControl, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
 import PlaylistsData from "./data/PlaylistsData"
-import PlaylistRow from "./PlaylistRow"
+import PlaylistSelectionRow from "./PlaylistSelectionRow"
 import { BlindTestContext } from 'App'
 import Paginator from './Paginator'
 
-const PlaylistTable = () => {
+const PlaylistSelection = () => {
   const PAGE_SIZE = 20;
 
   const { setSubtitle } = useContext(BlindTestContext);
@@ -114,7 +114,7 @@ const PlaylistTable = () => {
           </thead>
           <tbody>
             {playlists.map((playlist) => {
-              return <PlaylistRow
+              return <PlaylistSelectionRow
                 playlist={playlist}
                 key={playlist.id}
               />
@@ -131,4 +131,4 @@ const PlaylistTable = () => {
   }
 }
 
-export default PlaylistTable
+export default PlaylistSelection

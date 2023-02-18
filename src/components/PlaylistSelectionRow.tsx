@@ -3,15 +3,13 @@ import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTracks } from "./data/BlindTestData"
 import { setStoredBlindTestTracks, deleteStoredBlindTestScores, getStoredBlindTestScores } from "../helpers"
-import { useNavigate } from "react-router-dom";
 import { useContext, useState } from "react"
 import { BlindTestContext } from "App"
 
-const PlaylistRow = (props: any) => {
+const PlaylistSelectionRow = (props: any) => {
 
-  const { setOngoingBt } = useContext(BlindTestContext);
+  const { setTracksLoaded } = useContext(BlindTestContext);
   const [confirmationDisplayed, setConfirmationDisplayed] = useState(false);
-  const navigate = useNavigate();
 
   const selectPlaylist = async () => {
     if (getStoredBlindTestScores().size > 0) {
@@ -29,8 +27,7 @@ const PlaylistRow = (props: any) => {
     tracks = tracks.filter(t => t.track.is_playable);
     const bt = new BlindTestTracks(tracks, props.playlist.uri);
     setStoredBlindTestTracks(bt);
-    setOngoingBt(true);
-    navigate("/");
+    setTracksLoaded(true);
   }
 
   const renderTickCross = (condition: boolean) => {
@@ -58,9 +55,9 @@ const PlaylistRow = (props: any) => {
   return (
     <>
       {confirmationDisplayed &&
-        <div className="spot-modal-bg">
-          <Alert className="spot-modal" variant="secondary" >
-            <p>
+        <div className="alert-modal-bg">
+          <Alert className="alert-modal" variant="secondary" >
+            <p className="alert-modal-c-p">
               Do you want to reset the leaderboard scores ?
             </p>
             <div className="d-flex justify-content-center">
@@ -93,4 +90,4 @@ const PlaylistRow = (props: any) => {
   );
 };
 
-export default PlaylistRow
+export default PlaylistSelectionRow

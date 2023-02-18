@@ -1,5 +1,5 @@
-import { BlindTestTracks } from "components/data/BlindTestData"
-import { instanceToPlain, plainToInstance } from 'class-transformer'
+import { BlindTestTrack, BlindTestTracks } from "components/data/BlindTestData"
+import { ClassConstructor, instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
 
@@ -89,7 +89,7 @@ export const deleteStoredAccessToken = () => {
   localStorage.removeItem("access_token")
 }
 
-export const hasStoredBlindTest = () => {
+export const hasStoredTracks = () => {
   return localStorage.getItem("blind_test_tracks") !== null
 }
 
@@ -130,6 +130,12 @@ export const deleteStoredBlindTestTracks = () => {
 
 export const setStoredBlindTestTracks = (data: BlindTestTracks) => {
   localStorage.setItem("blind_test_tracks", JSON.stringify(instanceToPlain(data)))
+}
+
+export const deepCopyObject = <T, V>(cls: ClassConstructor<T>, data: V): T => {
+  const stringified = JSON.stringify(instanceToPlain(data));
+  const plain: T = JSON.parse(stringified);
+  return plainToInstance(cls, plain);
 }
 
 // light clean + trailing parts (- X || (X))

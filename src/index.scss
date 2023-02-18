@@ -16,6 +16,7 @@ $btn-transition: none;
   $player-button-hover-color: #686767;
   $input-focus-border-color: #b4b7b9;
   $input-placeholder-color: #c3c6c9;
+  $modal-background-color: #d8d8d8;
   @import "~bootstrap/scss/bootstrap";
   @import "global.scss";
 }
@@ -37,7 +38,9 @@ $btn-transition: none;
   $input-border-color: #424242;
   $input-focus-border-color: #686868;
   $input-color: #d7d9de;
+  $input-disabled-bg: #66696b;
   $input-placeholder-color: #525252;
+  $modal-background-color: #1f1f1f;
   @import "~bootstrap/scss/bootstrap";
   @import "global.scss";
 }

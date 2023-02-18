@@ -35,7 +35,7 @@ const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
 const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 
-const BlindTestView = () => {
+const BlindTest = () => {
 
   const { setSubtitle } = useContext(BlindTestContext);
 
@@ -411,11 +411,11 @@ const BlindTestView = () => {
                     <td>{sc.score}</td>
                     <td className="text-right">
                       <Button type="submit" variant="primary" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)} className="text-nowrap">
-                        <FontAwesomeIcon icon={['fas', 'minus']} size="sm" />
+                        <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
                       </Button>
                       &nbsp;
                       <Button type="submit" variant="primary" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)} className="text-nowrap">
-                        <FontAwesomeIcon icon={['fas', 'plus']} size="sm" />
+                        <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
                       </Button>
                     </td>
                   </tr>
@@ -434,4 +434,4 @@ const BlindTestView = () => {
   );
 }
 
-export default BlindTestView
+export default BlindTest

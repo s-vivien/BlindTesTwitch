@@ -16,8 +16,8 @@ const Help = () => {
   return (
     <>
       {helpDisplayed &&
-        <div className="spot-modal-bg">
-          <Alert className="spot-modal" variant="secondary">
+        <div className="alert-modal-bg">
+          <Alert className="alert-modal" variant="secondary">
             <h2>How to play</h2>
             <ul>
               <li><b>No registration/prerequisite needed </b> : just type in the chat to play ! You'll be added automatically to the leaderboard</li>

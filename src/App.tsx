@@ -1,16 +1,16 @@
 import './icons';
 import { useEffect, useState, createContext } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoredAccessToken, deleteStoredRefreshToken, getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredBlindTest, setStoredTheme, themeNames } from './helpers';
+import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoredAccessToken, deleteStoredRefreshToken, getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredTracks, setStoredTheme, themeNames } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
-import BlindTestView from './components/BlindTestView';
+import BlindTest from './components/BlindTest';
 import LoginCallback from './components/LoginCallback';
 import Help from 'components/Help';
-import PlaylistView from 'components/PlaylistView';
+import Playlist from 'components/Playlist';
 
 function App() {
   const navigate = useNavigate();
@@ -18,27 +18,31 @@ function App() {
   const [theme, setTheme] = useState(() => getStoredTheme());
   const [loggedIn, setLoggedIn] = useState(() => getStoredRefreshToken() !== null);
   const [configured, setConfigured] = useState(() => getStoredSettings().isInitialized());
-  const [ongoingBt, setOngoingBt] = useState(() => hasStoredBlindTest());
+  const [tracksLoaded, setTracksLoaded] = useState(() => hasStoredTracks());
   const [view, setView] = useState(<div />);
   const [subtitle, setSubtitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const contextValue = { loggedIn, setLoggedIn, configured, setConfigured, ongoingBt, setOngoingBt, subtitle, setSubtitle };
+  const contextValue = { loggedIn, setLoggedIn, configured, setConfigured, tracksLoaded, setTracksLoaded, subtitle, setSubtitle };
 
   useEffect(() => {
     setAxiosErrorCallback((msg: string) => { setErrorMessage(msg); });
   }, []);
+
+  const location = useLocation();
 
   useEffect(() => {
     if (!loggedIn) {
       setView(<Login />);
     } else if (!configured) {
       navigate('/settings');
-    } else if (!ongoingBt) {
-      navigate('/playlist');
-    } else {
-      setView(<BlindTestView />);
+    } else if (location.pathname === "/") {
+      if (!tracksLoaded) {
+        navigate('/playlist');
+      } else {
+        setView(<BlindTest />);
+      }
     }
-  }, [navigate, loggedIn, configured, ongoingBt]);
+  }, [navigate, loggedIn, configured, tracksLoaded]);
 
   useEffect(() => {
     for (let name of themeNames) {
@@ -65,7 +69,7 @@ function App() {
     deleteStoredTwitchOAuthToken();
     deleteStoredSettings();
     setLoggedIn(false);
-    setOngoingBt(false);
+    setTracksLoaded(false);
     setConfigured(false);
     navigate("/");
   }
@@ -78,7 +82,7 @@ function App() {
           <a href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
         </div>
         <div style={{ position: 'absolute', right: 0 }}>
-          {loggedIn && ongoingBt && <Button id="playButton" type="submit" variant="link" size="sm" onClick={() => navigate("/")} title="Play">
+          {loggedIn && tracksLoaded && <Button id="playButton" type="submit" variant="link" size="sm" onClick={() => navigate("/")} title="Play">
             <FontAwesomeIcon icon={['fas', 'music']} size="lg" />
           </Button>}
           {loggedIn && <Button id="listButton" type="submit" variant="link" size="sm" onClick={() => navigate("/playlist")} title="Playlists">
@@ -101,8 +105,8 @@ function App() {
       </header>
       <div className={"app container"} >
         {errorMessage &&
-          <div className="spot-modal-bg">
-            <Alert className="spot-modal" variant="danger" >
+          <div className="alert-modal-bg">
+            <Alert className="alert-modal" variant="danger" >
               <Alert.Heading>Error</Alert.Heading>
               <p>
                 Spotify server returned : {errorMessage}
@@ -117,7 +121,7 @@ function App() {
         }
         <Routes>
           <Route path="/" element={view} />
-          <Route path="/playlist" element={<PlaylistView />} />
+          <Route path="/playlist" element={<Playlist />} />
           <Route path="/callback" element={<LoginCallback />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
@@ -133,8 +137,8 @@ export const BlindTestContext = createContext({
   setLoggedIn: (v: boolean) => { }, // eslint-disable-line
   configured: false,
   setConfigured: (v: boolean) => { }, // eslint-disable-line
-  ongoingBt: false,
-  setOngoingBt: (v: boolean) => { }, // eslint-disable-line
+  tracksLoaded: false,
+  setTracksLoaded: (v: boolean) => { }, // eslint-disable-line
   subtitle: '',
   setSubtitle: (v: string) => { } // eslint-disable-line
 });

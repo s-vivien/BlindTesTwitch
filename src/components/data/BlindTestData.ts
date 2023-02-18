@@ -15,11 +15,11 @@ export class Guessable {
   disabled: boolean
   type: GuessableType
 
-  constructor(original: string, toGuess: string, maxDistance: number, type: GuessableType) {
+  constructor(original: string, toGuess: string, maxDistance: number, type: GuessableType, disabled: boolean) {
     this.original = original;
     this.toGuess = toGuess;
     this.maxDistance = maxDistance;
-    this.disabled = false;
+    this.disabled = disabled;
     this.type = type;
   }
 }
@@ -76,8 +76,8 @@ export class BlindTestTracks {
   }
 }
 
-const computeGuessable = (value: string, type: GuessableType) => {
+export function computeGuessable(value: string, type: GuessableType, disabled: boolean = false) {
   let cleaned = cleanValue(value);
   let maxDist = getMaxDist(cleaned);
-  return new Guessable(value, cleaned, maxDist, type);
+  return new Guessable(value, cleaned, maxDist, type, disabled);
 }
