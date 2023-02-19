@@ -102,13 +102,14 @@ const PlaylistEdition = () => {
       <Popover.Body>
         You can modify each value to guess directly in the text-fields.
         <br></br>
-        <strong>NB</strong> : Don't forget that the values are cleaned (i.e. the value that players will have to type to score points is different from the value displayed); hover the mouse over the value to see the cleaned value.
+        <br></br>
+        The <strong>accepted value</strong> indicates what will be used by the bot as a reference to accept answers. It's the "cleaned" version of the value.
         <br></br>
         <br></br>
-        Disabled fields are shown from the start during the game, and players won't be able to score points on them.
+        The checkbox indicates if the value is enabled or not. Disabled values are shown from the start during the game, and players won't be able to score points on them.
         <br></br>
         <br></br>
-        You can add extra values to guess by clicking the "Add value" button.
+        You can add extra values to guess by clicking the <strong>Add value</strong> button.
       </Popover.Body>
     </Popover>
   );
@@ -133,19 +134,37 @@ const PlaylistEdition = () => {
       <Modal show={edition} centered size="lg">
         <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }} className="px-3">
           <Modal.Body className="edition-form-row">
+
+            <Form.Group as={Row} controlId="formHeader">
+              <Form.Label column sm={1}>
+                <b>Type</b>
+              </Form.Label>
+              <Col sm={5}>
+                <b>Value</b>
+              </Col>
+              <Col sm={5}>
+                <b>Accepted value</b>
+              </Col>
+              <Col sm={1}>
+              </Col>
+            </Form.Group>
+
             {editedValues.map((guessable, index) => {
-              return <Form.Group as={Row} controlId="formHorizontalEmail">
-                <Form.Label column sm={2}>
+              return <Form.Group as={Row} controlId={"formRow" + index}>
+                <Form.Label column sm={1}>
                   {GuessableType[guessable.type]}
                 </Form.Label>
-                <Col sm={8}>
+                <Col sm={5}>
                   <Form.Control title={cleanValue(guessable.value)} size="sm" required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
                 </Col>
-                <Col sm={2}>
-                  {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="xl" />}
-                  {guessable.type !== GuessableType.Misc && <Form.Group controlId={"formGroupEnable" + index}>
-                    <Form.Check type="checkbox" label="Enabled" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />
-                  </Form.Group>}
+                <Col sm={5}>
+                  <Form.Label size="sm" className="edition-form-cleaned-value">
+                    {cleanValue(guessable.value)}
+                  </Form.Label>
+                </Col>
+                <Col sm={1} style={{ textAlign: 'center' }}>
+                  {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="lg" />}
+                  {guessable.type !== GuessableType.Misc && <input type="checkbox" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
                 </Col>
               </Form.Group>
             })}
@@ -188,7 +207,7 @@ const PlaylistEdition = () => {
                 {renderGuessables(track.getGuessables(GuessableType.Artist))}
               </div>
               <div className="px-3">
-                <i>{renderGuessables(track.getGuessables(GuessableType.Misc))}</i>
+                {renderGuessables(track.getGuessables(GuessableType.Misc))}
               </div>
             </div>
             {!edition && index >= bt.doneTracks && <div className="edition-buttons">

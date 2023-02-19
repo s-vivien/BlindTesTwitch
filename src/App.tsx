@@ -78,7 +78,7 @@ function App() {
     <BlindTestContext.Provider value={contextValue}>
       <header className="app-header">
         <div style={{ position: 'absolute', left: 0, fontSize: '1.3333rem', padding: '4px' }}>
-          <FontAwesomeIcon icon={['fab', 'spotify']} color="#84BD00" size="sm" />
+          <FontAwesomeIcon icon={['fab', 'spotify']} color="#1ED760" size="sm" />
           <a href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
         </div>
         <div style={{ position: 'absolute', right: 0 }}>
