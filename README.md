@@ -14,6 +14,12 @@ Once everything is setup, the application displays the blind-test view that the 
 
 The viewers type their guesses in the chat when a song plays, and the app will read chat messages to determine who found the correct answer(s) first, and reward them with points.
 
+## Screenshots
+
+![Playlist selection](https://i.imgur.com/KCyIxD9.png "Playlist selection")
+![Playlist edition](https://i.imgur.com/y0c1fBM.png "Playlist edition")
+![Track edition](https://i.imgur.com/c0OTz4l.png "Track edition")
+
 ## Configuration
 
 A few environment variables must be set in the `.env` file :
