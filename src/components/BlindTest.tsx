@@ -392,7 +392,7 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
           </div>
-          <div id="leaderboard" className="p-3 bt-panel border rounded-3">
+          <div id="leaderboard" className="p-3 bt-panel border rounded-3 leaderboard">
             <FormControl value={nickFilter} className={"mb-2"} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
             <table className="table-hover bt-t">
               <thead>
@@ -410,11 +410,11 @@ const BlindTest = () => {
                     <td>{sc.nick}</td>
                     <td>{sc.score}</td>
                     <td className="text-right">
-                      <Button type="submit" variant="primary" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)} className="text-nowrap">
+                      <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
                         <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
                       </Button>
                       &nbsp;
-                      <Button type="submit" variant="primary" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)} className="text-nowrap">
+                      <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
                         <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
                       </Button>
                     </td>

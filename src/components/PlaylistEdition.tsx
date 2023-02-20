@@ -133,20 +133,20 @@ const PlaylistEdition = () => {
 
       <Modal show={edition} centered size="lg">
         <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }} className="px-3">
-          <Modal.Body className="edition-form-row">
+          <Modal.Body>
 
-            <Form.Group as={Row} controlId="formHeader">
+            <Form.Group as={Row} controlId="formHeader" className='edition-form-header'>
               <Form.Label column sm={1}>
                 <b>Type</b>
               </Form.Label>
-              <Col sm={5}>
+              <Form.Label column sm={5}>
                 <b>Value</b>
-              </Col>
-              <Col sm={5}>
+              </Form.Label>
+              <Form.Label column sm={5}>
                 <b>Accepted value</b>
-              </Col>
-              <Col sm={1}>
-              </Col>
+              </Form.Label>
+              <Form.Label column sm={1}>
+              </Form.Label>
             </Form.Group>
 
             {editedValues.map((guessable, index) => {
@@ -211,8 +211,8 @@ const PlaylistEdition = () => {
               </div>
             </div>
             {!edition && index >= bt.doneTracks && <div className="edition-buttons">
-              <Button size="sm" onClick={() => startEdit(index)}>Edit</Button>
-              <Button size="sm" variant="danger" onClick={() => remove(index, false)}>Delete</Button>
+              <Button size="sm" variant="outline-secondary" onClick={() => startEdit(index)}>Edit</Button>
+              <Button size="sm" variant="outline-danger" onClick={() => remove(index, false)}>Delete</Button>
             </div>}
           </div>
         })

@@ -164,10 +164,9 @@ svg {
   margin-right: auto !important;
 }
 
-.edition-form-row {
-  div {
-    margin: auto;
-  }
+.edition-form-header {
+  border-bottom: 1px solid $input-border-color;
+  margin-bottom: 20px;
 }
 
 .edition-form-cleaned-value {
@@ -230,11 +229,12 @@ svg {
   background-color: $body-bg;
 }
 
+.modal-footer {
+  border: none;
+}
+
 .modal-content {
   background-color: $modal-background-color;
-  div {
-    border: 0;
-  }
 }
 
 .btn-close {
@@ -245,10 +245,17 @@ svg {
   padding: 1.25rem 1rem;
 }
 
+.leaderboard {
+  button {
+    width: 1.5rem;
+    text-align: center;
+    padding: 0.25rem 0;
+  }
+}
+
 .player {
   button {
     border: none;
-    border-radius: 0.3rem;
     background-color: $player-button-color !important;
     &:hover:not(:disabled) {
       background-color: $player-button-hover-color !important;

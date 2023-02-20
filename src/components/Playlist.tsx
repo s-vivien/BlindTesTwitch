@@ -1,9 +1,9 @@
-import { useContext, useState } from 'react'
-import { BlindTestContext } from "App"
-import PlaylistSelection from "./PlaylistSelection"
+import { useContext, useState } from 'react';
+import { BlindTestContext } from "App";
+import PlaylistSelection from "./PlaylistSelection";
 import PlaylistEdition from './PlaylistEdition';
 import { deleteStoredBlindTestTracks } from 'helpers';
-import { Alert, Button, Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 
 const Playlist = () => {
 
@@ -29,7 +29,7 @@ const Playlist = () => {
         <Modal.Body>
           Do you really want to load another playlist from Spotify ?
           <br></br>
-          <i>All tracks edits will be lost</i> (scores won't be affected)
+          <i>All modifications will be lost</i> (scores won't be affected)
         </Modal.Body>
         <Modal.Footer>
           <Button size="sm" className="mr-2" onClick={restart}>
