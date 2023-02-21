@@ -245,11 +245,35 @@ svg {
   padding: 1.25rem 1rem;
 }
 
-.leaderboard {
+.leaderboard-row {
+  position: relative;
+  span, div {
+    display: inline-block;
+    line-height: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  &:hover {
+    .leaderboard-buttons {
+      right: 0;
+    }
+    .leaderboard-nick {
+      max-width: calc(100% - 60px);
+    }
+  }
+}
+
+.leaderboard-buttons {
+  position: absolute;
+  top: 0;
+  right: -70px;
   button {
     width: 1.5rem;
     text-align: center;
-    padding: 0.25rem 0;
+    padding: 0;
+    line-height: 1.4rem;
+    margin-right: 5px;
   }
 }
 

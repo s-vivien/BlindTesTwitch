@@ -392,31 +392,35 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
             </Button>
           </div>
-          <div id="leaderboard" className="p-3 bt-panel border rounded-3 leaderboard">
+          <div id="leaderboard" className="p-3 bt-panel border rounded-3">
             <FormControl value={nickFilter} className={"mb-2"} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
             <table className="table-hover bt-t">
               <thead>
                 <tr>
                   <th style={{ width: "12%" }}>#</th>
-                  <th style={{ width: "55%" }}>Nick</th>
-                  <th style={{ width: "12%" }}>Score</th>
-                  <th style={{ width: "21%" }}></th>
+                  <th style={{ width: "70%" }}>Nick</th>
+                  <th style={{ width: "18%" }}>Score</th>
                 </tr>
               </thead>
               <tbody>
                 {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => {
-                  return <tr key={sc.nick}>
-                    <td>{sc.displayedRank}</td>
-                    <td>{sc.nick}</td>
-                    <td>{sc.score}</td>
-                    <td className="text-right">
-                      <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
-                        <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
-                      </Button>
-                      &nbsp;
-                      <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
-                        <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
-                      </Button>
+                  return <tr key={sc.nick} className="leaderboard-row">
+                    <td>
+                      <span>{sc.displayedRank}</span>
+                    </td>
+                    <td style={{ position: "relative" }}>
+                      <span className="leaderboard-nick">{sc.nick}</span>
+                      <div className="leaderboard-buttons">
+                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
+                          <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
+                        </Button>
+                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
+                          <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
+                        </Button>
+                      </div>
+                    </td>
+                    <td>
+                      <span>{sc.score}</span>
                     </td>
                   </tr>
                 })}
