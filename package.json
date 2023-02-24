@@ -16,7 +16,6 @@
     "reflect-metadata": "^0.1.13",
     "bootstrap": "^4.6.1",
     "class-transformer": "^0.5.1",
-    "node-sass": "^8.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
@@ -53,6 +52,7 @@
   },
   "devDependencies": {
     "eslint": "^8.6.0",
-    "gh-pages": "^3.2.3"
+    "gh-pages": "^3.2.3",
+    "sass": "^1.58.3"
   }
 }
