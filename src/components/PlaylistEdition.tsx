@@ -134,10 +134,10 @@ const PlaylistEdition = (props: any) => {
           <i>All modifications will be lost</i> (scores won't be affected)
         </Modal.Body>
         <Modal.Footer>
-          <Button size="sm" className="mr-2" onClick={restart}>
+          <Button className="mr-2" onClick={restart}>
             Yes
           </Button>
-          <Button size="sm" onClick={() => setRestartModal(false)}>
+          <Button onClick={() => setRestartModal(false)}>
             Cancel
           </Button>
         </Modal.Footer>
@@ -148,10 +148,10 @@ const PlaylistEdition = (props: any) => {
           Do you really want to remove this track ?
         </Modal.Body>
         <Modal.Footer>
-          <Button size="sm" className="mr-2" onClick={() => remove(selectedIndex, true)}>
+          <Button className="mr-2" onClick={() => remove(selectedIndex, true)}>
             Yes
           </Button>
-          <Button size="sm" onClick={() => setRemoveTrackModal(false)}>
+          <Button onClick={() => setRemoveTrackModal(false)}>
             Cancel
           </Button>
         </Modal.Footer>
@@ -176,22 +176,20 @@ const PlaylistEdition = (props: any) => {
             </Form.Group>
 
             {editedValues.map((guessable, index) => {
-              return <Form.Group as={Row} controlId={"formRow" + index}>
+              return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2">
                 <Form.Label column sm={1}>
                   {GuessableType[guessable.type]}
                 </Form.Label>
                 <Col sm={5}>
-                  <Form.Control title={cleanValue(guessable.value)} size="sm" required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
+                  <Form.Control title={cleanValue(guessable.value)} required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
                 </Col>
-                <Col sm={5}>
-                  <Form.Label size="sm" className="code">
-                    {cleanValue(guessable.value)}
-                  </Form.Label>
-                </Col>
-                <Col sm={1} style={{ textAlign: 'center' }}>
+                <Form.Label className="code" column sm={5}>
+                  {cleanValue(guessable.value)}
+                </Form.Label>
+                <Form.Label column sm={1}>
                   {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="lg" />}
-                  {guessable.type !== GuessableType.Misc && <input type="checkbox" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
-                </Col>
+                  {guessable.type !== GuessableType.Misc && <input type="checkbox" className="larger" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
+                </Form.Label>
               </Form.Group>
             })}
           </Modal.Body>
@@ -201,15 +199,15 @@ const PlaylistEdition = (props: any) => {
               delay={{ show: 250, hide: 400 }}
               overlay={popover}
             >
-              <FontAwesomeIcon icon={['fas', 'circle-info']} size="2xl" />
+              <FontAwesomeIcon icon={['fas', 'circle-info']} style={{ fontSize: "2.4rem" }} />
             </OverlayTrigger>
-            <Button className="mr-2 edition-form-left-buttons" size="sm" variant="primary" onClick={addExtraGuessable}>
+            <Button className="mr-2 edition-form-left-buttons" variant="primary" onClick={addExtraGuessable}>
               Add value
             </Button>
-            <Button className="mr-2" size="sm" variant="primary" type="submit">
+            <Button className="mr-2" variant="primary" type="submit">
               Save
             </Button>
-            <Button className="mr-2" size="sm" variant="secondary" onClick={endEdit}>
+            <Button className="mr-2" variant="secondary" onClick={endEdit}>
               Cancel
             </Button>
           </Modal.Footer>
@@ -217,18 +215,20 @@ const PlaylistEdition = (props: any) => {
       </Modal>
 
       <div className="playlist-load-button mb-2">
-        <Button id="selectList" type="submit" size="sm" onClick={() => setRestartModal(true)} title="Select playlist">
+        <Button id="selectList" type="submit" onClick={() => setRestartModal(true)} title="Select playlist">
           <b>Load another playlist from Spotify</b>
         </Button>
-        <Form.Switch
-          type="switch"
-          id="show-accepted"
-          label="Display the values the bot will accept (i.e. cleaned values)"
-          checked={showAcceptedValues}
-          className="m-2"
-          onChange={() => setShowAcceptedValues(!showAcceptedValues)}
-        >
-        </Form.Switch>
+        <div className="mt-2">
+          <input
+            type="checkbox"
+            id="show-accepted"
+            checked={showAcceptedValues}
+            className="m-2 large"
+            onChange={() => setShowAcceptedValues(!showAcceptedValues)}
+          >
+          </input>
+          <label htmlFor="show-accepted">Display the values the bot will accept (i.e. cleaned values)</label>
+        </div>
       </div>
 
       {
@@ -240,7 +240,7 @@ const PlaylistEdition = (props: any) => {
             <div id="cover" className="edition-cover">
               <img id="cover-image" src={track.img} alt="cover" />
             </div>
-            <div style={{ flex: 1 }} className={"px-3 " + (showAcceptedValues ? "code": "")}>
+            <div style={{ flex: 1 }} className={"px-3 " + (showAcceptedValues ? "code" : "")}>
               <div>
                 <b>{renderGuessables(track.getGuessables(GuessableType.Title))}</b>
               </div>
@@ -252,8 +252,8 @@ const PlaylistEdition = (props: any) => {
               </div>
             </div>
             {!edition && index >= bt.doneTracks && <div className="edition-buttons">
-              <Button size="sm" variant="outline-secondary" onClick={() => startEdit(index)}>Edit</Button>
-              <Button size="sm" variant="outline-danger" onClick={() => remove(index, false)}>Delete</Button>
+              <Button variant="outline-secondary" onClick={() => startEdit(index)}>Edit</Button>
+              <Button variant="outline-danger" onClick={() => remove(index, false)}>Delete</Button>
             </div>}
           </div>
         })

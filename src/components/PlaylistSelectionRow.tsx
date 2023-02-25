@@ -1,5 +1,5 @@
 import TracksBaseData from "./data/TracksBaseData"
-import { Button, Alert } from "react-bootstrap"
+import { Button, Modal } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTracks } from "./data/BlindTestData"
 import { setStoredBlindTestTracks, deleteStoredBlindTestScores, getStoredBlindTestScores } from "../helpers"
@@ -54,26 +54,23 @@ const PlaylistSelectionRow = (props: any) => {
 
   return (
     <>
-      {confirmationDisplayed &&
-        <div className="alert-modal-bg">
-          <Alert className="alert-modal" variant="secondary" >
-            <p className="alert-modal-c-p">
-              Do you want to reset the leaderboard scores ?
-            </p>
-            <div className="d-flex justify-content-center">
-              <Button className="mr-2" onClick={() => loadPlaylist(false)}>
-                Yes
-              </Button>
-              <Button className="mr-2" onClick={() => loadPlaylist(true)}>
-                No
-              </Button>
-              <Button onClick={() => setConfirmationDisplayed(false)}>
-                Cancel
-              </Button>
-            </div>
-          </Alert>
-        </div>
-      }
+      <Modal show={confirmationDisplayed} centered>
+        <Modal.Body>
+          Do you want to reset the leaderboard scores ?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
+            Yes
+          </Button>
+          <Button size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
+            No
+          </Button>
+          <Button size="sm" onClick={() => setConfirmationDisplayed(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <tr key={playlist.uri}>
         <td>{MusicIcon}</td>
         <td><a href={playlist.uri}>{playlist.name}</a></td>
