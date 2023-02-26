@@ -59,14 +59,14 @@ const PlaylistSelectionRow = (props: any) => {
           Do you want to reset the leaderboard scores ?
         </Modal.Body>
         <Modal.Footer>
-          <Button size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
-            Yes
+          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
+            <b>Yes</b>
           </Button>
-          <Button size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
-            No
+          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
+            <b>No</b>
           </Button>
-          <Button size="sm" onClick={() => setConfirmationDisplayed(false)}>
-            Cancel
+          <Button style={{ width: "65px" }} size="sm" variant="secondary" onClick={() => setConfirmationDisplayed(false)}>
+            <b>Cancel</b>
           </Button>
         </Modal.Footer>
       </Modal>

@@ -86,7 +86,7 @@ const Settings = () => {
 
   if (initialized) {
     return (
-      <div style={{ width: '600px', margin: 'auto' }}>
+      <div style={{ width: '600px', margin: 'auto' }} className="mb-3">
         <Form noValidate validated={validated} onSubmit={submit}>
 
           <h3>Global</h3>
@@ -145,11 +145,11 @@ const Settings = () => {
             </>
           }
 
-          <Button className="mr-2" variant="primary" type="submit">
-            Save
+          <Button style={{ width: "80px" }} size="sm" className="mr-2" variant="primary" type="submit">
+            <b>Save</b>
           </Button>
-          <Button className="mr-2" variant="secondary" onClick={() => navigate("/")}>
-            Cancel
+          <Button style={{ width: "80px" }} size="sm" className="mr-2" variant="secondary" onClick={() => navigate("/")}>
+            <b>Cancel</b>
           </Button>
         </Form>
       </div>

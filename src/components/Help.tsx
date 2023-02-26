@@ -53,8 +53,8 @@ const Help = () => {
               <li>Each player who answers correctly more than once on a track will receive <b>1 extra point</b> per<br />answer in addition to the points mentioned above</li>
             </ul>
             <div className="d-flex justify-content-center">
-              <Button style={{ color: 'white', width: '60px' }} onClick={() => setHelpDisplayed(false)}>
-                Ok
+              <Button size="sm" style={{ color: 'white', width: '60px' }} onClick={() => setHelpDisplayed(false)}>
+                <b>Ok</b>
               </Button>
             </div>
             <a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">https://github.com/s-vivien/BlindTesTwitch</a>

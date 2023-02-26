@@ -371,25 +371,25 @@ const BlindTest = () => {
         </div>
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong} title="Next">
-              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> NEXT
+            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> <b>NEXT</b>
             </Button>
             &nbsp;
             {
               paused &&
-              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" size="sm" onClick={handleResume} title="Resume">
-                <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> RESUME
+              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" size="sm" onClick={handleResume}>
+                <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> <b>RESUME</b>
               </Button>
             }
             {
               !paused &&
-              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" size="sm" onClick={handlePause} title="Pause">
-                <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> PAUSE
+              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" size="sm" onClick={handlePause}>
+                <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> <b>PAUSE</b>
               </Button>
             }
             &nbsp;
-            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal} title="Reveal">
-              <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> REVEAL
+            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
+              <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> <b>REVEAL</b>
             </Button>
           </div>
           <div id="leaderboard" className="p-3 bt-panel border rounded-3">

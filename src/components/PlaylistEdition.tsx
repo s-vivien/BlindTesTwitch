@@ -17,7 +17,7 @@ const PlaylistEdition = (props: any) => {
 
   const [bt, setBt] = useState(() => getStoredBlindTestTracks());
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [showAcceptedValues, setShowAcceptedValues] = useState(false);
+  // const [showAcceptedValues, setShowAcceptedValues] = useState(false);
   const [editedValues, setEditedValues] = useState<EditedGuessable[]>([]);
   const [edition, setEdition] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -99,7 +99,7 @@ const PlaylistEdition = (props: any) => {
     }
   }
 
-  const renderGuessables = (guessables: Guessable[]) => {
+  const renderGuessables = (guessables: Guessable[], showAcceptedValues: boolean = false) => {
     if (guessables.length === 0) return <></>
     return guessables.map<React.ReactNode>(g => {
       const value = showAcceptedValues ? g.toGuess : g.original;
@@ -107,7 +107,7 @@ const PlaylistEdition = (props: any) => {
     }).reduce((prev, curr) => [prev, ', ', curr]);
   }
 
-  const popover = (
+  const popoverHelp = (
     <Popover id="popover-help">
       <Popover.Body>
         You can modify each value to guess directly in the text-fields.
@@ -124,6 +124,30 @@ const PlaylistEdition = (props: any) => {
     </Popover>
   );
 
+  const popoverCleanedValues = (
+    <Popover id="popover-cleaned-values">
+      <Popover.Body>
+        This page displays the playlist tracks. For each of them, the track values (title/artist(s)) are displayed on the left, and the associated cleaned values on the right.
+        <br></br>
+        <br></br>
+        <u><b>What does "cleaned" mean ?</b></u>
+        <br></br>
+        The bot cleans the values by removing accents, extra-characters, extra-information, etc.
+        <br></br>
+        It keeps the simplest value possible.
+        <br></br>
+        <br></br>
+        The same cleaning process is applied to every chat answer before comparison.
+        <br></br>
+        <br></br>
+        Sometimes, the cleaning procedure isn't perfect so it's important to manually check for the cleaned values in order to avoid "impossible" guesses.
+        <br></br>
+        <br></br>
+        In such cases, feel free to <b>EDIT</b> the values to correct them.
+      </Popover.Body>
+    </Popover>
+  );
+
   return (
     <>
 
@@ -134,11 +158,11 @@ const PlaylistEdition = (props: any) => {
           <i>All modifications will be lost</i> (scores won't be affected)
         </Modal.Body>
         <Modal.Footer>
-          <Button className="mr-2" onClick={restart}>
-            Yes
+          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={restart}>
+            <b>Yes</b>
           </Button>
-          <Button onClick={() => setRestartModal(false)}>
-            Cancel
+          <Button style={{ width: "65px" }} variant="secondary" size="sm" onClick={() => setRestartModal(false)}>
+            <b>Cancel</b>
           </Button>
         </Modal.Footer>
       </Modal>
@@ -148,20 +172,21 @@ const PlaylistEdition = (props: any) => {
           Do you really want to remove this track ?
         </Modal.Body>
         <Modal.Footer>
-          <Button className="mr-2" onClick={() => remove(selectedIndex, true)}>
-            Yes
+          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={() => remove(selectedIndex, true)}>
+            <b>Yes</b>
           </Button>
-          <Button onClick={() => setRemoveTrackModal(false)}>
-            Cancel
+          <Button style={{ width: "65px" }} variant="secondary" size="sm" onClick={() => setRemoveTrackModal(false)}>
+            <b>Cancel</b>
           </Button>
         </Modal.Footer>
       </Modal>
 
       <Modal show={edition} centered size="lg">
-        <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }} className="px-3">
-          <Modal.Body>
-
+        <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }}>
+          <Modal.Body style={{ paddingTop: 0 }}>
             <Form.Group as={Row} controlId="formHeader" className='edition-form-header'>
+              <Form.Label column sm={1}>
+              </Form.Label>
               <Form.Label column sm={1}>
                 <b>Type</b>
               </Form.Label>
@@ -171,93 +196,113 @@ const PlaylistEdition = (props: any) => {
               <Form.Label column sm={5}>
                 <b>Accepted value</b>
               </Form.Label>
-              <Form.Label column sm={1}>
-              </Form.Label>
             </Form.Group>
 
             {editedValues.map((guessable, index) => {
               return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2">
                 <Form.Label column sm={1}>
+                  {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="lg" />}
+                  {guessable.type !== GuessableType.Misc && <input type="checkbox" className="larger" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
+                </Form.Label>
+                <Form.Label column sm={1}>
                   {GuessableType[guessable.type]}
                 </Form.Label>
                 <Col sm={5}>
-                  <Form.Control title={cleanValue(guessable.value)} required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
+                  <Form.Control required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
                 </Col>
                 <Form.Label className="code" column sm={5}>
                   {cleanValue(guessable.value)}
                 </Form.Label>
-                <Form.Label column sm={1}>
-                  {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="lg" />}
-                  {guessable.type !== GuessableType.Misc && <input type="checkbox" className="larger" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
-                </Form.Label>
               </Form.Group>
             })}
           </Modal.Body>
-          <Modal.Footer>
+          <Modal.Footer style={{ paddingTop: 0 }}>
             <OverlayTrigger
               placement="right"
-              delay={{ show: 250, hide: 400 }}
-              overlay={popover}
+              delay={{ show: 100, hide: 250 }}
+              overlay={popoverHelp}
             >
-              <FontAwesomeIcon icon={['fas', 'circle-info']} style={{ fontSize: "2.4rem" }} />
+              <FontAwesomeIcon icon={['fas', 'circle-info']} style={{ fontSize: "1.95rem" }} />
             </OverlayTrigger>
-            <Button className="mr-2 edition-form-left-buttons" variant="primary" onClick={addExtraGuessable}>
-              Add value
+            <Button size="sm" className="mr-2 edition-form-left-buttons" variant="primary" onClick={addExtraGuessable}>
+              <b>Add value</b>
             </Button>
-            <Button className="mr-2" variant="primary" type="submit">
-              Save
+            <Button style={{ width: "65px" }} size="sm" className="mr-2" variant="primary" type="submit">
+              <b>Save</b>
             </Button>
-            <Button className="mr-2" variant="secondary" onClick={endEdit}>
-              Cancel
+            <Button style={{ width: "65px" }} size="sm" className="mr-2" variant="secondary" onClick={endEdit}>
+              <b>Cancel</b>
             </Button>
           </Modal.Footer>
         </Form>
       </Modal>
 
       <div className="playlist-load-button mb-2">
-        <Button id="selectList" type="submit" onClick={() => setRestartModal(true)} title="Select playlist">
+        <Button id="selectList" type="submit" onClick={() => setRestartModal(true)}>
           <b>Load another playlist from Spotify</b>
         </Button>
-        <div className="mt-2">
-          <input
-            type="checkbox"
-            id="show-accepted"
-            checked={showAcceptedValues}
-            className="m-2 large"
-            onChange={() => setShowAcceptedValues(!showAcceptedValues)}
-          >
-          </input>
-          <label htmlFor="show-accepted">Display the values the bot will accept (i.e. cleaned values)</label>
-        </div>
       </div>
 
-      {
-        bt.tracks.map((track, index) => {
-          return <div className={"p-1 edition-row " + (index < bt.doneTracks ? "edition-row-disabled" : "")} key={"track-" + track.offset}>
-            <div className="edition-row-number">
-              #{1 + index}
-            </div>
-            <div id="cover" className="edition-cover">
-              <img id="cover-image" src={track.img} alt="cover" />
-            </div>
-            <div style={{ flex: 1 }} className={"px-3 " + (showAcceptedValues ? "code" : "")}>
-              <div>
-                <b>{renderGuessables(track.getGuessables(GuessableType.Title))}</b>
-              </div>
-              <div>
-                {renderGuessables(track.getGuessables(GuessableType.Artist))}
-              </div>
-              <div>
-                {renderGuessables(track.getGuessables(GuessableType.Misc))}
-              </div>
-            </div>
-            {!edition && index >= bt.doneTracks && <div className="edition-buttons">
-              <Button variant="outline-secondary" onClick={() => startEdit(index)}>Edit</Button>
-              <Button variant="outline-danger" onClick={() => remove(index, false)}>Delete</Button>
-            </div>}
-          </div>
-        })
-      }
+      <table className="table-hover edition-table">
+        <thead>
+          <tr>
+            <th style={{ width: "6%" }}></th>
+            <th style={{ width: "7%", textAlign: 'center' }}>Cover</th>
+            <th style={{ width: "36%" }} className={"px-3"}>Values</th>
+            <th style={{ width: "36%" }} className={"px-3"}>Cleaned values <OverlayTrigger
+              placement="right"
+              delay={{ show: 100, hide: 250 }}
+              overlay={popoverCleanedValues}
+            >
+              <FontAwesomeIcon icon={['fas', 'circle-info']} className="ml-2" />
+            </OverlayTrigger></th>
+            <th style={{ width: "15%", textAlign: 'center'}}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            bt.tracks.map((track, index) => {
+              return <tr className={"p-1 edition-row " + (index < bt.doneTracks ? "edition-row-disabled" : "")} key={"track-" + track.offset}>
+                <td className="edition-row-number">
+                  #{1 + index}
+                </td>
+                <td id="cover">
+                  <img className="edition-cover" id="cover-image" src={track.img} alt="cover" />
+                </td>
+                <td style={{ flex: 1 }} className={"px-3"}>
+                  <div>
+                    <b>{renderGuessables(track.getGuessables(GuessableType.Title))}</b>
+                  </div>
+                  <div>
+                    {renderGuessables(track.getGuessables(GuessableType.Artist))}
+                  </div>
+                  <div>
+                    {renderGuessables(track.getGuessables(GuessableType.Misc))}
+                  </div>
+                </td>
+                <td style={{ flex: 1 }} className={"px-3 code"}>
+                  <div>
+                    <b>{renderGuessables(track.getGuessables(GuessableType.Title), true)}</b>
+                  </div>
+                  <div>
+                    {renderGuessables(track.getGuessables(GuessableType.Artist), true)}
+                  </div>
+                  <div>
+                    {renderGuessables(track.getGuessables(GuessableType.Misc), true)}
+                  </div>
+                </td>
+                {index >= bt.doneTracks && <td className="edition-buttons">
+                  <Button size="sm" variant="outline-secondary" onClick={() => startEdit(index)}><b>Edit</b></Button>
+                  <Button size="sm" variant="outline-danger" onClick={() => remove(index, false)}><b>Delete</b></Button>
+                </td>}
+                {index < bt.doneTracks && <td className="edition-buttons">
+                  <span>DONE</span>
+                </td>}
+              </tr>
+            })
+          }
+        </tbody>
+      </table>
     </>
   );
 }

@@ -17,8 +17,8 @@ The viewers type their guesses in the chat when a song plays, and the app will r
 ## Screenshots
 
 ![Playlist selection](https://i.imgur.com/jJjUIZK.png "Playlist selection")
-![Playlist edition](https://i.imgur.com/izLCyaY.png "Playlist edition")
-![Track edition](https://i.imgur.com/IDEZz6L.png "Track edition")
+![Playlist edition](https://i.imgur.com/bqHOfwD.png "Playlist edition")
+![Track edition](https://i.imgur.com/pLnSZ8z.png "Track edition")
 
 ## Configuration
 
