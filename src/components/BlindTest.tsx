@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { BlindTestTrack, Guessable, GuessableType } from "./data/BlindTestData"
+import { BlindTestTrack, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
 import { TwitchMode } from "./data/SettingsData"
@@ -261,7 +261,7 @@ const BlindTest = () => {
       const newGuesses = [];
       delayedPoints = [];
       for (let guessable of track.guessables) {
-        newGuesses.push({ guessed: guessable.disabled, guessedBy: [] });
+        newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
         delayedPoints.push(new Map<string, number>());
       }
       setGuesses(newGuesses);
@@ -283,7 +283,7 @@ const BlindTest = () => {
     const guess: Guess = props.guess
     if (guess.guessed) {
       return <div className="mb-3">
-        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.disabled ? InfoEmoji : CrossEmoji)} {guessable.original}</div>
+        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? InfoEmoji : CrossEmoji)} {guessable.original}</div>
         {guess.guessedBy.length > 0 &&
           <div className="bt-gb">
             {BubbleEmoji}&nbsp;
@@ -326,45 +326,43 @@ const BlindTest = () => {
             </div>
             {playing && currentTrack !== null &&
               <div style={{ flex: 1 }}>
-                <div className="px-3 mb-2" >
-                  <div className="bt-h">
-                    <h2>TITLE</h2>
-                  </div>
-                  {playing &&
+                {currentTrack.getGuessables(GuessableType.Title).length > 0 &&
+                  <div className="px-3 pb-3" >
+                    <div className="bt-h">
+                      <h2>TITLE</h2>
+                    </div>
                     <div>
                       <GuessableView key="guess_0" guessable={currentTrack.guessables[0]} guess={guesses[0]} />
                     </div>
-                  }
-                </div>
-                <div className="px-3 pt-3 mb-2" >
-                  <div className="bt-h">
-                    <h2>ARTIST(S)</h2>
                   </div>
-                  {playing &&
+                }
+                {currentTrack.getGuessables(GuessableType.Artist).length > 0 &&
+                  <div className="px-3 pb-3" >
+                    <div className="bt-h">
+                      <h2>ARTIST(S)</h2>
+                    </div>
                     <div>
                       {currentTrack.mapGuessables(GuessableType.Artist, (guessable: Guessable, index: number) => {
                         return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
                       })}
                     </div>
-                  }
-                </div>
+                  </div>
+                }
                 {currentTrack.getGuessables(GuessableType.Misc).length > 0 &&
-                  <div className="px-3 pt-3 mb-2" >
+                  <div className="px-3 mb-2" >
                     <div className="bt-h">
                       <h2>MISC</h2>
                     </div>
-                    {playing &&
-                      <div>
-                        {currentTrack.mapGuessables(GuessableType.Misc, (guessable: Guessable, index: number) => {
-                          return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
-                        })}
-                      </div>
-                    }
+                    <div>
+                      {currentTrack.mapGuessables(GuessableType.Misc, (guessable: Guessable, index: number) => {
+                        return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
+                      })}
+                    </div>
                   </div>
                 }
               </div>
             }
-            {!playing &&
+            {!playing && !loading &&
               <div style={{ margin: 'auto', color: 'grey' }}><i>Click NEXT to start playing</i></div>
             }
           </div>

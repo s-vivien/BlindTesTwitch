@@ -2,23 +2,29 @@
 
 A **Blind-Test** web-application written in React, using Spotify/Twitch APIs
 
+You're a streamer and you want to try the app ? Contact me on Discord (Neumann#1578)
+
+## Description
+
+TL;DR; Login with your Spotify account, chose your playlist in the list, start the game with your viewers.
+
+BlindTesTwitch is a webapp: login and stream your web-browser, the app lets you control the tracks, displays the leaderboard, etc.
+The app reads your twitch chat, checks the answers and gives points to the fastest players.
+
+- Live leaderboard
+- Typo tolerance
+- Playlist edition (remove tracks, edit/hide/add any values to guess)
+
 <kbd>
     <img src="https://i.imgur.com/EkIW17l.gif" />
 </kbd>
 
-## Description
-
-The streamer logs in to their Spotify account from the application, configures the name of their Twitch channel and the device on which to play the music, then selects one of their playlists.
-
-Once everything is setup, the application displays the blind-test view that the streamer can capture/stream, along with its Spotify sound. It displays the leaderboard, and the current song's items to guess.
-
-The viewers type their guesses in the chat when a song plays, and the app will read chat messages to determine who found the correct answer(s) first, and reward them with points.
 
 ## Screenshots
 
 ![Playlist selection](https://i.imgur.com/jJjUIZK.png "Playlist selection")
 ![Playlist edition](https://i.imgur.com/bqHOfwD.png "Playlist edition")
-![Track edition](https://i.imgur.com/pLnSZ8z.png "Track edition")
+![Track edition](https://i.imgur.com/HWTBrmI.png "Track edition")
 
 ## Configuration
 

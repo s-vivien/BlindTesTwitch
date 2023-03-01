@@ -188,6 +188,10 @@ svg {
   margin-right: auto !important;
 }
 
+.edition-form-row {
+  align-items: center;
+}
+
 .edition-form-header {
   border-bottom: 1px solid $input-border-color;
   margin-bottom: 10px;
@@ -258,6 +262,11 @@ svg {
 
 .modal-content {
   background-color: $modal-background-color;
+}
+
+.modal-large {
+  width: 65%;
+  max-width: none!important;
 }
 
 .btn-close {

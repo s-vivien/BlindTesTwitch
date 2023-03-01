@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from 'react'
 import { BlindTestContext } from "App"
-import { cleanValue, deepCopyObject, deleteStoredBlindTestTracks, getStoredBlindTestTracks, setStoredBlindTestTracks } from 'helpers';
+import { cleanValue, deepCopyObject, getStoredBlindTestTracks, setStoredBlindTestTracks } from 'helpers';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
-import { BlindTestTracks, computeGuessable, Guessable, GuessableType } from './data/BlindTestData';
+import { BlindTestTracks, computeGuessable, Guessable, GuessableState, GuessableType } from './data/BlindTestData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type EditedGuessable = {
   value: string,
   type: GuessableType
-  disabled: boolean
+  state: GuessableState
 }
 
 const PlaylistEdition = (props: any) => {
@@ -33,7 +33,7 @@ const PlaylistEdition = (props: any) => {
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
       let newBt = deepCopyObject(BlindTestTracks, bt);
-      newBt.tracks[selectedIndex].guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.disabled));
+      newBt.tracks[selectedIndex].guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
       setStoredBlindTestTracks(newBt);
       setBt(newBt);
       endEdit();
@@ -50,13 +50,13 @@ const PlaylistEdition = (props: any) => {
     setSelectedIndex(index);
     setEdition(true);
     let editedGuessables: EditedGuessable[] = [];
-    bt.tracks[index].guessables.forEach(g => { editedGuessables.push({ value: g.original, type: g.type, disabled: g.disabled }); })
+    bt.tracks[index].guessables.forEach(g => { editedGuessables.push({ value: g.original, type: g.type, state: g.state }); })
     setEditedValues(editedGuessables);
   }
 
   const addExtraGuessable = () => {
     let newEditedValues = [...editedValues];
-    newEditedValues.push({ value: "", type: GuessableType.Misc, disabled: false });
+    newEditedValues.push({ value: "", type: GuessableType.Misc, state: GuessableState.Enabled });
     setEditedValues(newEditedValues);
   }
 
@@ -71,9 +71,11 @@ const PlaylistEdition = (props: any) => {
     setEdition(false);
   }
 
-  const updateDisabled = (index: number, enabled: boolean) => {
+  const updateState = (index: number, state: string) => {
     let newEditedValues = [...editedValues];
-    newEditedValues[index].disabled = !enabled;
+    const newState: GuessableState = GuessableState[state as keyof typeof GuessableState];
+    console.log(`${index} : ${newEditedValues[index].state} -> ${newState}`);
+    newEditedValues[index].state = newState;
     setEditedValues(newEditedValues);
   }
 
@@ -103,7 +105,7 @@ const PlaylistEdition = (props: any) => {
     if (guessables.length === 0) return <></>
     return guessables.map<React.ReactNode>(g => {
       const value = showAcceptedValues ? g.toGuess : g.original;
-      return g.disabled ? <del>{value}</del> : <>{value}</>;
+      return g.state != GuessableState.Enabled ? <del>{value}</del> : <>{value}</>;
     }).reduce((prev, curr) => [prev, ', ', curr]);
   }
 
@@ -181,11 +183,11 @@ const PlaylistEdition = (props: any) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={edition} centered size="lg">
+      <Modal show={edition} centered size="lg" dialogClassName="modal-large">
         <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }}>
           <Modal.Body style={{ paddingTop: 0 }}>
             <Form.Group as={Row} controlId="formHeader" className='edition-form-header'>
-              <Form.Label column sm={1}>
+              <Form.Label column sm={2}>
               </Form.Label>
               <Form.Label column sm={1}>
                 <b>Type</b>
@@ -193,24 +195,32 @@ const PlaylistEdition = (props: any) => {
               <Form.Label column sm={5}>
                 <b>Value</b>
               </Form.Label>
-              <Form.Label column sm={5}>
+              <Form.Label column sm={4}>
                 <b>Accepted value</b>
               </Form.Label>
             </Form.Group>
 
             {editedValues.map((guessable, index) => {
-              return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2">
-                <Form.Label column sm={1}>
-                  {guessable.type === GuessableType.Misc && <FontAwesomeIcon onClick={() => removeExtraGuessable(index)} icon={['fas', 'trash']} size="lg" />}
-                  {guessable.type !== GuessableType.Misc && <input type="checkbox" className="larger" checked={!guessable.disabled} onChange={(e) => { updateDisabled(index, e.target.checked) }} />}
+              return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2 edition-form-row">
+                <Form.Label column sm={2}>
+                  {guessable.type === GuessableType.Misc &&
+                    <Button style={{ width: '100%' }} size="sm" variant="danger" onClick={() => removeExtraGuessable(index)}>Delete</Button>
+                  }
+                  {guessable.type !== GuessableType.Misc &&
+                    <Form.Select className="form-control form-control-sm" value={GuessableState[guessable.state]} onChange={(e) => { updateState(index, e.target.value) }}>
+                      <option value={GuessableState[GuessableState.Enabled]}>Enabled</option>
+                      <option value={GuessableState[GuessableState.Disabled]}>Disabled</option>
+                      <option value={GuessableState[GuessableState.DisabledHidden]}>Disabled and hidden</option>
+                    </Form.Select>
+                  }
                 </Form.Label>
                 <Form.Label column sm={1}>
                   {GuessableType[guessable.type]}
                 </Form.Label>
                 <Col sm={5}>
-                  <Form.Control required disabled={guessable.disabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
+                  <Form.Control size="sm" required disabled={guessable.state != GuessableState.Enabled} value={guessable.value} onChange={(e) => { updateValue(index, e.target.value) }} type="text" placeholder="Enter value" />
                 </Col>
-                <Form.Label className="code" column sm={5}>
+                <Form.Label className="code" column sm={4}>
                   {cleanValue(guessable.value)}
                 </Form.Label>
               </Form.Group>
@@ -256,7 +266,7 @@ const PlaylistEdition = (props: any) => {
             >
               <FontAwesomeIcon icon={['fas', 'circle-info']} className="ml-2" />
             </OverlayTrigger></th>
-            <th style={{ width: "15%", textAlign: 'center'}}>Actions</th>
+            <th style={{ width: "15%", textAlign: 'center' }}>Actions</th>
           </tr>
         </thead>
         <tbody>
