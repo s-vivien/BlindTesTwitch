@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { Type } from "class-transformer"
-import { cleanValue, cleanSpoiler, getMaxDist } from "../../helpers"
+import { cleanValue, cleanSpoiler } from "../../helpers"
 
 export enum GuessableState {
   Enabled = 0,
@@ -17,14 +17,12 @@ export enum GuessableType {
 export class Guessable {
   original: string // the original string
   toGuess: string // the cleaned string
-  maxDistance: number // the max D/L distance to match
   state: GuessableState
   type: GuessableType
 
-  constructor(original: string, toGuess: string, maxDistance: number, type: GuessableType, state: GuessableState) {
+  constructor(original: string, toGuess: string, type: GuessableType, state: GuessableState) {
     this.original = original;
     this.toGuess = toGuess;
-    this.maxDistance = maxDistance;
     this.state = state;
     this.type = type;
   }
@@ -84,6 +82,5 @@ export class BlindTestTracks {
 
 export function computeGuessable(value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled) {
   let cleaned = cleanValue(value);
-  let maxDist = getMaxDist(cleaned);
-  return new Guessable(value, cleaned, maxDist, type, state);
+  return new Guessable(value, cleaned, type, state);
 }

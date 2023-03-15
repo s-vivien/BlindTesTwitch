@@ -174,42 +174,63 @@ export const cleanSpoiler = (title: string, artists: string[]) => {
   return cleaned;
 }
 
-export const getMaxDist = (value: string) => {
-  return Math.floor(Math.max(0, value.length - 3) / 6);
-}
+// ref, input
+export const sorensenDiceScore = (first: string, second: string) => {
+  first = first.replace(/\s+/g, '');
+  second = second.replace(/\s+/g, '');
 
-export const computeDistance = (source: string, target: string) => {
-  const sourceLength: number = source.length
-  const targetLength: number = target.length
-  if (sourceLength === 0) return targetLength
-  if (targetLength === 0) return sourceLength
+  if (first === second) return 1;
+  if (first.length < 2 && second.length >= 2) return 0;
 
-  const dist = new Array<number[]>(sourceLength + 1)
-  for (let i = 0; i <= sourceLength; ++i) {
-    dist[i] = new Array<number>(targetLength + 1).fill(0)
-  }
+  let firstBigrams = new Map();
+  let firstReverseBigrams = new Map();
+  let firstAltBigrams = new Map();
+  for (let i = 0; i < first.length - 1; i++) {
+    const bigram = first[i] + first[i + 1];
+    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1;
+    firstBigrams.set(bigram, count);
 
-  for (let i = 0; i < sourceLength + 1; i++) {
-    dist[i][0] = i
-  }
-  for (let j = 0; j < targetLength + 1; j++) {
-    dist[0][j] = j
-  }
-  for (let i = 1; i < sourceLength + 1; i++) {
-    for (let j = 1; j < targetLength + 1; j++) {
-      let cost = source.charAt(i - 1) === target.charAt(j - 1) ? 0 : 1
+    const reverseBigram = first[i + 1] + first[i];
+    const reverseCount = firstReverseBigrams.has(reverseBigram) ? firstReverseBigrams.get(reverseBigram) + 1 : 1;
+    firstReverseBigrams.set(reverseBigram, reverseCount);
 
-      // special cases
-      if (source.charAt(i - 1) === ' ' && (target.charAt(j - 1) === '-' || target.charAt(j - 1) === '\'')) cost = 0
+    if (i + 2 < first.length) {
+      const altBigram = first[i] + first[i + 2];
+      const altCount = firstAltBigrams.has(altBigram) ? firstAltBigrams.get(altBigram) + 1 : 1;
+      firstAltBigrams.set(altBigram, altCount);
+    }
+  };
 
-      dist[i][j] = Math.min(dist[i - 1][j] + 1, dist[i][j - 1] + 1, dist[i - 1][j - 1] + cost)
-      if (i > 1 &&
-        j > 1 &&
-        source.charAt(i - 1) === target.charAt(j - 2) &&
-        source.charAt(i - 2) === target.charAt(j - 1)) {
-        dist[i][j] = Math.min(dist[i][j], dist[i - 2][j - 2] + cost)
+  let intersectionSize = 0;
+  const altRatio = Math.max(0.2, 1.0 - 0.05 * first.length);
+  
+  for (let i = 0; i < second.length - 1; i++) {
+    const bigram = second[i] + second[i + 1];
+
+    if (firstBigrams.has(bigram)) {
+      const count = firstBigrams.get(bigram);
+      if (count > 0) {
+        firstBigrams.set(bigram, count - 1);
+        intersectionSize++;
+        continue;
+      }
+    }
+    if (firstReverseBigrams.has(bigram)) {
+      const count = firstReverseBigrams.get(bigram);
+      if (count > 0) {
+        firstReverseBigrams.set(bigram, count - 1);
+        intersectionSize += altRatio;
+        continue;
+      }
+    }
+    if (firstAltBigrams.has(bigram)) {
+      const count = firstAltBigrams.get(bigram);
+      if (count > 0) {
+        firstAltBigrams.set(bigram, count - 1);
+        intersectionSize += altRatio;
       }
     }
   }
-  return dist[sourceLength][targetLength]
+
+  return (2.0 * intersectionSize) / (first.length + second.length - 2);
 }

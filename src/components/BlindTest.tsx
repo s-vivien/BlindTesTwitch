@@ -1,4 +1,4 @@
-import { getStoredBlindTestTracks, getStoredBlindTestScores, computeDistance, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
+import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, FormControl } from "react-bootstrap"
@@ -155,8 +155,9 @@ const BlindTest = () => {
         if (guess.guessed) continue; // guess is no longer active
         if (guess.guessedBy.find((g) => g.nick === nick)) continue; // the player already guessed this item
         const guessable = currentTrack.guessables[i];
-        const d = computeDistance(proposition, guessable.toGuess)
-        if (d <= guessable.maxDistance || (proposition.includes(guessable.toGuess) && proposition.length <= 1.6 * guessable.toGuess.length)) {
+        const d = sorensenDiceScore(guessable.toGuess, proposition);
+        // console.log(`${guessable.toGuess} ${proposition} ${d}`);
+        if (d >= 0.8) {
           let points = 1;
           if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
           for (let g of guesses) {
