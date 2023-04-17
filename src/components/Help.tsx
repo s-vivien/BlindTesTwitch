@@ -18,21 +18,23 @@ const Help = () => {
       {helpDisplayed &&
         <div className="alert-modal-bg">
           <Alert className="alert-modal" variant="secondary">
+            <strong>BlindTesTwitch</strong> is made by <strong>Neumann</strong> (<a href="https://twitter.com/N_e_u_m_a_n_n" target="_blank">@N_e_u_m_a_n_n</a>) and is <strong><a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">open-source</a></strong>
+            <br />
+            <br />
             <h2>How to play</h2>
             <ul>
               <li><b>No registration/prerequisite needed </b> : just type in the chat to play ! You'll be added automatically to the leaderboard</li>
               <li>There is a (small) <b>typo tolerance</b>, don't be afraid to type fast 😃</li>
-              <li>The syntax is the one used by Spotify. Example : <i>AC/DC</i> (<del>ACDC</del>), <i>Polo & Pan</i> (<del>Polo and Pan</del>), <i>The Police</i> (<del>Police</del>)</li>
+              <li>The syntax is the one used by Spotify. Example : <i>AC/DC</i> (<del>ACDC</del>), <i>The Police</i> (<del>Police</del>)</li>
               <li>Artists/titles and propositions are <b>cleaned before comparison</b> :
                 <ul>
                   <li>Accents are removed</li>
                   <li>The following characters are removed/ignored : <b>¿ ¡ * , .</b></li>
-                  <li>Some characters are replaced (e.g. <b>$</b> is replaced by <b>s</b>)</li>
+                  <li>Some characters are replaced (<b>$</b> is replaced by <b>s</b>, <b>&</b> is replaced by <b>and</b>, etc...)</li>
                   <li>The characters <b>!</b> and <b>?</b> are removed when they are at the beginning or the end of a word</li>
                   <li>Lower-cased (i.e. propositions are case-insensitive)</li>
                 </ul>
               </li>
-              <li>Ask the streamer to hover over the answer to see what exactly was asked to validate the point</li>
             </ul>
             <p style={{ border: 'dashed black', padding: '10px' }}>
               <FontAwesomeIcon icon={['fas', 'exclamation-triangle']} size="lg" /> <i><b>Each proposition must contain a single artist/title</b></i> <FontAwesomeIcon icon={['fas', 'exclamation-triangle']} size="lg" />
@@ -57,7 +59,6 @@ const Help = () => {
                 <b>Ok</b>
               </Button>
             </div>
-            <a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">https://github.com/s-vivien/BlindTesTwitch</a>
           </Alert>
         </div>
       }

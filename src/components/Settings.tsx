@@ -84,6 +84,11 @@ const Settings = () => {
     setValidated(true);
   }
 
+  const twitchLogin = () => {
+    // pre-save settings before heading towards twitch login page
+    setStoredSettings(new SettingsData(channel, selectedDevice, addEveryUser, loggedInTwitch && chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0, scoreCommandMode));
+  }
+
   if (initialized) {
     return (
       <div style={{ width: '600px', margin: 'auto' }} className="mb-3">
@@ -121,7 +126,7 @@ const Settings = () => {
             <>
               {!loggedInTwitch &&
                 <Form.Text id="twitchLoginBlock" muted>
-                  Connect your twitch account to unlock more features. <a href={twitchLoginURI}>Click here to connect an account.</a>
+                  Connect your twitch account to unlock more features. <a onClick={twitchLogin} href={twitchLoginURI}>Click here to connect an account.</a>
                 </Form.Text>
               }
               {loggedInTwitch &&

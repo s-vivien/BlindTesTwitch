@@ -94,7 +94,7 @@ function App() {
           {loggedIn && <Button id="settingButton" type="submit" variant="link" size="sm" onClick={() => navigate("/settings")} title="Settings">
             <FontAwesomeIcon icon={['fas', 'cog']} size="lg" />
           </Button>}
-          <Help />
+          {loggedIn && tracksLoaded && <Help />}
           {loggedIn && <Button id="logoutButton" type="submit" variant="link" size="sm" onClick={logout} title="Logout">
             <FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" />
           </Button>}
