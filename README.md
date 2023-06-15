@@ -4,7 +4,7 @@ A **Blind-Test** web-application written in React, using Spotify/Twitch APIs
 
 You're a streamer and you want to try the app ?
 The application is deployed and ready to use !
-Just contact me on Discord (Neumann#1578)
+Just contact me on Discord (neumann__)
 
 ## Description
 
