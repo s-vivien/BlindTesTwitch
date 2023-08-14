@@ -5,7 +5,6 @@ export enum TwitchMode {
 }
 
 export class SettingsData {
-  twitchChannel: string
   deviceId: string
   addEveryUser: boolean
   chatNotifications: boolean
@@ -13,8 +12,7 @@ export class SettingsData {
   acceptanceDelay: number
   scoreCommandMode: TwitchMode
 
-  constructor(twitchChannel: string, deviceId: string, addEveryUser: boolean, chatNotifications: boolean, acceptanceDelay: number, previewGuessNumber: boolean, scoreCommandMode: TwitchMode) {
-    this.twitchChannel = twitchChannel;
+  constructor(deviceId: string, addEveryUser: boolean, chatNotifications: boolean, acceptanceDelay: number, previewGuessNumber: boolean, scoreCommandMode: TwitchMode) {
     this.deviceId = deviceId;
     this.addEveryUser = addEveryUser;
     this.chatNotifications = chatNotifications;
@@ -24,6 +22,6 @@ export class SettingsData {
   }
 
   isInitialized(): boolean {
-    return this.twitchChannel !== undefined && this.deviceId !== undefined;
+    return this.deviceId !== undefined;
   }
 }

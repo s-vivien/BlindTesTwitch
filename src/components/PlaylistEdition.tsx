@@ -74,7 +74,6 @@ const PlaylistEdition = (props: any) => {
   const updateState = (index: number, state: string) => {
     let newEditedValues = [...editedValues];
     const newState: GuessableState = GuessableState[state as keyof typeof GuessableState];
-    console.log(`${index} : ${newEditedValues[index].state} -> ${newState}`);
     newEditedValues[index].state = newState;
     setEditedValues(newEditedValues);
   }

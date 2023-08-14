@@ -1,4 +1,4 @@
-import { setStoredAccessToken, setStoredRefreshToken, getQueryParam, setStoredUserCountry } from "helpers"
+import { setStoredSpotifyAccessToken, setStoredSpotifyRefreshToken, getQueryParam, setStoredUserCountry, getHashParam, setStoredTwitchOAuthToken } from "helpers"
 import { useNavigate } from "react-router-dom";
 import instance, { getUserProfile, retrieveAccessToken } from 'services/SpotifyAPI'
 import { useContext, useEffect } from 'react'
@@ -6,27 +6,30 @@ import { BlindTestContext } from "App";
 
 const LoginCallback = () => {
 
-  const { setLoggedIn } = useContext(BlindTestContext);
+  const { setLoggedInSpotify, setLoggedInTwitch } = useContext(BlindTestContext);
   const navigate = useNavigate()
 
   useEffect(() => {
-    const code = getQueryParam('code')
-    if (code) {
-      retrieveAccessToken(code).then(response => {
-        setStoredRefreshToken(response.data.refresh_token);
+    const twitchToken = getHashParam('access_token')
+    const spotifyCode = getQueryParam('code')
+
+    if (twitchToken) { // Twitch logging callback
+      setStoredTwitchOAuthToken(twitchToken);
+      setLoggedInTwitch(true);
+    } else if (spotifyCode) { // Spotify logging callback
+      retrieveAccessToken(spotifyCode).then(response => {
+        setStoredSpotifyRefreshToken(response.data.refresh_token);
         const accessToken = response.data.access_token;
-        setStoredAccessToken(accessToken);
+        setStoredSpotifyAccessToken(accessToken);
         instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-        setLoggedIn(true);
+        setLoggedInSpotify(true);
         getUserProfile().then(response => {
           setStoredUserCountry(response.data.country);
         });
-        navigate("/");
       })
-    } else {
-      navigate("/")
     }
-  }, [navigate, setLoggedIn]);
+    navigate("/");
+  }, [navigate, setLoggedInSpotify, setLoggedInTwitch]);
 
   return (
     <div className="spinner"></div>

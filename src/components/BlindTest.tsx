@@ -37,7 +37,7 @@ const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 
 const BlindTest = () => {
 
-  const { setSubtitle } = useContext(BlindTestContext);
+  const { setSubtitle, twitchNick } = useContext(BlindTestContext);
 
   const [bt] = useState(() => getStoredBlindTestTracks());
   const [settings] = useState(() => getStoredSettings());
@@ -52,12 +52,12 @@ const BlindTest = () => {
   const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
 
   useEffect(() => {
-    console.log(`Twitch channel changed to ${settings.twitchChannel}`);
-    twitchConnection(settings.twitchChannel, settings.chatNotifications);
+    console.log(`Twitch channel changed to ${twitchNick}`);
+    twitchConnection(twitchNick, settings.chatNotifications);
     return () => {
       twitchDisconnection();
     }
-  }, [settings.twitchChannel]);
+  }, [twitchNick]);
 
   useEffect(() => {
     if (playing) {
@@ -144,7 +144,7 @@ const BlindTest = () => {
           if (settings.scoreCommandMode === TwitchMode.Whisper) {
             twitchClient?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           } else {
-            twitchClient?.say(settings.twitchChannel, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+            twitchClient?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           }
         }
       }
@@ -180,7 +180,7 @@ const BlindTest = () => {
     if (settings.chatNotifications) {
       let msg = `✅ [${currentTrack?.guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
       if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
-      twitchClient?.say(settings.twitchChannel, msg);
+      twitchClient?.say(twitchNick, msg);
     }
     setGuesses(newGuesses);
     if (delayed) {

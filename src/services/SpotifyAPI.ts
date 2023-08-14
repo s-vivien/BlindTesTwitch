@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getStoredRefreshToken, setStoredRefreshToken, deleteStoredAccessToken, getStoredAccessToken, setStoredAccessToken, consumePkcePair, getAppHomeURL, getStoredUserCountry } from 'helpers';
+import { getStoredSpotifyRefreshToken, setStoredSpotifyRefreshToken, deleteStoreSpotifyAccessToken, getStoredSpotifyAccessToken, setStoredSpotifyAccessToken, consumePkcePair, getAppHomeURL, getStoredUserCountry } from 'helpers';
 
 const instance = axios.create({
   headers: {
@@ -24,12 +24,12 @@ instance.interceptors.response.use(
       // Access Token was expired
       if (err.response.status === 401 && !config._retry) {
         delete instance.defaults.headers.common.Authorization
-        deleteStoredAccessToken()
+        deleteStoreSpotifyAccessToken()
         config._retry = true
         try {
           const params = new URLSearchParams()
           params.append('grant_type', 'refresh_token')
-          params.append('refresh_token', getStoredRefreshToken() || "")
+          params.append('refresh_token', getStoredSpotifyRefreshToken() || "")
           params.append('client_id', process.env.REACT_APP_SPOTIFY_CLIENT_ID || "")
           const rs = await instance.post('https://accounts.spotify.com/api/token',
             params, {
@@ -37,9 +37,9 @@ instance.interceptors.response.use(
               "Content-Type": "application/x-www-form-urlencoded",
             }
           })
-          setStoredRefreshToken(rs.data.refresh_token)
+          setStoredSpotifyRefreshToken(rs.data.refresh_token)
           const accessToken = rs.data.access_token
-          setStoredAccessToken(accessToken)
+          setStoredSpotifyAccessToken(accessToken)
           instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
           config.headers.Authorization = `Bearer ${accessToken}`
           return instance(config)
@@ -75,7 +75,7 @@ export const retrieveAccessToken = (access_code: string) => {
   })
 }
 
-const accessToken = getStoredAccessToken()
+const accessToken = getStoredSpotifyAccessToken()
 if (accessToken) {
   instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
 }

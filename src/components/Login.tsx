@@ -6,13 +6,23 @@ import { BlindTestContext } from "App";
 
 const Login = () => {
 
-  const { setSubtitle } = useContext(BlindTestContext);
+  const { setSubtitle, loggedInSpotify, loggedInTwitch } = useContext(BlindTestContext);
 
   useEffect(() => {
     setSubtitle('');
   }, [setSubtitle]);
 
-  const authorize = async () => {
+
+  const twitchLogin = async () => {
+    window.location.href = "https://id.twitch.tv/oauth2/authorize" +
+      "?client_id=" + process.env.REACT_APP_TWITCH_CLIENT_ID +
+      "&redirect_uri=" + getAppHomeURL() + "/callback" +
+      "&scope=chat:read+chat:edit+whispers:edit" +
+      "&force_verify=true" +
+      "&response_type=token";
+  }
+
+  const spotifyLogin = async () => {
     const pkcePair = computePkcePair()
     window.location.href = "https://accounts.spotify.com/authorize" +
       "?client_id=" + process.env.REACT_APP_SPOTIFY_CLIENT_ID +
@@ -24,10 +34,20 @@ const Login = () => {
       "&show_dialog=true";
   }
 
+  const LoginButton = (props: any) => {
+    return (
+      <Button id={props.appName + "LoginButton"} disabled={props.flag} style={{ display: 'block', margin: '5px auto', width: '15rem' }} variant={props.flag ? "outline-success" : "secondary"} size="lg" onClick={props.onClick}>
+        {!props.flag && <>Login with {props.appName}</>}
+        {props.flag && <><FontAwesomeIcon icon={['far', 'check-circle']} size="sm" /> Logged in {props.appName}</>}
+      </Button>
+    );
+  };
+
   return (
-    <Button id="loginButton" style={{ display: 'block', margin: '0 auto' }} type="submit" variant="outline-secondary" size="lg" onClick={authorize}>
-      <FontAwesomeIcon icon={['far', 'check-circle']} size="sm" /> Login with Spotify
-    </Button>
+    <>
+      <LoginButton flag={loggedInSpotify} appName="Spotify" onClick={spotifyLogin}></LoginButton>
+      <LoginButton flag={loggedInTwitch} appName="Twitch" onClick={twitchLogin}></LoginButton>
+    </>
   )
 }
 

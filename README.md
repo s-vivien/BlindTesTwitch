@@ -32,9 +32,10 @@ The app reads your twitch chat, checks the answers and gives points to the faste
 
 A few environment variables must be set in the `.env` file :
 - REACT_APP_SPOTIFY_CLIENT_ID : (mandatory) Your Spotify app clientId
-- REACT_APP_TWITCH_CLIENT_ID : (optional) Your Twitch app clientId
+- REACT_APP_TWITCH_CLIENT_ID : (mandatory) Your Twitch app clientId
 
-The Spotify app is mandatory : https://developer.spotify.com/dashboard/ (set redirect URI to `https://<domain>/BlindTesTwitch/callback`)   
-The Twitch app is optional (the chat notifications won't be available, but that does not prevent the application from working) : https://dev.twitch.tv/console/apps (set redirect URI to `https://<domain>/BlindTesTwitch/settings`)   
+Both Spotify and Twitch apps are mandatory (set redirect URI to `https://<domain>/BlindTesTwitch/callback` for both) :
+https://developer.spotify.com/dashboard/
+https://dev.twitch.tv/console/apps/
 
 Note : The application can be deployed on Github Pages, thanks to https://github.com/rafgraph/spa-github-pages

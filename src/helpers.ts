@@ -1,4 +1,4 @@
-import { BlindTestTrack, BlindTestTracks } from "components/data/BlindTestData"
+import { BlindTestTracks } from "components/data/BlindTestData"
 import { ClassConstructor, instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
@@ -57,18 +57,6 @@ export const deleteStoredTwitchOAuthToken = () => {
   localStorage.removeItem("twitch_oauth_token")
 }
 
-export const getStoredRefreshToken = () => {
-  return localStorage.getItem("refresh_token")
-}
-
-export const setStoredRefreshToken = (refresh_token: any) => {
-  localStorage.setItem("refresh_token", refresh_token)
-}
-
-export const deleteStoredRefreshToken = () => {
-  localStorage.removeItem("refresh_token")
-}
-
 export const getStoredUserCountry = () => {
   return localStorage.getItem("user_country")
 }
@@ -77,16 +65,28 @@ export const setStoredUserCountry = (user_country: any) => {
   localStorage.setItem("user_country", user_country)
 }
 
-export const getStoredAccessToken = () => {
-  return localStorage.getItem("access_token")
+export const getStoredSpotifyRefreshToken = () => {
+  return localStorage.getItem("spotify_refresh_token")
 }
 
-export const setStoredAccessToken = (access_token: any) => {
-  localStorage.setItem("access_token", access_token)
+export const setStoredSpotifyRefreshToken = (refresh_token: any) => {
+  localStorage.setItem("spotify_refresh_token", refresh_token)
 }
 
-export const deleteStoredAccessToken = () => {
-  localStorage.removeItem("access_token")
+export const deleteStoredSpotifyRefreshToken = () => {
+  localStorage.removeItem("spotify_refresh_token")
+}
+
+export const getStoredSpotifyAccessToken = () => {
+  return localStorage.getItem("spotify_access_token")
+}
+
+export const setStoredSpotifyAccessToken = (access_token: any) => {
+  localStorage.setItem("spotify_access_token", access_token)
+}
+
+export const deleteStoreSpotifyAccessToken = () => {
+  localStorage.removeItem("spotify_access_token")
 }
 
 export const hasStoredTracks = () => {

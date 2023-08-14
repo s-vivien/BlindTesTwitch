@@ -4,35 +4,53 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoredAccessToken, deleteStoredRefreshToken, getStoredRefreshToken, getStoredSettings, getStoredTheme, hasStoredTracks, setStoredTheme, themeNames } from './helpers';
+import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoreSpotifyAccessToken, deleteStoredSpotifyRefreshToken, getStoredSpotifyRefreshToken, getStoredSettings, getStoredTheme, hasStoredTracks, setStoredTheme, themeNames, getStoredTwitchOAuthToken } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import BlindTest from './components/BlindTest';
 import LoginCallback from './components/LoginCallback';
 import Help from 'components/Help';
 import Playlist from 'components/Playlist';
+import { validateToken } from 'services/TwitchAPI';
 
 function App() {
   const navigate = useNavigate();
 
+  const [twitchNick, setTwitchNick] = useState('');
   const [theme, setTheme] = useState(() => getStoredTheme());
-  const [loggedIn, setLoggedIn] = useState(() => getStoredRefreshToken() !== null);
+  const [loggedInSpotify, setLoggedInSpotify] = useState(() => getStoredSpotifyRefreshToken() !== null);
+  const [loggedInTwitch, setLoggedInTwitch] = useState(() => getStoredTwitchOAuthToken() !== null);
   const [configured, setConfigured] = useState(() => getStoredSettings().isInitialized());
   const [tracksLoaded, setTracksLoaded] = useState(() => hasStoredTracks());
   const [view, setView] = useState(<div />);
   const [subtitle, setSubtitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const contextValue = { loggedIn, setLoggedIn, configured, setConfigured, tracksLoaded, setTracksLoaded, subtitle, setSubtitle };
-
-  useEffect(() => {
-    setAxiosErrorCallback((msg: string) => { setErrorMessage(msg); });
-  }, []);
+  const contextValue = { loggedInSpotify, setLoggedInSpotify, loggedInTwitch, setLoggedInTwitch, configured, setConfigured, tracksLoaded, setTracksLoaded, subtitle, setSubtitle, twitchNick, setTwitchNick };
 
   const location = useLocation();
 
   useEffect(() => {
-    if (!loggedIn) {
+    setAxiosErrorCallback((msg: string) => { setErrorMessage(msg); });
+
+    // check if twitch token is still valid
+    if (getStoredTwitchOAuthToken() !== null) {
+      const twitchToken = getStoredTwitchOAuthToken() || '';
+      validateToken(twitchToken).then(response => {
+        if (response.status !== 200) {
+          deleteStoredTwitchOAuthToken();
+          setLoggedInTwitch(false);
+        } else {
+          response.json().then(body => setTwitchNick(body['login']));
+          setLoggedInTwitch(true);
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loggedInSpotify || !loggedInTwitch) {
       setView(<Login />);
+      navigate('/');
     } else if (!configured) {
       navigate('/settings');
     } else if (location.pathname === "/") {
@@ -40,9 +58,10 @@ function App() {
         navigate('/playlist');
       } else {
         setView(<BlindTest />);
+        navigate('/');
       }
     }
-  }, [navigate, loggedIn, configured, tracksLoaded]);
+  }, [navigate, loggedInSpotify, loggedInTwitch, configured, tracksLoaded]);
 
   useEffect(() => {
     for (let name of themeNames) {
@@ -62,18 +81,20 @@ function App() {
   }
 
   const logout = () => {
-    deleteStoredRefreshToken();
-    deleteStoredAccessToken();
+    deleteStoredSpotifyRefreshToken();
+    deleteStoreSpotifyAccessToken();
     deleteStoredBlindTestTracks();
     deleteStoredBlindTestScores();
     deleteStoredTwitchOAuthToken();
     deleteStoredSettings();
-    setLoggedIn(false);
+    setLoggedInSpotify(false);
+    setLoggedInTwitch(false);
     setTracksLoaded(false);
     setConfigured(false);
     navigate("/");
   }
 
+  const loggedIn = loggedInSpotify && loggedInTwitch;
   return (
     <BlindTestContext.Provider value={contextValue}>
       <header className="app-header">
@@ -133,12 +154,16 @@ function App() {
 export default App;
 
 export const BlindTestContext = createContext({
-  loggedIn: false,
-  setLoggedIn: (v: boolean) => { }, // eslint-disable-line
+  loggedInSpotify: false,
+  setLoggedInSpotify: (v: boolean) => { }, // eslint-disable-line
+  loggedInTwitch: false,
+  setLoggedInTwitch: (v: boolean) => { }, // eslint-disable-line
   configured: false,
   setConfigured: (v: boolean) => { }, // eslint-disable-line
   tracksLoaded: false,
   setTracksLoaded: (v: boolean) => { }, // eslint-disable-line
   subtitle: '',
-  setSubtitle: (v: string) => { } // eslint-disable-line
+  setSubtitle: (v: string) => { }, // eslint-disable-line
+  twitchNick: '',
+  setTwitchNick: (v: string) => { } // eslint-disable-line
 });
