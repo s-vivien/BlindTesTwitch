@@ -90,7 +90,7 @@ export const getPlaylists = (offset: number, limit: number) => {
 
 export const getPlaylistTracks = (playlist_id: string, offset: number, limit: number) => {
   const market = getStoredUserCountry();
-  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),album(images)))`)
+  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),track_number,album(images,uri)))`)
 }
 
 export const setRepeatMode = (enabled: boolean, device_id: string) => {

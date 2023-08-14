@@ -255,7 +255,7 @@ const BlindTest = () => {
     let track = bt.tracks[doneTracks]
     setPlaying(false);
     setLoading(true);
-    launchTrack(bt.playlistUri, track.offset, settings.deviceId).then(() => {
+    launchTrack(track.album_uri, track.track_number, settings.deviceId).then(() => {
       setRepeatMode(true, settings.deviceId);
       setDoneTracks(doneTracks + 1);
       setCurrentTrack(track);

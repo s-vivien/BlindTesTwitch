@@ -25,7 +25,7 @@ const PlaylistSelectionRow = (props: any) => {
     }
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     tracks = tracks.filter(t => t.track.is_playable);
-    const bt = new BlindTestTracks(tracks, props.playlist.uri);
+    const bt = new BlindTestTracks(tracks);
     setStoredBlindTestTracks(bt);
     setTracksLoaded(true);
   }
