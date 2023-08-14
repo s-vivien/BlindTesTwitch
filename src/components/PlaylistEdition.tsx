@@ -17,7 +17,6 @@ const PlaylistEdition = (props: any) => {
 
   const [bt, setBt] = useState(() => getStoredBlindTestTracks());
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  // const [showAcceptedValues, setShowAcceptedValues] = useState(false);
   const [editedValues, setEditedValues] = useState<EditedGuessable[]>([]);
   const [edition, setEdition] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -104,7 +103,7 @@ const PlaylistEdition = (props: any) => {
     if (guessables.length === 0) return <></>
     return guessables.map<React.ReactNode>(g => {
       const value = showAcceptedValues ? g.toGuess : g.original;
-      return g.state != GuessableState.Enabled ? <del>{value}</del> : <>{value}</>;
+      return <span key={g.original}>{g.state != GuessableState.Enabled ? <del>{value}</del> : <>{value}</>}</span>;
     }).reduce((prev, curr) => [prev, ', ', curr]);
   }
 
@@ -200,7 +199,7 @@ const PlaylistEdition = (props: any) => {
             </Form.Group>
 
             {editedValues.map((guessable, index) => {
-              return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2 edition-form-row">
+              return <Form.Group as={Row} controlId={"formRow" + index} className="mt-2 edition-form-row" key={index}>
                 <Form.Label column sm={2}>
                   {guessable.type === GuessableType.Misc &&
                     <Button style={{ width: '100%' }} size="sm" variant="danger" onClick={() => removeExtraGuessable(index)}>Delete</Button>

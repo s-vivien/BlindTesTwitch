@@ -37,7 +37,7 @@ const Login = () => {
   const LoginButton = (props: any) => {
     return (
       <Button id={props.appName + "LoginButton"} disabled={props.flag} style={{ display: 'block', margin: '5px auto', width: '15rem' }} variant={props.flag ? "outline-success" : "secondary"} size="lg" onClick={props.onClick}>
-        {!props.flag && <>Login with {props.appName}</>}
+        {!props.flag && <>Log in {props.appName}</>}
         {props.flag && <><FontAwesomeIcon icon={['far', 'check-circle']} size="sm" /> Logged in {props.appName}</>}
       </Button>
     );
