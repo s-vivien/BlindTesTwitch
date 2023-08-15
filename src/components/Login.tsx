@@ -34,19 +34,25 @@ const Login = () => {
       "&show_dialog=true";
   }
 
+  const spotifyIcon = <FontAwesomeIcon icon={['fab', 'spotify']} color="#1ED760" />
+  const twitchIcon = <FontAwesomeIcon icon={['fab', 'twitch']} color="#6441A4" />
+
   const LoginButton = (props: any) => {
     return (
-      <Button id={props.appName + "LoginButton"} disabled={props.flag} style={{ display: 'block', margin: '5px auto', width: '15rem' }} variant={props.flag ? "outline-success" : "secondary"} size="lg" onClick={props.onClick}>
-        {!props.flag && <>Log in {props.appName}</>}
-        {props.flag && <><FontAwesomeIcon icon={['far', 'check-circle']} size="sm" /> Logged in {props.appName}</>}
+      <Button id={props.appName + "LoginButton"} disabled={props.flag} style={{ display: 'block', margin: '5px auto', width: '20rem' }} variant={props.flag ? "outline-success" : "secondary"} size="lg" onClick={props.onClick}>
+        <>
+          {!props.flag && <>Log in {props.appName}</>}
+          {props.flag && <><FontAwesomeIcon icon={['far', 'check-circle']} /> Logged in {props.appName}</>}
+          &nbsp;{props.icon}
+        </>
       </Button>
     );
   };
 
   return (
     <>
-      <LoginButton flag={loggedInSpotify} appName="Spotify" onClick={spotifyLogin}></LoginButton>
-      <LoginButton flag={loggedInTwitch} appName="Twitch" onClick={twitchLogin}></LoginButton>
+      <LoginButton flag={loggedInSpotify} appName="Spotify" onClick={spotifyLogin} icon={spotifyIcon}></LoginButton>
+      <LoginButton flag={loggedInTwitch} appName="Twitch" onClick={twitchLogin} icon={twitchIcon}></LoginButton>
     </>
   )
 }
