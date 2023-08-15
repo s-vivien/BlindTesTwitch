@@ -142,7 +142,6 @@ export const deepCopyObject = <T, V>(cls: ClassConstructor<T>, data: V): T => {
 export const cleanValue = (value: string) => {
   return cleanValueLight(value)
     .replaceAll(/ \(.+\).*| -.+/g, "")
-    .replaceAll(/ & /g, " and ")
     .trim();
 }
 
@@ -156,8 +155,7 @@ export const cleanValueLight = (value: string) => {
     .replaceAll(/^[!?]+/g, "")
     .replaceAll(/ [!?]+/g, " ")
     .replaceAll(/[!?]+ /g, " ")
-    .replaceAll(/[¿¡*,.]/g, "")
-    .replaceAll("’", "'")
+    .replaceAll(/[¿¡*,.’']/g, "")
     .replaceAll("œ", "oe")
     .replaceAll(/[$]/g, "s")
     .replaceAll(/[ø]/g, "o")
