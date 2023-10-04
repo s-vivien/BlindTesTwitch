@@ -32,13 +32,11 @@ export class BlindTestTrack {
   @Type(() => Guessable)
   guessables: Guessable[]
   img: string
-  album_uri: string
-  track_number: number
+  track_uri: string
 
-  constructor(guessables: Guessable[], album_uri: string, track_number: number, img: string) {
+  constructor(guessables: Guessable[], track_uri: string, img: string) {
     this.guessables = guessables;
-    this.album_uri = album_uri;
-    this.track_number = track_number;
+    this.track_uri = track_uri;
     this.img = img;
   }
 
@@ -71,8 +69,7 @@ export class BlindTestTracks {
         let title = cleanSpoiler(t.name, artists);
         this.tracks.push(new BlindTestTrack(
           [computeGuessable(title, GuessableType.Title), ...t.artists.map((a: { name: string }) => computeGuessable(a.name, GuessableType.Artist))],
-          t.album.uri,
-          t.track_number - 1,
+          t.uri,
           t.album.images[1]?.url || ""
         ));
       }

@@ -270,7 +270,7 @@ const PlaylistEdition = (props: any) => {
         <tbody>
           {
             bt.tracks.map((track, index) => {
-              return <tr className={"p-1 edition-row " + (index < bt.doneTracks ? "edition-row-disabled" : "")} key={"track-" + track.album_uri + track.track_number}>
+              return <tr className={"p-1 edition-row " + (index < bt.doneTracks ? "edition-row-disabled" : "")} key={"track-" + track.track_uri}>
                 <td className="edition-row-number">
                   #{1 + index}
                 </td>
