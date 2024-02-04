@@ -71,17 +71,12 @@ const BlindTest = () => {
 
   useEffect(() => {
     let flat: DisplayableScore[] = []
-    let distinctScores: number[] = [];
     scores.forEach((_val: number, _key: string) => {
       flat.push({
         nick: _key,
         score: _val
       })
-      if (!distinctScores.includes(_val)) {
-        distinctScores.push(_val);
-      }
     })
-    distinctScores.sort((a, b) => b - a);
     flat.sort((a, b) => a.nick.localeCompare(b.nick))
     flat.sort((a, b) => b.score - a.score)
     if (nickFilter) {
@@ -89,7 +84,7 @@ const BlindTest = () => {
     }
     // Display rank only for the first of each group
     for (let i = 0; i < flat.length; i++) {
-      const rank = 1 + distinctScores.indexOf(flat[i].score);
+      const rank = 1 + i;
       if (i === 0 || flat[i].score !== flat[i - 1].score) {
         flat[i].displayedRank = rank;
       }
