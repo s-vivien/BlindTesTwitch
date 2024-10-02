@@ -7,6 +7,7 @@ import { BlindTestTrack, Guessable, GuessableState, GuessableType } from "./data
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
 import { TwitchMode } from "./data/SettingsData"
+import { AnimatePresence, motion } from "framer-motion"
 
 type DisplayableScore = {
   nick: string,
@@ -397,38 +398,48 @@ const BlindTest = () => {
                 </tr>
               </thead>
               <tbody>
-                {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => {
-                  return <tr key={sc.nick} className="leaderboard-row">
-                    <td>
-                      <span>{sc.displayedRank}</span>
-                    </td>
-                    <td style={{ position: "relative" }}>
-                      <span className="leaderboard-nick">{sc.nick}</span>
-                      <div className="leaderboard-buttons">
-                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
-                          <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
-                        </Button>
-                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
-                          <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
-                        </Button>
-                      </div>
-                    </td>
-                    <td>
-                      <span>{sc.score}</span>
-                    </td>
-                  </tr>
-                })}
-                {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
-                  <tr style={{ textAlign: "center" }}>
-                    <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
-                  </tr>
-                }
+                <AnimatePresence>
+                  {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
+                    <motion.tr
+                      key={sc.nick}
+                      className="leaderboard-row"
+                      initial={{ opacity: 0, top: -20 }}
+                      animate={{ opacity: 1, top: 0 }}
+                      exit={{ opacity: 0, top: 20 }}
+                      transition={{ duration: 0.3 }}
+                      layout="position"
+                    >
+                      <td>
+                        <span>{sc.displayedRank}</span>
+                      </td>
+                      <td style={{ position: "relative" }}>
+                        <span className="leaderboard-nick">{sc.nick}</span>
+                        <div className="leaderboard-buttons">
+                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
+                            <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
+                          </Button>
+                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
+                            <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
+                          </Button>
+                        </div>
+                      </td>
+                      <td>
+                        <span>{sc.score}</span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                  {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
+                    <tr style={{ textAlign: "center" }}>
+                      <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
+                    </tr>
+                  }
+                </AnimatePresence>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
