@@ -20,7 +20,7 @@ const Settings = () => {
   const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || true);
   const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || true);
   const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay || 5);
-  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode || TwitchMode.Disabled);
+  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode || TwitchMode.Channel);
   const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settings.previewGuessNumber || false);
 
   useEffect(() => {
@@ -78,6 +78,7 @@ const Settings = () => {
           <Form.Group className="mb-3" controlId="formGroupScoreCommandMode">
             <Form.Label>Score command mode (<i>!score</i>)</Form.Label>
             <Form.Select required className="form-control" value={scoreCommandMode} onChange={(e) => { setScoreCommandMode(+(e.target.value)) }}>
+              <option value={TwitchMode.Disabled}>Disabled</option>
               <option value={TwitchMode.Channel}>The bot will respond in the channel</option>
               <option value={TwitchMode.Whisper}>The bot will respond in DM</option>
             </Form.Select>
