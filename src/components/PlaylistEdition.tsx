@@ -270,7 +270,7 @@ const PlaylistEdition = (props: any) => {
         <tbody>
           {
             bt.tracks.map((track, index) => {
-              return <tr className={"p-1 edition-row " + (index < bt.doneTracks ? "edition-row-disabled" : "")} key={"track-" + track.track_uri}>
+              return <tr className={"p-1 edition-row " + (track.done ? "edition-row-disabled" : "")} key={"track-" + track.track_uri}>
                 <td className="edition-row-number">
                   #{1 + index}
                 </td>
@@ -299,11 +299,11 @@ const PlaylistEdition = (props: any) => {
                     {renderGuessables(track.getGuessables(GuessableType.Misc), true)}
                   </div>
                 </td>
-                {index >= bt.doneTracks && <td className="edition-buttons">
+                {!track.done && <td className="edition-buttons">
                   <Button size="sm" variant="outline-secondary" onClick={() => startEdit(index)}><b>Edit</b></Button>
                   <Button size="sm" variant="outline-danger" onClick={() => remove(index, false)}><b>Delete</b></Button>
                 </td>}
-                {index < bt.doneTracks && <td className="edition-buttons">
+                {track.done && <td className="edition-buttons">
                   <span>DONE</span>
                 </td>}
               </tr>

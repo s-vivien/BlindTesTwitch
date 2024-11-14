@@ -107,12 +107,4 @@ export const getDevices = () => {
   return instance.get(`https://api.spotify.com/v1/me/player/devices`)
 }
 
-export const pausePlayer = (device_id: string) => {
-  return instance.put(`https://api.spotify.com/v1/me/player/pause?device_id=${device_id}`)
-}
-
-export const resumePlayer = (device_id: string) => {
-  return instance.put(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`)
-}
-
 export default instance;

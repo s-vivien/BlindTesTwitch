@@ -30,6 +30,7 @@ export class Guessable {
 
 export class BlindTestTrack {
   @Type(() => Guessable)
+  done: boolean
   guessables: Guessable[]
   img: string
   track_uri: string
@@ -38,6 +39,7 @@ export class BlindTestTrack {
     this.guessables = guessables;
     this.track_uri = track_uri;
     this.img = img;
+    this.done = false;
   }
 
   mapGuessables = <U>(type: GuessableType, callbackfn: (value: Guessable, index: number) => U): U[] => {

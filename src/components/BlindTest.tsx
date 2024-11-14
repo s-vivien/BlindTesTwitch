@@ -1,6 +1,6 @@
 import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useState } from 'react'
-import { launchTrack, pausePlayer, resumePlayer, setRepeatMode } from "../services/SpotifyAPI"
+import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTrack, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
@@ -30,7 +30,7 @@ let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
 let endGuess: (index: number, delayed: boolean) => void = () => { };
 let delayedPoints: Map<string, number>[] = [];
-let guessTimeouts: NodeJS.Timeout[] = [];
+let guessTimeouts: (NodeJS.Timeout | undefined)[] = [];
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
@@ -48,7 +48,7 @@ const BlindTest = () => {
   const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [shuffled, setShuffled] = useState(false);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
 
@@ -69,6 +69,13 @@ const BlindTest = () => {
       setSubtitle('Blind-test is finished !');
     }
   }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
+
+  useEffect(() => {
+    if (currentTrack && !currentTrack.done && allGuessed()) {
+      currentTrack.done = true;
+      backupState();
+    }
+  }, [playing, guesses, currentTrack]);
 
   useEffect(() => {
     let flat: DisplayableScore[] = []
@@ -171,22 +178,26 @@ const BlindTest = () => {
   twitchCallback = onProposition;
 
   endGuess = (index: number, delayed: boolean) => {
-    let newGuesses = [...guesses];
-    newGuesses[index].guessed = true;
-    if (settings.chatNotifications) {
-      let msg = `✅ [${currentTrack?.guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
-      if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
-      twitchClient?.say(twitchNick, msg);
-    }
-    setGuesses(newGuesses);
+    setGuesses(guesses => {
+      let newGuesses = [...guesses];
+      newGuesses[index].guessed = true;
+      if (settings.chatNotifications) {
+        let msg = `✅ [${currentTrack?.guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
+        if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
+        twitchClient?.say(twitchNick, msg);
+      }
+      return newGuesses;
+    });
     if (delayed) {
-      const points = delayedPoints[index];
-      let newScores: Map<string, number> = new Map(scores);
-      points.forEach((value: number, nick: string) => {
-        newScores.set(nick, (newScores.get(nick) || 0) + value);
+      setScores(scores => {
+        const points = delayedPoints[index];
+        let newScores: Map<string, number> = new Map(scores);
+        points.forEach((value: number, nick: string) => {
+          newScores.set(nick, (newScores.get(nick) || 0) + value);
+        });
+        setStoredBlindTestScores(newScores);
+        return newScores;
       });
-      setStoredBlindTestScores(newScores);
-      setScores(newScores);
     }
   }
 
@@ -197,58 +208,64 @@ const BlindTest = () => {
   }
 
   const addPointToPlayer = (nick: string, points: number) => {
-    let newScores: Map<string, number> = new Map(scores);
-    newScores.set(nick, (newScores.get(nick) || 0) + points);
-    if (points !== 0) setStoredBlindTestScores(newScores);
-    setScores(newScores);
+    setScores(scores => {
+      let newScores: Map<string, number> = new Map(scores);
+      newScores.set(nick, (newScores.get(nick) || 0) + points);
+      if (points !== 0) setStoredBlindTestScores(newScores);
+      return newScores;
+    });
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
-    const firstGuess = guesses[index].guessedBy.length === 0;
-    let newGuesses = [...guesses];
-    newGuesses[index].guessedBy.push({ nick: nick, points: points });
-    if (settings.acceptanceDelay === 0) {
-      endGuess(index, false);
-      addPointToPlayer(nick, points);
-    } else {
-      if (firstGuess) {
-        const to = setTimeout(() => {
-          endGuess(index, true);
-        }, settings.acceptanceDelay * 1000);
-        guessTimeouts.push(to);
+    setGuesses(guesses => {
+      const firstGuess = guesses[index].guessedBy.length === 0;
+      let newGuesses = [...guesses];
+      newGuesses[index].guessedBy.push({ nick: nick, points: points });
+      if (settings.acceptanceDelay === 0) {
+        endGuess(index, false);
+        addPointToPlayer(nick, points);
+      } else {
+        if (firstGuess) {
+          const to = setTimeout(() => {
+            endGuess(index, true);
+            guessTimeouts[index] = undefined;
+          }, settings.acceptanceDelay * 1000);
+          guessTimeouts[index] = to;
+        }
+        delayedPoints[index].set(nick, (delayedPoints[index].get(nick) || 0) + points);
       }
-      delayedPoints[index].set(nick, (delayedPoints[index].get(nick) || 0) + points);
-    }
-    setGuesses(newGuesses);
+      return newGuesses;
+    });
   }
 
   const allGuessed = () => {
     return playing && guesses.reduce((prev, curr) => prev && curr.guessed, true);
   }
 
+  const triggerTimeouts = () => {
+    for (let index = 0; index < guessTimeouts.length; index++) {
+      if (guessTimeouts[index]) {
+        clearTimeout(guessTimeouts[index]);
+        endGuess(index, true);
+        guessTimeouts[index] = undefined;
+      }
+    }
+  }
+
   const handleReveal = () => {
-    backupState();
-    for (let to of guessTimeouts) { clearTimeout(to); }
+    triggerTimeouts();
     let newGuesses = [...guesses];
     guesses.forEach((g: Guess) => { g.guessed = true; });
+    currentTrack!.done = true;
+    backupState();
     setGuesses(newGuesses);
-  }
-
-  const handlePause = () => {
-    pausePlayer(settings.deviceId);
-    setPaused(true);
-  }
-
-  const handleResume = () => {
-    resumePlayer(settings.deviceId);
-    setPaused(false);
   }
 
   const handleNextSong = async () => {
     backupState();
-    for (let to of guessTimeouts) { clearTimeout(to); }
-    guessTimeouts = [];
-    let track = bt.tracks[doneTracks]
+    triggerTimeouts();
+    const leftTracks = bt.tracks.filter(t => !t.done);
+    let track = shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
     setPlaying(false);
     setLoading(true);
     launchTrack(track.track_uri, settings.deviceId).then(() => {
@@ -257,17 +274,22 @@ const BlindTest = () => {
       setCurrentTrack(track);
       const newGuesses = [];
       delayedPoints = [];
+      guessTimeouts = [];
       for (let guessable of track.guessables) {
         newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
         delayedPoints.push(new Map<string, number>());
+        guessTimeouts.push(undefined);
       }
       setGuesses(newGuesses);
       setPlaying(true);
-      setPaused(false);
       setLoading(false);
     }).catch(() => {
       setLoading(false);
     });
+  }
+
+  const toggleShuffle = () => {
+    setShuffled(!shuffled);
   }
 
   const CrossEmoji = <FontAwesomeIcon color="#de281b" icon={['fas', 'times']} size="lg" />;
@@ -366,25 +388,16 @@ const BlindTest = () => {
         </div>
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
-              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#84BD00" size="sm" /> <b>NEXT</b>
+            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} >
+              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#b6ff0d' : '#242526'} size="lg" />
             </Button>
             &nbsp;
-            {
-              paused &&
-              <Button className="col-sm" id="resumeButton" disabled={!playing} type="submit" size="sm" onClick={handleResume}>
-                <FontAwesomeIcon icon={['fas', 'play']} color="#84BD00" size="sm" /> <b>RESUME</b>
-              </Button>
-            }
-            {
-              !paused &&
-              <Button className="col-sm" id="pauseButton" disabled={!playing} type="submit" size="sm" onClick={handlePause}>
-                <FontAwesomeIcon icon={['fas', 'pause']} color="#84BD00" size="sm" /> <b>PAUSE</b>
-              </Button>
-            }
+            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#b6ff0d" size="lg" /> <b>NEXT</b>
+            </Button>
             &nbsp;
             <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
-              <FontAwesomeIcon icon={['fas', 'eye']} color="#84BD00" size="sm" /> <b>REVEAL</b>
+              <FontAwesomeIcon icon={['fas', 'eye']} color="#b6ff0d" size="lg" /> <b>REVEAL</b>
             </Button>
           </div>
           <div id="leaderboard" className="p-3 bt-panel border rounded-3">
