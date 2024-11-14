@@ -140,7 +140,7 @@ export const deepCopyObject = <T, V>(cls: ClassConstructor<T>, data: V): T => {
 
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
-  return cleanValueLight(value.replaceAll(/ \(.+\).*| -.+/g, "")).trim();
+  return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, "")).trim();
 }
 
 // lower-case + remove diacritic + remove some special characters
