@@ -312,22 +312,6 @@ svg {
   }
 }
 
-.player {
-  button {
-    border: none;
-    background-color: $player-button-color !important;
-    &:hover:not(:disabled) {
-      background-color: $player-button-hover-color !important;
-    }
-    &:disabled {
-      filter: brightness(80%);
-    }
-  }
-  input {
-    border-radius: 0.3rem;
-  }
-}
-
 .cover {
   color: rgb(49, 49, 49);
   height: 300px;
@@ -468,4 +452,8 @@ svg {
       cursor: pointer;
     }
   }
+}
+
+.no-caret-dropdown::after {
+  display: none !important;
 }

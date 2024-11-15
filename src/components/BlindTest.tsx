@@ -1,7 +1,7 @@
 import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useState } from 'react'
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
-import { Button, FormControl } from "react-bootstrap"
+import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTrack, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
@@ -31,6 +31,7 @@ let twitchCallback: (nick: string, msg: string) => void = () => { };
 let endGuess: (index: number, delayed: boolean) => void = () => { };
 let delayedPoints: Map<string, number>[] = [];
 let guessTimeouts: (NodeJS.Timeout | undefined)[] = [];
+let scoresBackup: Map<string, number>;
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
@@ -135,6 +136,19 @@ const BlindTest = () => {
     bt.doneTracks = doneTracks;
     setStoredBlindTestTracks(bt);
     setStoredBlindTestScores(scores);
+  }
+
+  const pickRandomPlayer = () => {
+    const nicks = Array.from(scores)
+      .filter(([k, v]) => v > 0)
+      .map(([k]) => k);
+    if (nicks.length > 0) {
+      setNickFilter(nicks[Math.floor(Math.random() * nicks.length)].toLowerCase());
+    }
+  }
+
+  const cancelLastTrackPoints = () => {
+    setScores(scoresBackup);
   }
 
   const onProposition = (nick: string, message: string) => {
@@ -262,6 +276,7 @@ const BlindTest = () => {
   }
 
   const handleNextSong = async () => {
+    scoresBackup = scores;
     backupState();
     triggerTimeouts();
     const leftTracks = bt.tracks.filter(t => !t.done);
@@ -389,16 +404,27 @@ const BlindTest = () => {
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
             <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} >
-              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#b6ff0d' : '#242526'} size="lg" />
+              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
             <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
-              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#b6ff0d" size="lg" /> <b>NEXT</b>
+              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;
             <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
-              <FontAwesomeIcon icon={['fas', 'eye']} color="#b6ff0d" size="lg" /> <b>REVEAL</b>
+              <FontAwesomeIcon icon={['fas', 'eye']} color="#1ed760" size="lg" /> <b>REVEAL</b>
             </Button>
+            &nbsp;
+            <Dropdown>
+              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary">
+                <FontAwesomeIcon icon={['fas', 'ellipsis']} color="#1ed760" size="lg" />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>
+                <Dropdown.Item onClick={pickRandomPlayer}>Pick random player</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+
           </div>
           <div id="leaderboard" className="p-3 bt-panel border rounded-3">
             <FormControl value={nickFilter} className={"mb-2"} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
