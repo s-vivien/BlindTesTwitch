@@ -92,12 +92,13 @@ const BlindTest = () => {
       flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
     }
     // Display rank only for the first of each group
+    let lastRankGroup = 1;
     for (let i = 0; i < flat.length; i++) {
-      const rank = 1 + i;
       if (i === 0 || flat[i].score !== flat[i - 1].score) {
-        flat[i].displayedRank = rank;
+        lastRankGroup = i + 1;
+        flat[i].displayedRank = lastRankGroup;
       }
-      flat[i].rank = rank;
+      flat[i].rank = lastRankGroup;
     }
     setLeaderboardRows(flat);
   }, [nickFilter, scores]);
