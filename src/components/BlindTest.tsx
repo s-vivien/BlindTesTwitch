@@ -267,15 +267,18 @@ const BlindTest = () => {
   }
 
   const handleReveal = () => {
-    triggerTimeouts();
-    let newGuesses = [...guesses];
-    guesses.forEach((g: Guess) => { g.guessed = true; });
-    currentTrack!.done = true;
-    backupState();
-    setGuesses(newGuesses);
+    if (currentTrack) {
+      triggerTimeouts();
+      let newGuesses = [...guesses];
+      guesses.forEach((g: Guess) => { g.guessed = true; });
+      currentTrack.done = true;
+      backupState();
+      setGuesses(newGuesses);
+    }
   }
 
   const handleNextSong = async () => {
+    handleReveal();
     scoresBackup = scores;
     backupState();
     triggerTimeouts();
@@ -352,7 +355,7 @@ const BlindTest = () => {
                 <img id="cover-image" src={currentTrack?.img} alt="cover" />
               }
               {(playing || loading) && !allGuessed() &&
-                <FontAwesomeIcon icon={['fas', 'question']} size="sm" />
+                <img src='/BlindTesTwitch/audio-wave.svg' />
               }
               {!playing && !loading &&
                 <FontAwesomeIcon icon={['fas', 'volume-mute']} size="sm" />
@@ -403,7 +406,7 @@ const BlindTest = () => {
         </div>
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} >
+            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: "35px" }}>
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
@@ -416,7 +419,7 @@ const BlindTest = () => {
             </Button>
             &nbsp;
             <Dropdown>
-              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary">
+              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: "35px" }}>
                 <FontAwesomeIcon icon={['fas', 'ellipsis']} color="#1ed760" size="lg" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
