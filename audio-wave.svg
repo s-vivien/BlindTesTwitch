@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+<g transform="scale(.5) translate(150 150)">
+<rect x="50" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="30;150;30"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="220;100;220"/>
+</rect>
+<rect x="80" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="170;120;170"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="80;130;80"/>
+</rect>
+<rect x="110" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="100;200;100"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="150;50;150"/>
+</rect>
+<rect x="140" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="170;120;170"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="80;130;80"/>
+</rect>
+<rect x="170" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="90;180;90"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="160;70;160"/>
+</rect>
+<rect x="200" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="200;70;200"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="50;180;50"/>
+</rect>
+<rect x="230" width="20" height="50" fill="#18191a">
+<animate attributeName="height" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="100;200;100"/>
+<animate attributeName="y" dur="0.5s" keyTimes="0;0.5;1" repeatCount="indefinite" values="150;50;150"/>
+</rect>
+</g>
+</svg>
