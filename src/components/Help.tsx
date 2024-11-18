@@ -18,7 +18,7 @@ const Help = () => {
       {helpDisplayed &&
         <div className="alert-modal-bg">
           <Alert className="alert-modal" variant="secondary">
-            <strong>BlindTesTwitch</strong> is made by <strong>Neumann</strong> (<a href="https://twitter.com/N_e_u_m_a_n_n" target="_blank">@N_e_u_m_a_n_n</a>) and is <strong><a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">open-source</a></strong>
+            <strong>BlindTesTwitch</strong> is made by <strong>Neumann</strong> (<a href="https://bsky.app/profile/neum4nn.bsky.social" target="_blank">@neum4nn.bsky.social</a>) and is <strong><a href="https://github.com/s-vivien/BlindTesTwitch" target="_blank">open-source</a></strong>
             <br />
             <br />
             <h2>How to play</h2>

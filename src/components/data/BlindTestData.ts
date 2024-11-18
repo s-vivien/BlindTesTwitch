@@ -88,6 +88,5 @@ export function computeGuessable(value: string, type: GuessableType, state: Gues
       }
     }
   });
-  console.log(cleaned);
   return new Guessable(value, cleaned, type, state);
 }

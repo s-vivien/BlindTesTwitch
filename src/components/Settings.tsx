@@ -17,11 +17,11 @@ const Settings = () => {
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
-  const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications || true);
-  const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser || true);
-  const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay || 5);
-  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode || TwitchMode.Channel);
-  const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settings.previewGuessNumber || false);
+  const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications !== undefined ? settings.chatNotifications : true);
+  const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser !== undefined ? settings.addEveryUser : true);
+  const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay !== undefined ? settings.acceptanceDelay : 5);
+  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode !== undefined ? settings.scoreCommandMode : TwitchMode.Channel);
+  const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settings.previewGuessNumber !== undefined ? settings.previewGuessNumber : false);
 
   useEffect(() => {
     setSubtitle('Settings');
