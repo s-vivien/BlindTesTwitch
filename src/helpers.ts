@@ -160,6 +160,12 @@ export const cleanValueLight = (value: string) => {
     .trim();
 }
 
+export const specialCharactersAlternatives = new Map<RegExp, string[]>([
+  [/ & /g, [" and ", " et "]],
+  [/ \+ /g, [" and ", " et "]],
+  [/^the /g, [""]],
+]);
+
 export const cleanSpoiler = (title: string, artists: string[]) => {
   let cleaned = title;
   for (let artist of artists) {
@@ -176,7 +182,7 @@ export const sorensenDiceScore = (first: string, second: string) => {
   second = second.replace(/\s+/g, '');
 
   if (first === second) return 1;
-  if (first.length < 2 && second.length >= 2) return 0;
+  if ((first.length < 2 && second.length >= 2) || second.length > 100) return 0;
 
   let firstBigrams = new Map();
   let firstReverseBigrams = new Map();
@@ -199,7 +205,7 @@ export const sorensenDiceScore = (first: string, second: string) => {
 
   let intersectionSize = 0;
   const altRatio = Math.max(0.2, 1.0 - 0.05 * first.length);
-  
+
   for (let i = 0; i < second.length - 1; i++) {
     const bigram = second[i] + second[i + 1];
 

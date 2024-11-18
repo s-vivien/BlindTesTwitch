@@ -102,7 +102,7 @@ const PlaylistEdition = (props: any) => {
   const renderGuessables = (guessables: Guessable[], showAcceptedValues: boolean = false) => {
     if (guessables.length === 0) return <></>
     return guessables.map<React.ReactNode>(g => {
-      const value = showAcceptedValues ? g.toGuess : g.original;
+      const value = showAcceptedValues ? g.toGuess[0] : g.original;
       return <span key={g.original}>{g.state != GuessableState.Enabled ? <del>{value}</del> : <>{value}</>}</span>;
     }).reduce((prev, curr) => [prev, ', ', curr]);
   }

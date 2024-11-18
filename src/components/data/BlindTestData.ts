@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { Type } from "class-transformer"
-import { cleanValue, cleanSpoiler } from "../../helpers"
+import { cleanValue, cleanSpoiler, specialCharactersAlternatives } from "../../helpers"
 
 export enum GuessableState {
   Enabled = 0,
@@ -16,11 +16,11 @@ export enum GuessableType {
 
 export class Guessable {
   original: string // the original string
-  toGuess: string // the cleaned string
+  toGuess: string[] // the cleaned strings
   state: GuessableState
   type: GuessableType
 
-  constructor(original: string, toGuess: string, type: GuessableType, state: GuessableState) {
+  constructor(original: string, toGuess: string[], type: GuessableType, state: GuessableState) {
     this.original = original;
     this.toGuess = toGuess;
     this.state = state;
@@ -80,6 +80,14 @@ export class BlindTestTracks {
 }
 
 export function computeGuessable(value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled) {
-  let cleaned = cleanValue(value);
+  let cleaned = [cleanValue(value)];
+  specialCharactersAlternatives.forEach((replacements: string[], regexp: RegExp) => {
+    if (value.toLowerCase().match(regexp)) {
+      for (const replacement of replacements) {
+        cleaned.push(cleanValue(value.toLowerCase().replaceAll(regexp, replacement)));
+      }
+    }
+  });
+  console.log(cleaned);
   return new Guessable(value, cleaned, type, state);
 }

@@ -173,20 +173,25 @@ const BlindTest = () => {
         if (guess.guessed) continue; // guess is no longer active
         if (guess.guessedBy.find((g) => g.nick === nick)) continue; // the player already guessed this item
         const guessable = currentTrack.guessables[i];
-        const d = sorensenDiceScore(guessable.toGuess, proposition);
-        // console.log(`${guessable.toGuess} ${proposition} ${d}`);
-        if (d >= 0.8) {
-          let points = 1;
-          if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
-          for (let g of guesses) {
-            if (g.guessedBy.find((gb) => gb.nick === nick)) {
-              points += 1; // this player already guessed something else on this track
-              break;
+        var matched = false;
+        for (const toGuess of guessable.toGuess) {
+          const d = sorensenDiceScore(toGuess, proposition);
+          // console.log(`[${toGuess}] [${proposition}] ${d}`);
+          if (d >= 0.8) {
+            let points = 1;
+            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
+            for (let g of guesses) {
+              if (g.guessedBy.find((gb) => gb.nick === nick)) {
+                points += 1; // this player already guessed something else on this track
+                break;
+              }
             }
+            updateGuessState(i, nick, points);
+            matched = true;
+            break;
           }
-          updateGuessState(i, nick, points);
-          break;
         }
+        if (matched) break;
       }
     }
   }
@@ -197,7 +202,7 @@ const BlindTest = () => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
       if (settings.chatNotifications) {
-        let msg = `✅ [${currentTrack?.guessables[index].toGuess}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
+        let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
         twitchClient?.say(twitchNick, msg);
       }
@@ -321,7 +326,7 @@ const BlindTest = () => {
     const guess: Guess = props.guess
     if (guess.guessed) {
       return <div className="mb-3">
-        <div className="bt-guess" title={guessable.toGuess}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? InfoEmoji : CrossEmoji)} {guessable.original}</div>
+        <div className="bt-guess" title={guessable.toGuess[0]}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? InfoEmoji : CrossEmoji)} {guessable.original}</div>
         {guess.guessedBy.length > 0 &&
           <div className="bt-gb">
             {BubbleEmoji}&nbsp;
