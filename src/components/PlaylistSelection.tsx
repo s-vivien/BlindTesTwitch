@@ -36,7 +36,7 @@ const PlaylistSelection = () => {
     } else {
       setSearchSubmitted(true);
       const playlists = await playlistsData.search(query)
-      setPlaylists(playlists);
+      setPlaylists(playlists.filter(p => p != null));
       setPlaylistCount(playlists.length);
       setCurrentPage(1);
 
@@ -62,7 +62,7 @@ const PlaylistSelection = () => {
     )
 
     setInitialized(true);
-    setPlaylists(playlists);
+    setPlaylists(playlists.filter(p => p != null));
 
     const count = await playlistsData.total();
     setPlaylistCount(count);
