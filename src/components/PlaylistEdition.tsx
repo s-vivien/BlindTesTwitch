@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import { BlindTestContext } from "App"
-import { cleanValue, deepCopyObject, getStoredBlindTestTracks, setStoredBlindTestTracks } from 'helpers';
+import { cleanValue, getStoredBlindTestTracks, setStoredBlindTestTracks } from 'helpers';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
-import { BlindTestTracks, computeGuessable, Guessable, GuessableState, GuessableType } from './data/BlindTestData';
+import { computeGuessable, Guessable, GuessableState, GuessableType } from './data/BlindTestData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type EditedGuessable = {
@@ -31,10 +31,9 @@ const PlaylistEdition = (props: any) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      let newBt = deepCopyObject(BlindTestTracks, bt);
-      newBt.tracks[selectedIndex].guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
-      setStoredBlindTestTracks(newBt);
-      setBt(newBt);
+      bt.tracks[selectedIndex].guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
+      setStoredBlindTestTracks(bt);
+      setBt(bt);
       endEdit();
     }
     setValidated(true);
@@ -88,12 +87,11 @@ const PlaylistEdition = (props: any) => {
       setSelectedIndex(index);
       setRemoveTrackModal(true);
     } else {
-      let newBt = deepCopyObject(BlindTestTracks, bt);
-      newBt.tracks.splice(index, 1);
-      setStoredBlindTestTracks(newBt);
-      setBt(newBt);
-      if (index < newBt.doneTracks) {
-        newBt.doneTracks--;
+      bt.tracks.splice(index, 1);
+      setStoredBlindTestTracks(bt);
+      setBt(bt);
+      if (index < bt.doneTracks) {
+        bt.doneTracks--;
       }
       setRemoveTrackModal(false);
     }

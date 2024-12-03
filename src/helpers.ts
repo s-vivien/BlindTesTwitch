@@ -1,5 +1,5 @@
 import { BlindTestTracks } from "components/data/BlindTestData"
-import { ClassConstructor, instanceToPlain, plainToInstance } from 'class-transformer'
+import { instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 import { SettingsData } from "components/data/SettingsData"
 
@@ -42,7 +42,7 @@ export const getStoredTheme = () => {
 export const themeNames = ['light', 'dark'];
 
 export const setStoredTheme = (theme: any) => {
-  localStorage.setItem("theme", theme)
+  localStorage.setItem("theme", theme);
 }
 
 export const getStoredTwitchOAuthToken = () => {
@@ -50,47 +50,47 @@ export const getStoredTwitchOAuthToken = () => {
 }
 
 export const setStoredTwitchOAuthToken = (twitch_oauth_token: any) => {
-  localStorage.setItem("twitch_oauth_token", twitch_oauth_token)
+  localStorage.setItem("twitch_oauth_token", twitch_oauth_token);
 }
 
 export const deleteStoredTwitchOAuthToken = () => {
-  localStorage.removeItem("twitch_oauth_token")
+  localStorage.removeItem("twitch_oauth_token");
 }
 
 export const getStoredUserCountry = () => {
-  return localStorage.getItem("user_country")
+  return localStorage.getItem("user_country");
 }
 
 export const setStoredUserCountry = (user_country: any) => {
-  localStorage.setItem("user_country", user_country)
+  localStorage.setItem("user_country", user_country);
 }
 
 export const getStoredSpotifyRefreshToken = () => {
-  return localStorage.getItem("spotify_refresh_token")
+  return localStorage.getItem("spotify_refresh_token");
 }
 
 export const setStoredSpotifyRefreshToken = (refresh_token: any) => {
-  localStorage.setItem("spotify_refresh_token", refresh_token)
+  localStorage.setItem("spotify_refresh_token", refresh_token);
 }
 
 export const deleteStoredSpotifyRefreshToken = () => {
-  localStorage.removeItem("spotify_refresh_token")
+  localStorage.removeItem("spotify_refresh_token");
 }
 
 export const getStoredSpotifyAccessToken = () => {
-  return localStorage.getItem("spotify_access_token")
+  return localStorage.getItem("spotify_access_token");
 }
 
 export const setStoredSpotifyAccessToken = (access_token: any) => {
-  localStorage.setItem("spotify_access_token", access_token)
+  localStorage.setItem("spotify_access_token", access_token);
 }
 
 export const deleteStoreSpotifyAccessToken = () => {
-  localStorage.removeItem("spotify_access_token")
+  localStorage.removeItem("spotify_access_token");
 }
 
 export const hasStoredTracks = () => {
-  return localStorage.getItem("blind_test_tracks") !== null
+  return localStorage.getItem("blind_test_tracks") !== null;
 }
 
 export const getStoredSettings = () => {
@@ -99,11 +99,11 @@ export const getStoredSettings = () => {
 }
 
 export const deleteStoredSettings = () => {
-  localStorage.removeItem("settings")
+  localStorage.removeItem("settings");
 }
 
 export const setStoredSettings = (data: SettingsData) => {
-  localStorage.setItem("settings", JSON.stringify(instanceToPlain(data)))
+  localStorage.setItem("settings", JSON.stringify(instanceToPlain(data)));
 }
 
 export const getStoredBlindTestScores = () => {
@@ -112,7 +112,7 @@ export const getStoredBlindTestScores = () => {
 }
 
 export const deleteStoredBlindTestScores = () => {
-  localStorage.removeItem("blind_test_scores")
+  localStorage.removeItem("blind_test_scores");
 }
 
 export const setStoredBlindTestScores = (scores: Map<string, number>) => {
@@ -125,17 +125,11 @@ export const getStoredBlindTestTracks = () => {
 }
 
 export const deleteStoredBlindTestTracks = () => {
-  localStorage.removeItem("blind_test_tracks")
+  localStorage.removeItem("blind_test_tracks");
 }
 
 export const setStoredBlindTestTracks = (data: BlindTestTracks) => {
-  localStorage.setItem("blind_test_tracks", JSON.stringify(instanceToPlain(data)))
-}
-
-export const deepCopyObject = <T, V>(cls: ClassConstructor<T>, data: V): T => {
-  const stringified = JSON.stringify(instanceToPlain(data));
-  const plain: T = JSON.parse(stringified);
-  return plainToInstance(cls, plain);
+  localStorage.setItem("blind_test_tracks", JSON.stringify(instanceToPlain(data)));
 }
 
 // light clean + trailing parts (- X || (X))
