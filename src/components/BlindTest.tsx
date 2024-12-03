@@ -1,12 +1,12 @@
 import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { BlindTestTrack, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
+import { BlindTestTrack, BlindTestTracks, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
-import { TwitchMode } from "./data/SettingsData"
+import { SettingsData, TwitchMode } from "./data/SettingsData"
 import { AnimatePresence, motion } from "framer-motion"
 
 type DisplayableScore = {
@@ -26,12 +26,7 @@ type Guess = {
   guessedBy: Guesser[]
 };
 
-let twitchClient: Client | null = null;
 let twitchCallback: (nick: string, msg: string) => void = () => { };
-let endGuess: (index: number, delayed: boolean) => void = () => { };
-let delayedPoints: Map<string, number>[] = [];
-let guessTimeouts: (NodeJS.Timeout | undefined)[] = [];
-let scoresBackup: Map<string, number>;
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
@@ -41,9 +36,14 @@ const BlindTest = () => {
 
   const { setSubtitle, twitchNick } = useContext(BlindTestContext);
 
-  const [bt] = useState(() => getStoredBlindTestTracks());
-  const [settings] = useState(() => getStoredSettings());
-  const [doneTracks, setDoneTracks] = useState(bt.doneTracks);
+  const twitchClient = useRef<Client | null>(null);
+  const delayedPoints = useRef<Map<string, number>[]>([]);
+  const scoresBackup = useRef<Map<string, number>>(new Map());
+  const bt = useRef<BlindTestTracks>(getStoredBlindTestTracks());
+  const settings = useRef<SettingsData>(getStoredSettings());
+  const guessTimeouts= useRef<(NodeJS.Timeout | undefined)[]>([]);
+
+  const [doneTracks, setDoneTracks] = useState(bt.current.doneTracks);
   const [scores, setScores] = useState(() => getStoredBlindTestScores());
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
@@ -55,7 +55,7 @@ const BlindTest = () => {
 
   useEffect(() => {
     console.log(`Twitch channel changed to ${twitchNick}`);
-    twitchConnection(twitchNick, settings.chatNotifications);
+    twitchConnection(twitchNick, settings.current.chatNotifications);
     return () => {
       twitchDisconnection();
     }
@@ -63,13 +63,13 @@ const BlindTest = () => {
 
   useEffect(() => {
     if (playing) {
-      setSubtitle(`Playing song #${doneTracks} out of ${bt.tracks.length}`)
-    } else if (bt.tracks.length - doneTracks > 0) {
-      setSubtitle(`${bt.tracks.length - doneTracks} tracks left`);
+      setSubtitle(`Playing song #${doneTracks} out of ${bt.current.tracks.length}`)
+    } else if (bt.current.tracks.length - doneTracks > 0) {
+      setSubtitle(`${bt.current.tracks.length - doneTracks} tracks left`);
     } else {
       setSubtitle('Blind-test is finished !');
     }
-  }, [setSubtitle, bt.tracks.length, playing, doneTracks]);
+  }, [setSubtitle, bt.current.tracks.length, playing, doneTracks]);
 
   useEffect(() => {
     if (currentTrack && !currentTrack.done && allGuessed()) {
@@ -105,8 +105,8 @@ const BlindTest = () => {
 
   const twitchDisconnection = () => {
     console.log('Disconnecting from Twitch...');
-    if (twitchClient !== null) {
-      twitchClient.disconnect();
+    if (twitchClient.current !== null) {
+      twitchClient.current.disconnect();
     }
   }
 
@@ -123,9 +123,9 @@ const BlindTest = () => {
         password: getStoredTwitchOAuthToken() || ""
       }
     }
-    twitchClient = new Client(opts);
-    twitchClient.connect();
-    twitchClient.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
+    twitchClient.current = new Client(opts);
+    twitchClient.current.connect();
+    twitchClient.current.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
       if (_self) return;
       if (_tags['message-type'] !== "whisper") {
         return twitchCallback(_tags['display-name'], _message);
@@ -134,8 +134,8 @@ const BlindTest = () => {
   }
 
   const backupState = () => {
-    bt.doneTracks = doneTracks;
-    setStoredBlindTestTracks(bt);
+    bt.current.doneTracks = doneTracks;
+    setStoredBlindTestTracks(bt.current);
     setStoredBlindTestScores(scores);
   }
 
@@ -149,20 +149,20 @@ const BlindTest = () => {
   }
 
   const cancelLastTrackPoints = () => {
-    setScores(scoresBackup);
+    setScores(scoresBackup.current);
   }
 
   const onProposition = (nick: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
     addPlayerIfUnknown(nick);
     if (message === "!score") {
-      if (settings.scoreCommandMode !== TwitchMode.Disabled) {
+      if (settings.current.scoreCommandMode !== TwitchMode.Disabled) {
         const rank = leaderboardRows.find(row => row.nick === nick);
         if (rank !== undefined) {
-          if (settings.scoreCommandMode === TwitchMode.Whisper) {
-            twitchClient?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+          if (settings.current.scoreCommandMode === TwitchMode.Whisper) {
+            twitchClient.current?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           } else {
-            twitchClient?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+            twitchClient.current?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           }
         }
       }
@@ -179,7 +179,7 @@ const BlindTest = () => {
           // console.log(`[${toGuess}] [${proposition}] ${d}`);
           if (d >= 0.8) {
             let points = 1;
-            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
+            if (settings.current.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
             for (let g of guesses) {
               if (g.guessedBy.find((gb) => gb.nick === nick)) {
                 points += 1; // this player already guessed something else on this track
@@ -197,20 +197,20 @@ const BlindTest = () => {
   }
   twitchCallback = onProposition;
 
-  endGuess = (index: number, delayed: boolean) => {
+  const endGuess = (index: number, delayed: boolean) => {
     setGuesses(guesses => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
-      if (settings.chatNotifications) {
+      if (settings.current.chatNotifications) {
         let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
-        twitchClient?.say(twitchNick, msg);
+        twitchClient.current?.say(twitchNick, msg);
       }
       return newGuesses;
     });
     if (delayed) {
       setScores(scores => {
-        const points = delayedPoints[index];
+        const points = delayedPoints.current[index];
         let newScores: Map<string, number> = new Map(scores);
         points.forEach((value: number, nick: string) => {
           newScores.set(nick, (newScores.get(nick) || 0) + value);
@@ -222,7 +222,7 @@ const BlindTest = () => {
   }
 
   const addPlayerIfUnknown = (nick: string) => {
-    if (settings.addEveryUser && scores.get(nick) === undefined) {
+    if (settings.current.addEveryUser && scores.get(nick) === undefined) {
       addPointToPlayer(nick, 0);
     }
   }
@@ -241,18 +241,18 @@ const BlindTest = () => {
       const firstGuess = guesses[index].guessedBy.length === 0;
       let newGuesses = [...guesses];
       newGuesses[index].guessedBy.push({ nick: nick, points: points });
-      if (settings.acceptanceDelay === 0) {
+      if (settings.current.acceptanceDelay === 0) {
         endGuess(index, false);
         addPointToPlayer(nick, points);
       } else {
         if (firstGuess) {
           const to = setTimeout(() => {
             endGuess(index, true);
-            guessTimeouts[index] = undefined;
-          }, settings.acceptanceDelay * 1000);
-          guessTimeouts[index] = to;
+            guessTimeouts.current[index] = undefined;
+          }, settings.current.acceptanceDelay * 1000);
+          guessTimeouts.current[index] = to;
         }
-        delayedPoints[index].set(nick, (delayedPoints[index].get(nick) || 0) + points);
+        delayedPoints.current[index].set(nick, (delayedPoints.current[index].get(nick) || 0) + points);
       }
       return newGuesses;
     });
@@ -263,11 +263,11 @@ const BlindTest = () => {
   }
 
   const triggerTimeouts = () => {
-    for (let index = 0; index < guessTimeouts.length; index++) {
-      if (guessTimeouts[index]) {
-        clearTimeout(guessTimeouts[index]);
+    for (let index = 0; index < guessTimeouts.current.length; index++) {
+      if (guessTimeouts.current[index]) {
+        clearTimeout(guessTimeouts.current[index]);
         endGuess(index, true);
-        guessTimeouts[index] = undefined;
+        guessTimeouts.current[index] = undefined;
       }
     }
   }
@@ -285,24 +285,24 @@ const BlindTest = () => {
 
   const handleNextSong = async () => {
     handleReveal();
-    scoresBackup = scores;
+    scoresBackup.current = scores;
     backupState();
     triggerTimeouts();
-    const leftTracks = bt.tracks.filter(t => !t.done);
+    const leftTracks = bt.current.tracks.filter(t => !t.done);
     let track = shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
     setPlaying(false);
     setLoading(true);
-    launchTrack(track.track_uri, settings.deviceId).then(() => {
-      setRepeatMode(true, settings.deviceId);
+    launchTrack(track.track_uri, settings.current.deviceId).then(() => {
+      setRepeatMode(true, settings.current.deviceId);
       setDoneTracks(doneTracks + 1);
       setCurrentTrack(track);
       const newGuesses = [];
-      delayedPoints = [];
-      guessTimeouts = [];
+      delayedPoints.current = [];
+      guessTimeouts.current = [];
       for (let guessable of track.guessables) {
         newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
-        delayedPoints.push(new Map<string, number>());
-        guessTimeouts.push(undefined);
+        delayedPoints.current.push(new Map<string, number>());
+        guessTimeouts.current.push(undefined);
       }
       setGuesses(newGuesses);
       setPlaying(true);
@@ -340,7 +340,7 @@ const BlindTest = () => {
           </div>
         }
       </div>
-    } else if (guess.guessedBy.length > 0 && settings.previewGuessNumber) {
+    } else if (guess.guessedBy.length > 0 && settings.current.previewGuessNumber) {
       return <div className="mb-3">
         {CheckEmoji}<div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
       </div>
@@ -416,7 +416,7 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
-            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.current.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;
