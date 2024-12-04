@@ -1,4 +1,4 @@
-import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, getStoredSettings, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
+import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useRef, useState } from 'react'
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, Dropdown, FormControl } from "react-bootstrap"
@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { BlindTestTrack, BlindTestTracks, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
-import { SettingsData, TwitchMode } from "./data/SettingsData"
+import { settingsStore, TwitchMode } from "./data/SettingsStore"
 import { AnimatePresence, motion } from "framer-motion"
 
 type DisplayableScore = {
@@ -40,8 +40,8 @@ const BlindTest = () => {
   const delayedPoints = useRef<Map<string, number>[]>([]);
   const scoresBackup = useRef<Map<string, number>>(new Map());
   const bt = useRef<BlindTestTracks>(getStoredBlindTestTracks());
-  const settings = useRef<SettingsData>(getStoredSettings());
-  const guessTimeouts= useRef<(NodeJS.Timeout | undefined)[]>([]);
+  const settings = settingsStore();
+  const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
 
   const [doneTracks, setDoneTracks] = useState(bt.current.doneTracks);
   const [scores, setScores] = useState(() => getStoredBlindTestScores());
@@ -55,7 +55,7 @@ const BlindTest = () => {
 
   useEffect(() => {
     console.log(`Twitch channel changed to ${twitchNick}`);
-    twitchConnection(twitchNick, settings.current.chatNotifications);
+    twitchConnection(twitchNick, settings.chatNotifications);
     return () => {
       twitchDisconnection();
     }
@@ -156,10 +156,10 @@ const BlindTest = () => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
     addPlayerIfUnknown(nick);
     if (message === "!score") {
-      if (settings.current.scoreCommandMode !== TwitchMode.Disabled) {
+      if (settings.scoreCommandMode !== TwitchMode.Disabled) {
         const rank = leaderboardRows.find(row => row.nick === nick);
         if (rank !== undefined) {
-          if (settings.current.scoreCommandMode === TwitchMode.Whisper) {
+          if (settings.scoreCommandMode === TwitchMode.Whisper) {
             twitchClient.current?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           } else {
             twitchClient.current?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
@@ -179,7 +179,7 @@ const BlindTest = () => {
           // console.log(`[${toGuess}] [${proposition}] ${d}`);
           if (d >= 0.8) {
             let points = 1;
-            if (settings.current.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
+            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
             for (let g of guesses) {
               if (g.guessedBy.find((gb) => gb.nick === nick)) {
                 points += 1; // this player already guessed something else on this track
@@ -201,7 +201,7 @@ const BlindTest = () => {
     setGuesses(guesses => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
-      if (settings.current.chatNotifications) {
+      if (settings.chatNotifications) {
         let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
         twitchClient.current?.say(twitchNick, msg);
@@ -222,7 +222,7 @@ const BlindTest = () => {
   }
 
   const addPlayerIfUnknown = (nick: string) => {
-    if (settings.current.addEveryUser && scores.get(nick) === undefined) {
+    if (settings.addEveryUser && scores.get(nick) === undefined) {
       addPointToPlayer(nick, 0);
     }
   }
@@ -241,7 +241,7 @@ const BlindTest = () => {
       const firstGuess = guesses[index].guessedBy.length === 0;
       let newGuesses = [...guesses];
       newGuesses[index].guessedBy.push({ nick: nick, points: points });
-      if (settings.current.acceptanceDelay === 0) {
+      if (settings.acceptanceDelay === 0) {
         endGuess(index, false);
         addPointToPlayer(nick, points);
       } else {
@@ -249,7 +249,7 @@ const BlindTest = () => {
           const to = setTimeout(() => {
             endGuess(index, true);
             guessTimeouts.current[index] = undefined;
-          }, settings.current.acceptanceDelay * 1000);
+          }, settings.acceptanceDelay * 1000);
           guessTimeouts.current[index] = to;
         }
         delayedPoints.current[index].set(nick, (delayedPoints.current[index].get(nick) || 0) + points);
@@ -292,8 +292,8 @@ const BlindTest = () => {
     let track = shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
     setPlaying(false);
     setLoading(true);
-    launchTrack(track.track_uri, settings.current.deviceId).then(() => {
-      setRepeatMode(true, settings.current.deviceId);
+    launchTrack(track.track_uri, settings.deviceId).then(() => {
+      setRepeatMode(true, settings.deviceId);
       setDoneTracks(doneTracks + 1);
       setCurrentTrack(track);
       const newGuesses = [];
@@ -340,7 +340,7 @@ const BlindTest = () => {
           </div>
         }
       </div>
-    } else if (guess.guessedBy.length > 0 && settings.current.previewGuessNumber) {
+    } else if (guess.guessedBy.length > 0 && settings.previewGuessNumber) {
       return <div className="mb-3">
         {CheckEmoji}<div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
       </div>

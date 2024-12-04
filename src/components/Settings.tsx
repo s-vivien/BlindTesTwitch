@@ -1,8 +1,7 @@
-import { getStoredSettings, setStoredSettings } from "helpers"
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react'
 import { getDevices } from "services/SpotifyAPI"
-import { SettingsData, TwitchMode } from "./data/SettingsData";
+import { settingsStore, TwitchMode } from "./data/SettingsStore";
 import Form from 'react-bootstrap/Form'
 import { Button } from "react-bootstrap";
 import { BlindTestContext } from "App";
@@ -12,7 +11,7 @@ const Settings = () => {
   const { configured, setConfigured, setSubtitle } = useContext(BlindTestContext);
   const navigate = useNavigate();
 
-  const [settings] = useState(() => getStoredSettings());
+  const settings = settingsStore();
   const [validated, setValidated] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
@@ -39,7 +38,14 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      setStoredSettings(new SettingsData(selectedDevice, addEveryUser, chatNotifications, acceptanceDelay, previewGuessNumber && acceptanceDelay > 0, scoreCommandMode));
+      settings.update({
+        deviceId: selectedDevice,
+        addEveryUser: addEveryUser,
+        chatNotifications: chatNotifications,
+        previewGuessNumber: previewGuessNumber && acceptanceDelay > 0,
+        acceptanceDelay: acceptanceDelay,
+        scoreCommandMode: scoreCommandMode,
+      });
       setConfigured(true);
       navigate("/");
     }

@@ -4,7 +4,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoredSettings, deleteStoreSpotifyAccessToken, deleteStoredSpotifyRefreshToken, getStoredSpotifyRefreshToken, getStoredSettings, getStoredTheme, hasStoredTracks, setStoredTheme, themeNames, getStoredTwitchOAuthToken } from './helpers';
+import { deleteStoredBlindTestTracks, deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoreSpotifyAccessToken, deleteStoredSpotifyRefreshToken, getStoredSpotifyRefreshToken, getStoredTheme, hasStoredTracks, setStoredTheme, themeNames, getStoredTwitchOAuthToken } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import BlindTest from './components/BlindTest';
@@ -12,15 +12,18 @@ import LoginCallback from './components/LoginCallback';
 import Help from 'components/Help';
 import Playlist from 'components/Playlist';
 import { validateToken } from 'services/TwitchAPI';
+import { settingsStore } from 'components/data/SettingsStore';
 
 function App() {
   const navigate = useNavigate();
+
+  const settings = settingsStore();
 
   const [twitchNick, setTwitchNick] = useState('');
   const [theme, setTheme] = useState(() => getStoredTheme());
   const [loggedInSpotify, setLoggedInSpotify] = useState(() => getStoredSpotifyRefreshToken() !== null);
   const [loggedInTwitch, setLoggedInTwitch] = useState(() => getStoredTwitchOAuthToken() !== null);
-  const [configured, setConfigured] = useState(() => getStoredSettings().isInitialized());
+  const [configured, setConfigured] = useState(() => settings.isInitialized());
   const [tracksLoaded, setTracksLoaded] = useState(() => hasStoredTracks());
   const [view, setView] = useState(<div />);
   const [subtitle, setSubtitle] = useState('');
@@ -86,7 +89,7 @@ function App() {
     deleteStoredBlindTestTracks();
     deleteStoredBlindTestScores();
     deleteStoredTwitchOAuthToken();
-    deleteStoredSettings();
+    settings.reset();
     setLoggedInSpotify(false);
     setLoggedInTwitch(false);
     setTracksLoaded(false);

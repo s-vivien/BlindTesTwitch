@@ -1,7 +1,6 @@
 import { BlindTestTracks } from "components/data/BlindTestData"
 import { instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
-import { SettingsData } from "components/data/SettingsData"
 
 export const getAppHomeURL = () => {
   return new URL(window.location.href).origin + process.env.PUBLIC_URL;
@@ -91,19 +90,6 @@ export const deleteStoreSpotifyAccessToken = () => {
 
 export const hasStoredTracks = () => {
   return localStorage.getItem("blind_test_tracks") !== null;
-}
-
-export const getStoredSettings = () => {
-  const plain: SettingsData = JSON.parse(localStorage.getItem("settings") || "{}");
-  return plainToInstance(SettingsData, plain);
-}
-
-export const deleteStoredSettings = () => {
-  localStorage.removeItem("settings");
-}
-
-export const setStoredSettings = (data: SettingsData) => {
-  localStorage.setItem("settings", JSON.stringify(instanceToPlain(data)));
 }
 
 export const getStoredBlindTestScores = () => {

@@ -24,7 +24,8 @@
     "framer-motion": "^11.9.0",
     "tmi.js": "^1.8.5",
     "typescript": "^4.9.5",
-    "yarn": "^1.22.19"
+    "yarn": "^1.22.19",
+    "zustand": "^5.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
