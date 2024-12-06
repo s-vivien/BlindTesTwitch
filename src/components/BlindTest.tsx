@@ -1,13 +1,13 @@
-import { getStoredBlindTestTracks, getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, setStoredBlindTestTracks, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
+import { getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useRef, useState } from 'react'
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { BlindTestTrack, BlindTestTracks, Guessable, GuessableState, GuessableType } from "./data/BlindTestData"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
 import { settingsStore, TwitchMode } from "./data/SettingsStore"
 import { AnimatePresence, motion } from "framer-motion"
+import { BlindTestTrack, btTracksStore, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables } from "./data/BlindTestTracksStore"
 
 type DisplayableScore = {
   nick: string,
@@ -39,11 +39,10 @@ const BlindTest = () => {
   const twitchClient = useRef<Client | null>(null);
   const delayedPoints = useRef<Map<string, number>[]>([]);
   const scoresBackup = useRef<Map<string, number>>(new Map());
-  const bt = useRef<BlindTestTracks>(getStoredBlindTestTracks());
   const settings = settingsStore();
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
+  const bt = btTracksStore();
 
-  const [doneTracks, setDoneTracks] = useState(bt.current.doneTracks);
   const [scores, setScores] = useState(() => getStoredBlindTestScores());
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
@@ -63,13 +62,13 @@ const BlindTest = () => {
 
   useEffect(() => {
     if (playing) {
-      setSubtitle(`Playing song #${doneTracks} out of ${bt.current.tracks.length}`)
-    } else if (bt.current.tracks.length - doneTracks > 0) {
-      setSubtitle(`${bt.current.tracks.length - doneTracks} tracks left`);
+      setSubtitle(`Playing song #${bt.doneTracks} out of ${bt.tracks.length}`)
+    } else if (bt.tracks.length - bt.doneTracks > 0) {
+      setSubtitle(`${bt.tracks.length - bt.doneTracks} tracks left`);
     } else {
       setSubtitle('Blind-test is finished !');
     }
-  }, [setSubtitle, bt.current.tracks.length, playing, doneTracks]);
+  }, [setSubtitle, bt.tracks.length, playing, bt.doneTracks]);
 
   useEffect(() => {
     if (currentTrack && !currentTrack.done && allGuessed()) {
@@ -134,9 +133,8 @@ const BlindTest = () => {
   }
 
   const backupState = () => {
-    bt.current.doneTracks = doneTracks;
-    setStoredBlindTestTracks(bt.current);
-    setStoredBlindTestScores(scores);
+    bt.backup();
+    // scores.backup();
   }
 
   const pickRandomPlayer = () => {
@@ -277,8 +275,6 @@ const BlindTest = () => {
       triggerTimeouts();
       let newGuesses = [...guesses];
       guesses.forEach((g: Guess) => { g.guessed = true; });
-      currentTrack.done = true;
-      backupState();
       setGuesses(newGuesses);
     }
   }
@@ -286,15 +282,13 @@ const BlindTest = () => {
   const handleNextSong = async () => {
     handleReveal();
     scoresBackup.current = scores;
-    backupState();
     triggerTimeouts();
-    const leftTracks = bt.current.tracks.filter(t => !t.done);
-    let track = shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
+    const track = bt.getNextTrack(shuffled);
     setPlaying(false);
     setLoading(true);
     launchTrack(track.track_uri, settings.deviceId).then(() => {
       setRepeatMode(true, settings.deviceId);
-      setDoneTracks(doneTracks + 1);
+      bt.doneTracks++;
       setCurrentTrack(track);
       const newGuesses = [];
       delayedPoints.current = [];
@@ -351,6 +345,8 @@ const BlindTest = () => {
     }
   }
 
+  console.log('render BlindTest');
+
   return (
     <div id="blindtest">
       <div className="row mb-4">
@@ -369,7 +365,7 @@ const BlindTest = () => {
             </div>
             {playing && currentTrack !== null &&
               <div style={{ flex: 1 }}>
-                {currentTrack.getGuessables(GuessableType.Title).length > 0 &&
+                {getGuessables(currentTrack, GuessableType.Title).length > 0 &&
                   <div className="px-3 pb-3" >
                     <div className="bt-h">
                       <h2>TITLE</h2>
@@ -379,25 +375,25 @@ const BlindTest = () => {
                     </div>
                   </div>
                 }
-                {currentTrack.getGuessables(GuessableType.Artist).length > 0 &&
+                {getGuessables(currentTrack, GuessableType.Artist).length > 0 &&
                   <div className="px-3 pb-3" >
                     <div className="bt-h">
                       <h2>ARTIST(S)</h2>
                     </div>
                     <div>
-                      {currentTrack.mapGuessables(GuessableType.Artist, (guessable: Guessable, index: number) => {
+                      {mapGuessables(currentTrack, GuessableType.Artist, (guessable: Guessable, index: number) => {
                         return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
                       })}
                     </div>
                   </div>
                 }
-                {currentTrack.getGuessables(GuessableType.Misc).length > 0 &&
+                {getGuessables(currentTrack, GuessableType.Misc).length > 0 &&
                   <div className="px-3 mb-2" >
                     <div className="bt-h">
                       <h2>MISC</h2>
                     </div>
                     <div>
-                      {currentTrack.mapGuessables(GuessableType.Misc, (guessable: Guessable, index: number) => {
+                      {mapGuessables(currentTrack, GuessableType.Misc, (guessable: Guessable, index: number) => {
                         return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
                       })}
                     </div>
@@ -416,7 +412,7 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
-            <Button className="col-sm" id="nextButton" disabled={loading || doneTracks >= bt.current.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+            <Button className="col-sm" id="nextButton" disabled={loading || bt.doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;

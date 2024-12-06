@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { BlindTestContext } from "App"
-import { cleanValue, getStoredBlindTestTracks, setStoredBlindTestTracks } from 'helpers';
+import { cleanValue } from 'helpers';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
-import { computeGuessable, Guessable, GuessableState, GuessableType } from './data/BlindTestData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { btTracksStore, computeGuessable, getGuessables, Guessable, GuessableState, GuessableType } from './data/BlindTestTracksStore';
 
 type EditedGuessable = {
   value: string,
@@ -15,7 +15,7 @@ const PlaylistEdition = (props: any) => {
 
   const { setSubtitle } = useContext(BlindTestContext);
 
-  const [bt, setBt] = useState(() => getStoredBlindTestTracks());
+  const bt = btTracksStore();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [editedValues, setEditedValues] = useState<EditedGuessable[]>([]);
   const [edition, setEdition] = useState(false);
@@ -31,9 +31,9 @@ const PlaylistEdition = (props: any) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      bt.tracks[selectedIndex].guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
-      setStoredBlindTestTracks(bt);
-      setBt(bt);
+      const updatedTrack = bt.tracks[selectedIndex];
+      updatedTrack.guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
+      bt.backup();
       endEdit();
     }
     setValidated(true);
@@ -87,12 +87,11 @@ const PlaylistEdition = (props: any) => {
       setSelectedIndex(index);
       setRemoveTrackModal(true);
     } else {
-      bt.tracks.splice(index, 1);
-      setStoredBlindTestTracks(bt);
-      setBt(bt);
       if (index < bt.doneTracks) {
         bt.doneTracks--;
       }
+      bt.tracks.splice(index, 1);
+      bt.backup();
       setRemoveTrackModal(false);
     }
   }
@@ -277,24 +276,24 @@ const PlaylistEdition = (props: any) => {
                 </td>
                 <td style={{ flex: 1 }} className={"px-3"}>
                   <div>
-                    <b>{renderGuessables(track.getGuessables(GuessableType.Title))}</b>
+                    <b>{renderGuessables(getGuessables(track, GuessableType.Title))}</b>
                   </div>
                   <div>
-                    {renderGuessables(track.getGuessables(GuessableType.Artist))}
+                    {renderGuessables(getGuessables(track, GuessableType.Artist))}
                   </div>
                   <div>
-                    {renderGuessables(track.getGuessables(GuessableType.Misc))}
+                    {renderGuessables(getGuessables(track, GuessableType.Misc))}
                   </div>
                 </td>
                 <td style={{ flex: 1 }} className={"px-3 code"}>
                   <div>
-                    <b>{renderGuessables(track.getGuessables(GuessableType.Title), true)}</b>
+                    <b>{renderGuessables(getGuessables(track, GuessableType.Title), true)}</b>
                   </div>
                   <div>
-                    {renderGuessables(track.getGuessables(GuessableType.Artist), true)}
+                    {renderGuessables(getGuessables(track, GuessableType.Artist), true)}
                   </div>
                   <div>
-                    {renderGuessables(track.getGuessables(GuessableType.Misc), true)}
+                    {renderGuessables(getGuessables(track, GuessableType.Misc), true)}
                   </div>
                 </td>
                 {!track.done && <td className="edition-buttons">

@@ -1,4 +1,3 @@
-import { BlindTestTracks } from "components/data/BlindTestData"
 import { instanceToPlain, plainToInstance } from 'class-transformer'
 import { createPKCECodes, PKCECodePair } from 'pkce'
 
@@ -88,10 +87,6 @@ export const deleteStoreSpotifyAccessToken = () => {
   localStorage.removeItem("spotify_access_token");
 }
 
-export const hasStoredTracks = () => {
-  return localStorage.getItem("blind_test_tracks") !== null;
-}
-
 export const getStoredBlindTestScores = () => {
   const plain: Map<string, number> = JSON.parse(localStorage.getItem("blind_test_scores") || "{}");
   return plainToInstance(Map<string, number>, plain);
@@ -103,19 +98,6 @@ export const deleteStoredBlindTestScores = () => {
 
 export const setStoredBlindTestScores = (scores: Map<string, number>) => {
   localStorage.setItem("blind_test_scores", JSON.stringify(instanceToPlain(scores)));
-}
-
-export const getStoredBlindTestTracks = () => {
-  const plain: BlindTestTracks = JSON.parse(localStorage.getItem("blind_test_tracks") || "{}");
-  return plainToInstance(BlindTestTracks, plain);
-}
-
-export const deleteStoredBlindTestTracks = () => {
-  localStorage.removeItem("blind_test_tracks");
-}
-
-export const setStoredBlindTestTracks = (data: BlindTestTracks) => {
-  localStorage.setItem("blind_test_tracks", JSON.stringify(instanceToPlain(data)));
 }
 
 // light clean + trailing parts (- X || (X))
