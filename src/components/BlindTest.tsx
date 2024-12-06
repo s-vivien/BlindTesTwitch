@@ -1,13 +1,14 @@
-import { getStoredBlindTestScores, sorensenDiceScore, cleanValueLight, setStoredBlindTestScores, getStoredTwitchOAuthToken } from "helpers"
+import { sorensenDiceScore, cleanValueLight, getStoredTwitchOAuthToken } from "helpers"
 import { useContext, useEffect, useRef, useState } from 'react'
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Client, Options } from "tmi.js"
 import { BlindTestContext } from "App"
-import { settingsStore, TwitchMode } from "./data/SettingsStore"
+import { useSettingsStore, TwitchMode } from "./data/SettingsStore"
 import { AnimatePresence, motion } from "framer-motion"
-import { BlindTestTrack, btTracksStore, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables } from "./data/BlindTestTracksStore"
+import { BlindTestTrack, useBTTracksStore, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables } from "./data/BlindTestTracksStore"
+import { useScoringStore } from "./data/ScoringStore"
 
 type DisplayableScore = {
   nick: string,
@@ -37,13 +38,14 @@ const BlindTest = () => {
   const { setSubtitle, twitchNick } = useContext(BlindTestContext);
 
   const twitchClient = useRef<Client | null>(null);
-  const delayedPoints = useRef<Map<string, number>[]>([]);
-  const scoresBackup = useRef<Map<string, number>>(new Map());
-  const settings = settingsStore();
+  const delayedPoints = useRef<Record<string, number>[]>([]);
+  const scoresBackup = useRef<Record<string, number>>({});
+  const settings = useSettingsStore();
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
-  const bt = btTracksStore();
 
-  const [scores, setScores] = useState(() => getStoredBlindTestScores());
+  const btStore = useBTTracksStore();
+  const scoringStore = useScoringStore();
+
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
   const [loading, setLoading] = useState(false);
@@ -62,29 +64,23 @@ const BlindTest = () => {
 
   useEffect(() => {
     if (playing) {
-      setSubtitle(`Playing song #${bt.doneTracks} out of ${bt.tracks.length}`)
-    } else if (bt.tracks.length - bt.doneTracks > 0) {
-      setSubtitle(`${bt.tracks.length - bt.doneTracks} tracks left`);
+      setSubtitle(`Playing song #${btStore.doneTracks} out of ${btStore.tracks.length}`)
+    } else if (btStore.tracks.length - btStore.doneTracks > 0) {
+      setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
       setSubtitle('Blind-test is finished !');
     }
-  }, [setSubtitle, bt.tracks.length, playing, bt.doneTracks]);
-
-  useEffect(() => {
-    if (currentTrack && !currentTrack.done && allGuessed()) {
-      currentTrack.done = true;
-      backupState();
-    }
-  }, [playing, guesses, currentTrack]);
+  }, [setSubtitle, btStore.tracks.length, playing, btStore.doneTracks]);
 
   useEffect(() => {
     let flat: DisplayableScore[] = []
-    scores.forEach((_val: number, _key: string) => {
+    for (const _key of Object.keys(scoringStore.scores)) {
+      const _val = scoringStore.scores[_key];
       flat.push({
         nick: _key,
         score: _val
       })
-    })
+    }
     flat.sort((a, b) => a.nick.localeCompare(b.nick))
     flat.sort((a, b) => b.score - a.score)
     if (nickFilter) {
@@ -100,7 +96,7 @@ const BlindTest = () => {
       flat[i].rank = lastRankGroup;
     }
     setLeaderboardRows(flat);
-  }, [nickFilter, scores]);
+  }, [nickFilter, scoringStore]);
 
   const twitchDisconnection = () => {
     console.log('Disconnecting from Twitch...');
@@ -133,21 +129,21 @@ const BlindTest = () => {
   }
 
   const backupState = () => {
-    bt.backup();
-    // scores.backup();
+    btStore.backup();
+    scoringStore.backup();
   }
 
   const pickRandomPlayer = () => {
-    const nicks = Array.from(scores)
-      .filter(([k, v]) => v > 0)
-      .map(([k]) => k);
+    const nicks = Object.keys(scoringStore.scores)
+      .filter((k) => scoringStore.scores[k] > 0);
     if (nicks.length > 0) {
       setNickFilter(nicks[Math.floor(Math.random() * nicks.length)].toLowerCase());
     }
   }
 
   const cancelLastTrackPoints = () => {
-    setScores(scoresBackup.current);
+    scoringStore.setScores(scoresBackup.current);
+    scoringStore.backup();
   }
 
   const onProposition = (nick: string, message: string) => {
@@ -207,31 +203,18 @@ const BlindTest = () => {
       return newGuesses;
     });
     if (delayed) {
-      setScores(scores => {
-        const points = delayedPoints.current[index];
-        let newScores: Map<string, number> = new Map(scores);
-        points.forEach((value: number, nick: string) => {
-          newScores.set(nick, (newScores.get(nick) || 0) + value);
-        });
-        setStoredBlindTestScores(newScores);
-        return newScores;
-      });
+      scoringStore.addMultiplePoints(delayedPoints.current[index]);
     }
   }
 
   const addPlayerIfUnknown = (nick: string) => {
-    if (settings.addEveryUser && scores.get(nick) === undefined) {
+    if (settings.addEveryUser && !scoringStore.scores.hasOwnProperty(nick)) {
       addPointToPlayer(nick, 0);
     }
   }
 
   const addPointToPlayer = (nick: string, points: number) => {
-    setScores(scores => {
-      let newScores: Map<string, number> = new Map(scores);
-      newScores.set(nick, (newScores.get(nick) || 0) + points);
-      if (points !== 0) setStoredBlindTestScores(newScores);
-      return newScores;
-    });
+    scoringStore.addPoints(nick, points);
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
@@ -250,7 +233,7 @@ const BlindTest = () => {
           }, settings.acceptanceDelay * 1000);
           guessTimeouts.current[index] = to;
         }
-        delayedPoints.current[index].set(nick, (delayedPoints.current[index].get(nick) || 0) + points);
+        delayedPoints.current[index][nick] = (delayedPoints.current[index][nick] || 0) + points;
       }
       return newGuesses;
     });
@@ -270,32 +253,46 @@ const BlindTest = () => {
     }
   }
 
+  useEffect(() => {
+    if (currentTrack && !currentTrack.done && allGuessed()) {
+      endSong();
+    }
+  }, [playing, guesses, currentTrack]);
+
+  const endSong = () => {
+    if (currentTrack && !currentTrack.done) {
+      currentTrack.done = true;
+      backupState();
+    }
+  }
+
   const handleReveal = () => {
-    if (currentTrack) {
+    if (currentTrack && !currentTrack.done) {
       triggerTimeouts();
       let newGuesses = [...guesses];
       guesses.forEach((g: Guess) => { g.guessed = true; });
       setGuesses(newGuesses);
+      endSong();
     }
   }
 
   const handleNextSong = async () => {
     handleReveal();
-    scoresBackup.current = scores;
+    scoresBackup.current = { ...scoringStore.scores };
     triggerTimeouts();
-    const track = bt.getNextTrack(shuffled);
+    const track = btStore.getNextTrack(shuffled);
     setPlaying(false);
     setLoading(true);
     launchTrack(track.track_uri, settings.deviceId).then(() => {
       setRepeatMode(true, settings.deviceId);
-      bt.doneTracks++;
       setCurrentTrack(track);
+      btStore.incrementDoneTracks();
       const newGuesses = [];
       delayedPoints.current = [];
       guessTimeouts.current = [];
       for (let guessable of track.guessables) {
         newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
-        delayedPoints.current.push(new Map<string, number>());
+        delayedPoints.current.push({});
         guessTimeouts.current.push(undefined);
       }
       setGuesses(newGuesses);
@@ -412,7 +409,7 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
-            <Button className="col-sm" id="nextButton" disabled={loading || bt.doneTracks >= bt.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+            <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;

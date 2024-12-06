@@ -41,6 +41,7 @@ type Actions = {
     clear: () => void;
     setTracksFromRaw: (spotTracks: any[]) => void;
     getNextTrack: (random: boolean) => BlindTestTrack;
+    incrementDoneTracks: () => void;
 }
 
 // storage is done manually because the store might be large and we want to avoid writing it everytime it changes
@@ -49,7 +50,7 @@ type Actions = {
 const plain: BlindTestTracks = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
 const restoredState = plainToInstance(BlindTestTracks, plain);
 
-export const btTracksStore = create<BlindTestTracks & Actions>()(
+export const useBTTracksStore = create<BlindTestTracks & Actions>()(
     (set, get) => ({
         tracks: restoredState.tracks,
         doneTracks: restoredState.doneTracks,
@@ -86,6 +87,9 @@ export const btTracksStore = create<BlindTestTracks & Actions>()(
             const leftTracks = get().tracks.filter(t => !t.done);
             return shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
         },
+        incrementDoneTracks: () => {
+            set((state) => ({ doneTracks: state.doneTracks + 1 }));
+        }
     })
 );
 

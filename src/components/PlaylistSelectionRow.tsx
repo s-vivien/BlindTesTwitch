@@ -1,19 +1,20 @@
 import TracksBaseData from "./data/TracksBaseData"
 import { Button, Modal } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { deleteStoredBlindTestScores, getStoredBlindTestScores } from "../helpers"
 import { useContext, useState } from "react"
 import { BlindTestContext } from "App"
-import { btTracksStore } from "./data/BlindTestTracksStore"
+import { useBTTracksStore } from "./data/BlindTestTracksStore"
+import { useScoringStore } from "./data/ScoringStore"
 
 const PlaylistSelectionRow = (props: any) => {
 
-  const bt = btTracksStore();
+  const btStore = useBTTracksStore();
+  const scoringStore = useScoringStore();
   const { setTracksLoaded } = useContext(BlindTestContext);
   const [confirmationDisplayed, setConfirmationDisplayed] = useState(false);
 
   const selectPlaylist = async () => {
-    if (getStoredBlindTestScores().size > 0) {
+    if (Object.keys(scoringStore.scores).length > 0) {
       setConfirmationDisplayed(true);
     } else {
       loadPlaylist(false);
@@ -22,11 +23,11 @@ const PlaylistSelectionRow = (props: any) => {
 
   const loadPlaylist = async (keepScores: boolean) => {
     if (!keepScores) {
-      deleteStoredBlindTestScores();
+      scoringStore.clear();
     }
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
-    bt.setTracksFromRaw(tracks.filter(t => t.track.is_playable));
-    bt.backup();
+    btStore.setTracksFromRaw(tracks.filter(t => t.track.is_playable));
+    btStore.backup();
     setTracksLoaded(true); // TODO needed ?
   }
 

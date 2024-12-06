@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from 'react'
 import { getDevices } from "services/SpotifyAPI"
-import { settingsStore, TwitchMode } from "./data/SettingsStore";
+import { useSettingsStore, TwitchMode } from "./data/SettingsStore";
 import Form from 'react-bootstrap/Form'
 import { Button } from "react-bootstrap";
 import { BlindTestContext } from "App";
@@ -11,7 +11,7 @@ const Settings = () => {
   const { configured, setConfigured, setSubtitle } = useContext(BlindTestContext);
   const navigate = useNavigate();
 
-  const settings = settingsStore();
+  const settings = useSettingsStore();
   const [validated, setValidated] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);

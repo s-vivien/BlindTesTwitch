@@ -3,7 +3,7 @@ import { BlindTestContext } from "App"
 import { cleanValue } from 'helpers';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { btTracksStore, computeGuessable, getGuessables, Guessable, GuessableState, GuessableType } from './data/BlindTestTracksStore';
+import { useBTTracksStore, computeGuessable, getGuessables, Guessable, GuessableState, GuessableType } from './data/BlindTestTracksStore';
 
 type EditedGuessable = {
   value: string,
@@ -15,7 +15,7 @@ const PlaylistEdition = (props: any) => {
 
   const { setSubtitle } = useContext(BlindTestContext);
 
-  const bt = btTracksStore();
+  const btStore = useBTTracksStore();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [editedValues, setEditedValues] = useState<EditedGuessable[]>([]);
   const [edition, setEdition] = useState(false);
@@ -31,9 +31,9 @@ const PlaylistEdition = (props: any) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      const updatedTrack = bt.tracks[selectedIndex];
+      const updatedTrack = btStore.tracks[selectedIndex];
       updatedTrack.guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
-      bt.backup();
+      btStore.backup();
       endEdit();
     }
     setValidated(true);
@@ -48,7 +48,7 @@ const PlaylistEdition = (props: any) => {
     setSelectedIndex(index);
     setEdition(true);
     let editedGuessables: EditedGuessable[] = [];
-    bt.tracks[index].guessables.forEach(g => { editedGuessables.push({ value: g.original, type: g.type, state: g.state }); })
+    btStore.tracks[index].guessables.forEach(g => { editedGuessables.push({ value: g.original, type: g.type, state: g.state }); })
     setEditedValues(editedGuessables);
   }
 
@@ -87,11 +87,11 @@ const PlaylistEdition = (props: any) => {
       setSelectedIndex(index);
       setRemoveTrackModal(true);
     } else {
-      if (index < bt.doneTracks) {
-        bt.doneTracks--;
+      if (index < btStore.doneTracks) {
+        btStore.doneTracks--;
       }
-      bt.tracks.splice(index, 1);
-      bt.backup();
+      btStore.tracks.splice(index, 1);
+      btStore.backup();
       setRemoveTrackModal(false);
     }
   }
@@ -266,7 +266,7 @@ const PlaylistEdition = (props: any) => {
         </thead>
         <tbody>
           {
-            bt.tracks.map((track, index) => {
+            btStore.tracks.map((track, index) => {
               return <tr className={"p-1 edition-row " + (track.done ? "edition-row-disabled" : "")} key={"track-" + track.track_uri}>
                 <td className="edition-row-number">
                   #{1 + index}

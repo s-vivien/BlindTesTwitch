@@ -87,19 +87,6 @@ export const deleteStoreSpotifyAccessToken = () => {
   localStorage.removeItem("spotify_access_token");
 }
 
-export const getStoredBlindTestScores = () => {
-  const plain: Map<string, number> = JSON.parse(localStorage.getItem("blind_test_scores") || "{}");
-  return plainToInstance(Map<string, number>, plain);
-}
-
-export const deleteStoredBlindTestScores = () => {
-  localStorage.removeItem("blind_test_scores");
-}
-
-export const setStoredBlindTestScores = (scores: Map<string, number>) => {
-  localStorage.setItem("blind_test_scores", JSON.stringify(instanceToPlain(scores)));
-}
-
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
   return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, "")).trim();

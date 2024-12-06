@@ -31,7 +31,7 @@ const initialState: SettingsData = {
   scoreCommandMode: TwitchMode.Channel,
 }
 
-export const settingsStore = create<SettingsData & Actions>()(
+export const useSettingsStore = create<SettingsData & Actions>()(
   persist(
     (set, get) => ({
       ...initialState,

@@ -4,7 +4,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Alert, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { setAxiosErrorCallback } from './services/SpotifyAPI';
-import { deleteStoredBlindTestScores, deleteStoredTwitchOAuthToken, deleteStoreSpotifyAccessToken, deleteStoredSpotifyRefreshToken, getStoredSpotifyRefreshToken, getStoredTheme, setStoredTheme, themeNames, getStoredTwitchOAuthToken } from './helpers';
+import { deleteStoredTwitchOAuthToken, deleteStoreSpotifyAccessToken, deleteStoredSpotifyRefreshToken, getStoredSpotifyRefreshToken, getStoredTheme, setStoredTheme, themeNames, getStoredTwitchOAuthToken } from './helpers';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import BlindTest from './components/BlindTest';
@@ -12,16 +12,19 @@ import LoginCallback from './components/LoginCallback';
 import Help from 'components/Help';
 import Playlist from 'components/Playlist';
 import { validateToken } from 'services/TwitchAPI';
-import { settingsStore } from 'components/data/SettingsStore';
-import { btTracksStore } from 'components/data/BlindTestTracksStore';
+import { useSettingsStore } from 'components/data/SettingsStore';
+import { useBTTracksStore } from 'components/data/BlindTestTracksStore';
+import { useScoringStore } from 'components/data/ScoringStore';
 
 function App() {
   const navigate = useNavigate();
 
-  const settings = settingsStore();
+  const settings = useSettingsStore();
 
-  const btTotalTracks = btTracksStore((state) => state.totalTracks);
-  const btClear = btTracksStore((state) => state.clear);
+  const btTotalTracks = useBTTracksStore((state) => state.totalTracks);
+  const btClear = useBTTracksStore((state) => state.clear);
+  const scoringClear = useScoringStore((state) => state.clear);
+
   const [twitchNick, setTwitchNick] = useState('');
   const [theme, setTheme] = useState(() => getStoredTheme());
   const [loggedInSpotify, setLoggedInSpotify] = useState(() => getStoredSpotifyRefreshToken() !== null);
@@ -90,7 +93,7 @@ function App() {
     deleteStoredSpotifyRefreshToken();
     deleteStoreSpotifyAccessToken();
     btClear();
-    deleteStoredBlindTestScores();
+    scoringClear();
     deleteStoredTwitchOAuthToken();
     settings.reset();
     setLoggedInSpotify(false);
