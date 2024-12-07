@@ -1,16 +1,14 @@
-import TracksBaseData from "./data/TracksBaseData"
-import { Button, Modal } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useContext, useState } from "react"
-import { BlindTestContext } from "App"
+import { useState } from "react"
+import { Button, Modal } from "react-bootstrap"
 import { useBTTracksStore } from "./data/BlindTestTracksStore"
 import { useScoringStore } from "./data/ScoringStore"
+import TracksBaseData from "./data/TracksBaseData"
 
 const PlaylistSelectionRow = (props: any) => {
 
   const btStore = useBTTracksStore();
   const scoringStore = useScoringStore();
-  const { setTracksLoaded } = useContext(BlindTestContext);
   const [confirmationDisplayed, setConfirmationDisplayed] = useState(false);
 
   const selectPlaylist = async () => {
@@ -28,7 +26,6 @@ const PlaylistSelectionRow = (props: any) => {
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     btStore.setTracksFromRaw(tracks.filter(t => t.track.is_playable));
     btStore.backup();
-    setTracksLoaded(true); // TODO needed ?
   }
 
   const renderTickCross = (condition: boolean) => {

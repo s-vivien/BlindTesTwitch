@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from 'react'
-import { BlindTestContext } from "App"
-import { cleanValue } from 'helpers';
-import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useBTTracksStore, computeGuessable, getGuessables, Guessable, GuessableState, GuessableType } from './data/BlindTestTracksStore';
+import { cleanValue } from 'helpers';
+import { useEffect, useState } from 'react';
+import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
+import { computeGuessable, getGuessables, Guessable, GuessableState, GuessableType, useBTTracksStore } from './data/BlindTestTracksStore';
+import { useGlobalStore } from './data/GlobalStore';
 
 type EditedGuessable = {
   value: string,
@@ -13,7 +13,7 @@ type EditedGuessable = {
 
 const PlaylistEdition = (props: any) => {
 
-  const { setSubtitle } = useContext(BlindTestContext);
+  const globalStore = useGlobalStore();
 
   const btStore = useBTTracksStore();
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -24,7 +24,7 @@ const PlaylistEdition = (props: any) => {
   const [restartModal, setRestartModal] = useState(false);
 
   useEffect(() => {
-    setSubtitle(`Editing playlist`);
+    globalStore.setSubtitle(`Editing playlist`);
   }, []);
 
   const validateEdit = (e: any) => {

@@ -1,16 +1,16 @@
-import { useContext, useEffect, useState } from 'react'
-import { FormControl, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useEffect, useState } from 'react'
+import { Form, FormControl, InputGroup } from "react-bootstrap"
 
+import { useGlobalStore } from './data/GlobalStore'
 import PlaylistsData from "./data/PlaylistsData"
-import PlaylistSelectionRow from "./PlaylistSelectionRow"
-import { BlindTestContext } from 'App'
 import Paginator from './Paginator'
+import PlaylistSelectionRow from "./PlaylistSelectionRow"
 
 const PlaylistSelection = () => {
   const PAGE_SIZE = 20;
 
-  const { setSubtitle } = useContext(BlindTestContext);
+  const globalStore = useGlobalStore();
 
   const [playlistsData] = useState(() => new PlaylistsData(PAGE_SIZE));
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,8 +23,8 @@ const PlaylistSelection = () => {
   useEffect(() => {
     const min = ((currentPage - 1) * PAGE_SIZE) + 1;
     const max = Math.min(min + PAGE_SIZE - 1, playlistCount);
-    setSubtitle(`${min}-${max} of ${playlistCount} playlists`);
-  }, [setSubtitle, currentPage, playlistCount]);
+    globalStore.setSubtitle(`${min}-${max} of ${playlistCount} playlists`);
+  }, [currentPage, playlistCount]);
 
   useEffect(() => {
     loadCurrentPlaylistPage();
@@ -41,9 +41,9 @@ const PlaylistSelection = () => {
       setCurrentPage(1);
 
       if (playlists.length === PAGE_SIZE) {
-        setSubtitle(`First ${playlists.length} results with "${query}" in playlist name`)
+        globalStore.setSubtitle(`First ${playlists.length} results with "${query}" in playlist name`)
       } else {
-        setSubtitle(`${playlists.length} results with "${query}" in playlist name`)
+        globalStore.setSubtitle(`${playlists.length} results with "${query}" in playlist name`)
       }
     }
   }

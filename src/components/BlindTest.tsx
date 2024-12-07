@@ -1,14 +1,15 @@
-import { sorensenDiceScore, cleanValueLight, getStoredTwitchOAuthToken } from "helpers"
-import { useContext, useEffect, useRef, useState } from 'react'
-import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
-import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Client, Options } from "tmi.js"
-import { BlindTestContext } from "App"
-import { useSettingsStore, TwitchMode } from "./data/SettingsStore"
 import { AnimatePresence, motion } from "framer-motion"
-import { BlindTestTrack, useBTTracksStore, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables } from "./data/BlindTestTracksStore"
+import { cleanValueLight, sorensenDiceScore } from "helpers"
+import { useEffect, useRef, useState } from 'react'
+import { Button, Dropdown, FormControl } from "react-bootstrap"
+import { Client, Options } from "tmi.js"
+import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
+import { useAuthStore } from "./data/AuthStore"
+import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from "./data/BlindTestTracksStore"
+import { useGlobalStore } from "./data/GlobalStore"
 import { useScoringStore } from "./data/ScoringStore"
+import { TwitchMode, useSettingsStore } from "./data/SettingsStore"
 
 type DisplayableScore = {
   nick: string,
@@ -35,8 +36,6 @@ const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 
 const BlindTest = () => {
 
-  const { setSubtitle, twitchNick } = useContext(BlindTestContext);
-
   const twitchClient = useRef<Client | null>(null);
   const delayedPoints = useRef<Record<string, number>[]>([]);
   const scoresBackup = useRef<Record<string, number>>({});
@@ -45,6 +44,9 @@ const BlindTest = () => {
 
   const btStore = useBTTracksStore();
   const scoringStore = useScoringStore();
+  const twitchNick = useAuthStore((state) => state.twitchNick);
+  const twitchToken = useAuthStore((state) => state.twitchOauthToken);
+  const globalStore = useGlobalStore();
 
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
@@ -55,22 +57,24 @@ const BlindTest = () => {
   const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
 
   useEffect(() => {
-    console.log(`Twitch channel changed to ${twitchNick}`);
-    twitchConnection(twitchNick, settings.chatNotifications);
-    return () => {
-      twitchDisconnection();
+    if (twitchNick) {
+      console.log(`Twitch channel changed to ${twitchNick}`);
+      twitchConnection(twitchNick, settings.chatNotifications);
+      return () => {
+        twitchDisconnection();
+      }
     }
   }, [twitchNick]);
 
   useEffect(() => {
     if (playing) {
-      setSubtitle(`Playing song #${btStore.doneTracks} out of ${btStore.tracks.length}`)
+      globalStore.setSubtitle(`Playing song #${btStore.doneTracks} out of ${btStore.tracks.length}`)
     } else if (btStore.tracks.length - btStore.doneTracks > 0) {
-      setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
+      globalStore.setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
-      setSubtitle('Blind-test is finished !');
+      globalStore.setSubtitle('Blind-test is finished !');
     }
-  }, [setSubtitle, btStore.tracks.length, playing, btStore.doneTracks]);
+  }, [btStore.tracks.length, playing, btStore.doneTracks]);
 
   useEffect(() => {
     let flat: DisplayableScore[] = []
@@ -115,7 +119,7 @@ const BlindTest = () => {
     if (chatNotifications) {
       opts.identity = {
         username: 'foo',
-        password: getStoredTwitchOAuthToken() || ""
+        password: twitchToken || ""
       }
     }
     twitchClient.current = new Client(opts);
@@ -155,7 +159,7 @@ const BlindTest = () => {
         if (rank !== undefined) {
           if (settings.scoreCommandMode === TwitchMode.Whisper) {
             twitchClient.current?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
-          } else {
+          } else if (twitchNick) {
             twitchClient.current?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
           }
         }
@@ -195,7 +199,7 @@ const BlindTest = () => {
     setGuesses(guesses => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
-      if (settings.chatNotifications) {
+      if (settings.chatNotifications && twitchNick) {
         let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
         twitchClient.current?.say(twitchNick, msg);

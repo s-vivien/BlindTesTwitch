@@ -33,60 +33,6 @@ export const consumePkcePair = () => {
   return codePair;
 }
 
-export const getStoredTheme = () => {
-  return +(localStorage.getItem("theme") || 0);
-}
-
-export const themeNames = ['light', 'dark'];
-
-export const setStoredTheme = (theme: any) => {
-  localStorage.setItem("theme", theme);
-}
-
-export const getStoredTwitchOAuthToken = () => {
-  return localStorage.getItem("twitch_oauth_token");
-}
-
-export const setStoredTwitchOAuthToken = (twitch_oauth_token: any) => {
-  localStorage.setItem("twitch_oauth_token", twitch_oauth_token);
-}
-
-export const deleteStoredTwitchOAuthToken = () => {
-  localStorage.removeItem("twitch_oauth_token");
-}
-
-export const getStoredUserCountry = () => {
-  return localStorage.getItem("user_country");
-}
-
-export const setStoredUserCountry = (user_country: any) => {
-  localStorage.setItem("user_country", user_country);
-}
-
-export const getStoredSpotifyRefreshToken = () => {
-  return localStorage.getItem("spotify_refresh_token");
-}
-
-export const setStoredSpotifyRefreshToken = (refresh_token: any) => {
-  localStorage.setItem("spotify_refresh_token", refresh_token);
-}
-
-export const deleteStoredSpotifyRefreshToken = () => {
-  localStorage.removeItem("spotify_refresh_token");
-}
-
-export const getStoredSpotifyAccessToken = () => {
-  return localStorage.getItem("spotify_access_token");
-}
-
-export const setStoredSpotifyAccessToken = (access_token: any) => {
-  localStorage.setItem("spotify_access_token", access_token);
-}
-
-export const deleteStoreSpotifyAccessToken = () => {
-  localStorage.removeItem("spotify_access_token");
-}
-
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
   return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, "")).trim();

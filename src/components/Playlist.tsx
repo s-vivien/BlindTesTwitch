@@ -1,24 +1,21 @@
-import { useContext } from 'react';
-import { BlindTestContext } from "App";
-import PlaylistSelection from "./PlaylistSelection";
 import PlaylistEdition from './PlaylistEdition';
+import PlaylistSelection from "./PlaylistSelection";
 import { useBTTracksStore } from './data/BlindTestTracksStore';
 
 const Playlist = () => {
 
-  const { tracksLoaded, setTracksLoaded } = useContext(BlindTestContext);
-  const btStore = useBTTracksStore();
+  const btStoreClear = useBTTracksStore((state) => state.clear);
+  const btStoreTotalTracks = useBTTracksStore((state) => state.totalTracks);
 
   const restart = () => {
-    btStore.clear();
-    setTracksLoaded(false);
+    btStoreClear();
   }
 
   return (
     <div>
       <div id="playlists">
-        {tracksLoaded && <PlaylistEdition onRestart={restart} />}
-        {!tracksLoaded && <PlaylistSelection />}
+        {btStoreTotalTracks > 0 && <PlaylistEdition onRestart={restart} />}
+        {btStoreTotalTracks == 0 && <PlaylistSelection />}
       </div>
     </div>
   );

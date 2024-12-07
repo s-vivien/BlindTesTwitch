@@ -1,16 +1,18 @@
-import { Button } from "react-bootstrap"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { computePkcePair, getAppHomeURL } from "../helpers"
-import { useContext, useEffect } from "react";
-import { BlindTestContext } from "App";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect } from "react";
+import { Button } from "react-bootstrap";
+import { computePkcePair, getAppHomeURL } from "../helpers";
+import { useAuthStore } from "./data/AuthStore";
+import { useGlobalStore } from "./data/GlobalStore";
 
 const Login = () => {
 
-  const { setSubtitle, loggedInSpotify, loggedInTwitch } = useContext(BlindTestContext);
+  const globalStore = useGlobalStore();
+  const authStore = useAuthStore();
 
   useEffect(() => {
-    setSubtitle('');
-  }, [setSubtitle]);
+    globalStore.setSubtitle('');
+  }, []);
 
 
   const twitchLogin = async () => {
@@ -51,8 +53,8 @@ const Login = () => {
 
   return (
     <>
-      <LoginButton flag={loggedInSpotify} appName="Spotify" onClick={spotifyLogin} icon={spotifyIcon}></LoginButton>
-      <LoginButton flag={loggedInTwitch} appName="Twitch" onClick={twitchLogin} icon={twitchIcon}></LoginButton>
+      <LoginButton flag={authStore.spotifyRefreshToken !== undefined} appName="Spotify" onClick={spotifyLogin} icon={spotifyIcon}></LoginButton>
+      <LoginButton flag={authStore.twitchOauthToken !== undefined} appName="Twitch" onClick={twitchLogin} icon={twitchIcon}></LoginButton>
     </>
   )
 }

@@ -14,7 +14,7 @@ type Actions = {
     addMultiplePoints: (points: Record<string, number>) => void;
 }
 
-// storage is done manually because the store might be large and we want to avoid writing it everytime it changes
+// storage is done manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
 const restoredState: Scoring = JSON.parse(localStorage.getItem(localStorageKey) || "{}");

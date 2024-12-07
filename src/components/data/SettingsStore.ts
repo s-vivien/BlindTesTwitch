@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware';
+
+const themeNames = ['dark', 'light'];
 
 export enum TwitchMode {
   Disabled = 0,
@@ -16,31 +18,58 @@ type SettingsData = {
   scoreCommandMode: TwitchMode;
 }
 
+type ExtraSettingsData = {
+  theme: number;
+}
+
 type Actions = {
   isInitialized: () => boolean;
   reset: () => void;
   update: (data: SettingsData) => void;
+  toggleTheme: () => void;
 }
 
-const initialState: SettingsData = {
+const initialState: SettingsData & ExtraSettingsData = {
   deviceId: '',
   addEveryUser: true,
   chatNotifications: true,
   previewGuessNumber: false,
   acceptanceDelay: 5,
   scoreCommandMode: TwitchMode.Channel,
+  theme: 0
 }
 
-export const useSettingsStore = create<SettingsData & Actions>()(
+const setTheme = (theme: number) => {
+  for (let name of themeNames) {
+    document.documentElement.classList.remove(name);
+  }
+  document.documentElement.classList.add(themeNames[theme]);
+};
+
+export const useSettingsStore = create<SettingsData & ExtraSettingsData & Actions>()(
   persist(
     (set, get) => ({
       ...initialState,
       isInitialized: () => { return get().deviceId !== '' },
       reset: () => set(initialState),
-      update: (data: SettingsData) => set(data)
+      update: (data: SettingsData) => set(data),
+      toggleTheme: () => {
+        set((state) => {
+          const newTheme = 1 - state.theme;
+          setTheme(newTheme);
+          return ({ theme: newTheme });
+        });
+      }
     }),
     {
-      name: 'settings'
+      name: 'settings',
+      onRehydrateStorage: () => {
+        return (state, error) => {
+          if (!error && state) {
+            setTheme(state.theme);
+          }
+        }
+      }
     }
   )
 );

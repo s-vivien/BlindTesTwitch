@@ -1,32 +1,33 @@
-import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from 'react'
-import { getDevices } from "services/SpotifyAPI"
-import { useSettingsStore, TwitchMode } from "./data/SettingsStore";
-import Form from 'react-bootstrap/Form'
+import { useEffect, useState } from 'react';
 import { Button } from "react-bootstrap";
-import { BlindTestContext } from "App";
+import Form from 'react-bootstrap/Form';
+import { useNavigate } from "react-router-dom";
+import { getDevices } from "services/SpotifyAPI";
+import { useGlobalStore } from "./data/GlobalStore";
+import { TwitchMode, useSettingsStore } from "./data/SettingsStore";
 
 const Settings = () => {
 
-  const { configured, setConfigured, setSubtitle } = useContext(BlindTestContext);
   const navigate = useNavigate();
 
-  const settings = useSettingsStore();
+  const settingsStore = useSettingsStore();
+  const globalStore = useGlobalStore();
+
   const [validated, setValidated] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>('');
-  const [chatNotifications, setChatNotifications] = useState<boolean>(settings.chatNotifications);
-  const [addEveryUser, setAddEveryUser] = useState<boolean>(settings.addEveryUser);
-  const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settings.acceptanceDelay);
-  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settings.scoreCommandMode);
-  const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settings.previewGuessNumber);
+  const [chatNotifications, setChatNotifications] = useState<boolean>(settingsStore.chatNotifications);
+  const [addEveryUser, setAddEveryUser] = useState<boolean>(settingsStore.addEveryUser);
+  const [acceptanceDelay, setAcceptanceDelay] = useState<number>(settingsStore.acceptanceDelay);
+  const [scoreCommandMode, setScoreCommandMode] = useState<any>(settingsStore.scoreCommandMode);
+  const [previewGuessNumber, setPreviewGuessNumber] = useState<boolean>(settingsStore.previewGuessNumber);
 
   useEffect(() => {
-    setSubtitle('Settings');
+    globalStore.setSubtitle('Settings');
     getDevices().then(response => {
       setDevices(response.data.devices);
-      const found = response.data.devices.find((d: any) => d.id === settings.deviceId)
+      const found = response.data.devices.find((d: any) => d.id === settingsStore.deviceId)
       if (found) {
         setSelectedDevice(found.id)
       }
@@ -38,7 +39,7 @@ const Settings = () => {
     e.preventDefault();
     e.stopPropagation();
     if (e.currentTarget.checkValidity() === true) {
-      settings.update({
+      settingsStore.update({
         deviceId: selectedDevice,
         addEveryUser: addEveryUser,
         chatNotifications: chatNotifications,
@@ -46,7 +47,6 @@ const Settings = () => {
         acceptanceDelay: acceptanceDelay,
         scoreCommandMode: scoreCommandMode,
       });
-      setConfigured(true);
       navigate("/");
     }
     setValidated(true);
@@ -96,7 +96,7 @@ const Settings = () => {
           <Button style={{ width: "80px" }} size="sm" className="mr-2" variant="primary" type="submit">
             <b>Save</b>
           </Button>
-          <Button disabled={!configured} style={{ width: "80px" }} size="sm" className="mr-2" variant="secondary" onClick={() => navigate("/")}>
+          <Button disabled={!settingsStore.isInitialized()} style={{ width: "80px" }} size="sm" className="mr-2" variant="secondary" onClick={() => navigate("/")}>
             <b>Cancel</b>
           </Button>
         </Form>
