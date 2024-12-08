@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from 'components/data/AuthStore';
+import { useAuthStore } from 'components/store/AuthStore';
 import { consumePkcePair, getAppHomeURL } from 'helpers';
 
 const authStore = useAuthStore;

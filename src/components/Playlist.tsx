@@ -1,6 +1,6 @@
 import PlaylistEdition from './PlaylistEdition';
 import PlaylistSelection from "./PlaylistSelection";
-import { useBTTracksStore } from './data/BlindTestTracksStore';
+import { useBTTracksStore } from './store/BlindTestTracksStore';
 
 const Playlist = () => {
 

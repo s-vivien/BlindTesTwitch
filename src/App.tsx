@@ -1,15 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAuthStore } from 'components/data/AuthStore';
-import { useBTTracksStore } from 'components/data/BlindTestTracksStore';
-import { useGlobalStore } from 'components/data/GlobalStore';
-import { useScoringStore } from 'components/data/ScoringStore';
-import { useSettingsStore } from 'components/data/SettingsStore';
+import { useAuthStore } from 'components/store/AuthStore';
+import { useBTTracksStore } from 'components/store/BlindTestTracksStore';
+import { useGlobalStore } from 'components/store/GlobalStore';
+import { usePlayerStore } from 'components/store/PlayerStore';
+import { useSettingsStore } from 'components/store/SettingsStore';
 import Help from 'components/Help';
 import Playlist from 'components/Playlist';
 import { useEffect, useState } from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { validateToken } from 'services/TwitchAPI';
+import { setDefaultAuth, validateToken } from 'services/TwitchAPI';
 import BlindTest from './components/BlindTest';
 import Login from './components/Login';
 import LoginCallback from './components/LoginCallback';
@@ -25,7 +25,7 @@ function App() {
   const globalStore = useGlobalStore();
   const btTotalTracks = useBTTracksStore((state) => state.totalTracks);
   const btClear = useBTTracksStore((state) => state.clear);
-  const scoringClear = useScoringStore((state) => state.clear);
+  const clearPlayers = usePlayerStore((state) => state.clear);
 
   const [view, setView] = useState(<div />);
   const [errorMessage, setErrorMessage] = useState('');
@@ -41,6 +41,7 @@ function App() {
         if (response.status !== 200) {
           authStore.deleteTwitchOAuthToken();
         } else {
+          setDefaultAuth(authStore.twitchOauthToken || '');
           response.json().then(body => authStore.setTwitchNick(body['login']));
         }
       });
@@ -61,7 +62,7 @@ function App() {
         navigate('/');
       }
     }
-  }, [navigate]);
+  }, [navigate, authStore, settingsStore]);
 
   const onPopupClose = () => {
     setErrorMessage('');
@@ -70,7 +71,7 @@ function App() {
 
   const logout = () => {
     btClear();
-    scoringClear();
+    clearPlayers();
     authStore.clear();
     settingsStore.reset();
     navigate("/");

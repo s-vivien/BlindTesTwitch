@@ -2,8 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cleanValue } from 'helpers';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
-import { computeGuessable, getGuessables, Guessable, GuessableState, GuessableType, useBTTracksStore } from './data/BlindTestTracksStore';
-import { useGlobalStore } from './data/GlobalStore';
+import { computeGuessable, getGuessables, Guessable, GuessableState, GuessableType, useBTTracksStore } from './store/BlindTestTracksStore';
+import { useGlobalStore } from './store/GlobalStore';
 
 type EditedGuessable = {
   value: string,
