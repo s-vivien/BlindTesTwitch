@@ -1,21 +1,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { AnimatePresence, motion } from "framer-motion"
-import { cleanValueLight, sorensenDiceScore } from "helpers"
+import { cleanValueLight, colors, sorensenDiceScore } from "helpers"
 import { useEffect, useRef, useState } from 'react'
 import { Button, Dropdown, FormControl } from "react-bootstrap"
 import { Client, Options } from "tmi.js"
 import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
-import { useAuthStore } from "./data/AuthStore"
-import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from "./data/BlindTestTracksStore"
-import { useGlobalStore } from "./data/GlobalStore"
-import { useScoringStore } from "./data/ScoringStore"
-import { TwitchMode, useSettingsStore } from "./data/SettingsStore"
+import { useAuthStore } from "./store/AuthStore"
+import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from "./store/BlindTestTracksStore"
+import { useGlobalStore } from "./store/GlobalStore"
+import { Player, usePlayerStore as usePlayerStore } from "./store/PlayerStore"
+import { TwitchMode, useSettingsStore } from "./store/SettingsStore"
 
 type DisplayableScore = {
   nick: string,
   rank?: number,
   displayedRank?: number,
-  score: number
+  score: number,
+  tid: string,
+  avatar?: string
 };
 
 type Guesser = {
@@ -28,7 +30,7 @@ type Guess = {
   guessedBy: Guesser[]
 };
 
-let twitchCallback: (nick: string, msg: string) => void = () => { };
+let twitchCallback: (nick: string, tid: string, msg: string) => void = () => { };
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
@@ -43,7 +45,7 @@ const BlindTest = () => {
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
 
   const btStore = useBTTracksStore();
-  const scoringStore = useScoringStore();
+  const playerStore = usePlayerStore();
   const twitchNick = useAuthStore((state) => state.twitchNick);
   const twitchToken = useAuthStore((state) => state.twitchOauthToken);
   const globalStore = useGlobalStore();
@@ -78,11 +80,13 @@ const BlindTest = () => {
 
   useEffect(() => {
     let flat: DisplayableScore[] = []
-    for (const _key of Object.keys(scoringStore.scores)) {
-      const _val = scoringStore.scores[_key];
+    for (const _key of Object.keys(playerStore.players)) {
+      const _val = playerStore.players[_key];
       flat.push({
         nick: _key,
-        score: _val
+        score: _val.score,
+        tid: _val.tid,
+        avatar: _val.avatar
       })
     }
     flat.sort((a, b) => a.nick.localeCompare(b.nick))
@@ -100,7 +104,7 @@ const BlindTest = () => {
       flat[i].rank = lastRankGroup;
     }
     setLeaderboardRows(flat);
-  }, [nickFilter, scoringStore]);
+  }, [nickFilter, playerStore]);
 
   const twitchDisconnection = () => {
     console.log('Disconnecting from Twitch...');
@@ -127,32 +131,34 @@ const BlindTest = () => {
     twitchClient.current.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
       if (_self) return;
       if (_tags['message-type'] !== "whisper") {
-        return twitchCallback(_tags['display-name'], _message);
+        return twitchCallback(_tags['display-name'], _tags['user-id'], _message);
       }
     });
   }
 
   const backupState = () => {
     btStore.backup();
-    scoringStore.backup();
+    playerStore.backup();
   }
 
   const pickRandomPlayer = () => {
-    const nicks = Object.keys(scoringStore.scores)
-      .filter((k) => scoringStore.scores[k] > 0);
+    const nicks = Object.keys(playerStore.players)
+      .filter((k) => playerStore.players[k].score > 0);
     if (nicks.length > 0) {
       setNickFilter(nicks[Math.floor(Math.random() * nicks.length)].toLowerCase());
     }
   }
 
   const cancelLastTrackPoints = () => {
-    scoringStore.setScores(scoresBackup.current);
-    scoringStore.backup();
+    playerStore.setScores(scoresBackup.current);
+    playerStore.backup();
   }
 
-  const onProposition = (nick: string, message: string) => {
+  const onProposition = (nick: string, tid: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
-    addPlayerIfUnknown(nick);
+    if (settings.addEveryUser && !playerStore.players[nick]) {
+      playerStore.initPlayer(nick, tid);
+    }
     if (message === "!score") {
       if (settings.scoreCommandMode !== TwitchMode.Disabled) {
         const rank = leaderboardRows.find(row => row.nick === nick);
@@ -184,6 +190,9 @@ const BlindTest = () => {
                 break;
               }
             }
+            if (!playerStore.players[nick]) {
+              playerStore.initPlayer(nick, tid);
+            }
             updateGuessState(i, nick, points);
             matched = true;
             break;
@@ -207,18 +216,12 @@ const BlindTest = () => {
       return newGuesses;
     });
     if (delayed) {
-      scoringStore.addMultiplePoints(delayedPoints.current[index]);
-    }
-  }
-
-  const addPlayerIfUnknown = (nick: string) => {
-    if (settings.addEveryUser && !scoringStore.scores.hasOwnProperty(nick)) {
-      addPointToPlayer(nick, 0);
+      playerStore.addMultiplePoints(delayedPoints.current[index]);
     }
   }
 
   const addPointToPlayer = (nick: string, points: number) => {
-    scoringStore.addPoints(nick, points);
+    playerStore.addPoints(nick, points);
   }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
@@ -282,7 +285,7 @@ const BlindTest = () => {
 
   const handleNextSong = async () => {
     handleReveal();
-    scoresBackup.current = { ...scoringStore.scores };
+    scoresBackup.current = Object.fromEntries(Object.entries(playerStore.players).map(([key, value]) => [key, value.score]));
     triggerTimeouts();
     const track = btStore.getNextTrack(shuffled);
     setPlaying(false);
@@ -343,6 +346,18 @@ const BlindTest = () => {
       return <div className="mb-3">
         {CrossEmoji}<div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
       </div>
+    }
+  }
+
+  const computeDomAvatar = (displayable: DisplayableScore) => {
+    if (displayable.avatar) {
+      return <img className="avatar" src={displayable.avatar} onError={({ currentTarget }) => {
+        currentTarget.onerror = null;
+        currentTarget.src = "/BlindTesTwitch/avatar.png";
+      }}
+        style={{ backgroundColor: colors[(+displayable.tid) % colors.length] }}></img>
+    } else {
+      return <div className="avatar" style={{ backgroundColor: colors[(+displayable.tid) % colors.length] }}></div>
     }
   }
 
@@ -413,7 +428,7 @@ const BlindTest = () => {
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
             </Button>
             &nbsp;
-            <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length} type="submit" size="sm" onClick={handleNextSong}>
+            <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length || (playing && !allGuessed())} type="submit" size="sm" onClick={handleNextSong}>
               <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;
@@ -437,9 +452,10 @@ const BlindTest = () => {
             <table className="table-hover bt-t">
               <thead>
                 <tr>
-                  <th style={{ width: "12%" }}>#</th>
-                  <th style={{ width: "70%" }}>Nick</th>
-                  <th style={{ width: "18%" }}>Score</th>
+                  <th style={{ width: "10%" }}>#</th>
+                  <th style={{ width: "12%" }}></th>
+                  <th style={{ width: "61%" }}>Nick</th>
+                  <th style={{ width: "17%" }}>Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -456,6 +472,9 @@ const BlindTest = () => {
                     >
                       <td>
                         <span>{sc.displayedRank}</span>
+                      </td>
+                      <td>
+                        {computeDomAvatar(sc)}
                       </td>
                       <td style={{ position: "relative" }}>
                         <span className="leaderboard-nick">{sc.nick}</span>

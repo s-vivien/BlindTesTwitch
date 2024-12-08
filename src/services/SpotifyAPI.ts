@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from 'components/data/AuthStore';
+import { useAuthStore } from 'components/store/AuthStore';
 import { consumePkcePair, getAppHomeURL } from 'helpers';
 
 const authStore = useAuthStore;
@@ -100,12 +100,9 @@ export const setRepeatMode = (enabled: boolean, device_id: string) => {
 }
 
 export const launchTrack = (track_uri: string, device_id: string) => {
-  return new Promise((res, rej) => {
-    res("");
-  });
-  // return instance.put(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-  //   uris: [track_uri]
-  // })
+  return instance.put(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+    uris: [track_uri]
+  })
 }
 
 export const getDevices = () => {

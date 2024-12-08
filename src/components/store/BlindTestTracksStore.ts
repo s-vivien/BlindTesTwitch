@@ -78,7 +78,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
           done: false,
           guessables: [computeGuessable(title, GuessableType.Title), ...t.artists.map((a: { name: string }) => computeGuessable(a.name, GuessableType.Artist))],
           track_uri: t.uri,
-          img: t.album.images[1]?.url || ""
+          img: t.album.images[0]?.url || ""
         });
       }
       set({ tracks: tracks, totalTracks: tracks.length, doneTracks: 0 });

@@ -2,8 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { computePkcePair, getAppHomeURL } from "../helpers";
-import { useAuthStore } from "./data/AuthStore";
-import { useGlobalStore } from "./data/GlobalStore";
+import { useAuthStore } from "./store/AuthStore";
+import { useGlobalStore } from "./store/GlobalStore";
 
 const Login = () => {
 

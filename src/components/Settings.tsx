@@ -3,8 +3,8 @@ import { Button } from "react-bootstrap";
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from "react-router-dom";
 import { getDevices } from "services/SpotifyAPI";
-import { useGlobalStore } from "./data/GlobalStore";
-import { TwitchMode, useSettingsStore } from "./data/SettingsStore";
+import { useGlobalStore } from "./store/GlobalStore";
+import { TwitchMode, useSettingsStore } from "./store/SettingsStore";
 
 const Settings = () => {
 

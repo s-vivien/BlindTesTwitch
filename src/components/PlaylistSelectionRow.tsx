@@ -1,18 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react"
 import { Button, Modal } from "react-bootstrap"
-import { useBTTracksStore } from "./data/BlindTestTracksStore"
-import { useScoringStore } from "./data/ScoringStore"
 import TracksBaseData from "./data/TracksBaseData"
+import { useBTTracksStore } from "./store/BlindTestTracksStore"
+import { usePlayerStore } from "./store/PlayerStore"
 
 const PlaylistSelectionRow = (props: any) => {
 
   const btStore = useBTTracksStore();
-  const scoringStore = useScoringStore();
+  const playerStore = usePlayerStore();
   const [confirmationDisplayed, setConfirmationDisplayed] = useState(false);
 
   const selectPlaylist = async () => {
-    if (Object.keys(scoringStore.scores).length > 0) {
+    if (Object.keys(playerStore.players).length > 0) {
       setConfirmationDisplayed(true);
     } else {
       loadPlaylist(false);
@@ -21,7 +21,7 @@ const PlaylistSelectionRow = (props: any) => {
 
   const loadPlaylist = async (keepScores: boolean) => {
     if (!keepScores) {
-      scoringStore.clear();
+      playerStore.clear();
     }
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     btStore.setTracksFromRaw(tracks.filter(t => t.track.is_playable));

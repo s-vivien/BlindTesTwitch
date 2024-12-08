@@ -2,7 +2,7 @@ import { getHashParam, getQueryParam } from "helpers";
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import instance, { getUserProfile, retrieveAccessToken } from 'services/SpotifyAPI';
-import { useAuthStore } from "./data/AuthStore";
+import { useAuthStore } from "./store/AuthStore";
 
 const LoginCallback = () => {
 

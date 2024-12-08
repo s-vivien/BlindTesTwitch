@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEffect, useState } from 'react'
 import { Form, FormControl, InputGroup } from "react-bootstrap"
 
-import { useGlobalStore } from './data/GlobalStore'
+import { useGlobalStore } from './store/GlobalStore'
 import PlaylistsData from "./data/PlaylistsData"
 import Paginator from './Paginator'
 import PlaylistSelectionRow from "./PlaylistSelectionRow"

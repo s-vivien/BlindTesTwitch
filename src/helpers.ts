@@ -33,6 +33,8 @@ export const consumePkcePair = () => {
   return codePair;
 }
 
+export const colors: string[] = ['#D23F9A', '#7FBB61', '#2C75C2', '#F2A83A', '#6456F1', '#19E3B2', '#FA6B4D', '#8C84D4', '#D3F721', '#4A4A47'];
+
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
   return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, "")).trim();

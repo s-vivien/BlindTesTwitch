@@ -1,7 +1,7 @@
 import { Button, Alert } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react"
-import { useSettingsStore } from "./data/SettingsStore";
+import { useSettingsStore } from "./store/SettingsStore";
 
 const Help = () => {
 
