@@ -8,7 +8,7 @@ import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
 import { useAuthStore } from "./store/AuthStore"
 import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from "./store/BlindTestTracksStore"
 import { useGlobalStore } from "./store/GlobalStore"
-import { Player, usePlayerStore as usePlayerStore } from "./store/PlayerStore"
+import { usePlayerStore } from "./store/PlayerStore"
 import { TwitchMode, useSettingsStore } from "./store/SettingsStore"
 
 type DisplayableScore = {
@@ -452,10 +452,10 @@ const BlindTest = () => {
             <table className="table-hover bt-t">
               <thead>
                 <tr>
-                  <th style={{ width: "10%" }}>#</th>
+                  <th style={{ width: "10%", textAlign: 'center' }}>#</th>
                   <th style={{ width: "12%" }}></th>
                   <th style={{ width: "61%" }}>Nick</th>
-                  <th style={{ width: "17%" }}>Score</th>
+                  <th style={{ width: "17%", textAlign: 'center' }}>Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -470,7 +470,7 @@ const BlindTest = () => {
                       transition={{ duration: 0.3 }}
                       layout="position"
                     >
-                      <td>
+                      <td style={{ textAlign: 'center' }}>
                         <span>{sc.displayedRank}</span>
                       </td>
                       <td>
@@ -487,7 +487,7 @@ const BlindTest = () => {
                           </Button>
                         </div>
                       </td>
-                      <td>
+                      <td style={{ textAlign: 'center' }}>
                         <span>{sc.score}</span>
                       </td>
                     </motion.tr>

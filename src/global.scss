@@ -18,15 +18,16 @@ input.larger {
   height: 1.2rem;
 }
 
+a {
+  text-decoration: none
+}
+
 .btn.btn-xs {
   // line-height: ensure proper height of button next to small input
-  @include button-size(
-    $btn-padding-y-xs,
+  @include button-size($btn-padding-y-xs,
     $btn-padding-x-xs,
     $font-size-sm,
-    $input-btn-line-height-xs,
-    $btn-border-radius-sm
-  );
+    $btn-border-radius-sm );
 }
 
 button {
@@ -34,10 +35,10 @@ button {
 }
 
 body {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* IE10+/Edge */
-  user-select: none; /* Standard */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 input:-webkit-autofill {
@@ -46,38 +47,41 @@ input:-webkit-autofill {
 }
 
 .app-header {
-  overflow: hidden;
   text-align: center;
   position: fixed;
   top: 0;
   height: 42px;
   width: 100%;
   z-index: 100;
-  background-color: $header-color;
+  background-color: var(--header-color);
+
   p {
     margin-top: 0.3rem;
   }
+
   a {
     font-size: "large";
     letter-spacing: 0.05rem;
-    color: $top-button-color;
+    color: var(--top-button-color);
+
     &:hover {
-      color: $top-button-color;
+      color: var(--top-button-color);
       text-decoration: none;
     }
   }
+
   button {
-    color: $top-button-color;
+    color: var(--top-button-color);
     padding: 10px;
+
     &:hover {
-      color: $top-button-hover-color;
+      color: var(--top-button-hover-color);
     }
   }
 }
 
 .app {
   margin-top: 60px;
-  max-width: 1240px;
 }
 
 svg {
@@ -85,6 +89,16 @@ svg {
 }
 
 .bt-t {
+  td:first-child {
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+  }
+
+  td:last-child {
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+  }
+
   font-weight: 700;
   width: 100%;
   table-layout: fixed;
@@ -93,9 +107,11 @@ svg {
   border-bottom: 1px solid #989898;
   letter-spacing: 0.9px;
   line-height: 1.2;
+
   th {
     border-bottom: 1px solid #989898;
   }
+
   td {
     text-transform: none;
     font-weight: initial;
@@ -103,6 +119,7 @@ svg {
     overflow: hidden;
     white-space: nowrap;
   }
+
   button {
     font-size: 0.6rem;
     margin: 1px 0px;
@@ -116,6 +133,7 @@ svg {
   border-bottom: 1px solid #989898;
   padding-bottom: 2px;
   letter-spacing: 0.9px;
+
   h2 {
     font-weight: inherit;
     display: inline-block;
@@ -125,8 +143,7 @@ svg {
 }
 
 .bt-panel {
-  background-color: $panel-bg;
-  border: 1px solid $panel-border-color !important;
+  background-color: var(--panel-bg);
   border-radius: 0.3rem;
 }
 
@@ -156,6 +173,7 @@ svg {
   align-items: center;
   justify-content: center;
   font-size: larger;
+
   button {
     width: 30rem;
     background-color: #1ED760;
@@ -167,6 +185,7 @@ svg {
   height: 80px;
   width: 80px;
   border: solid black 1px;
+
   img {
     vertical-align: top;
   }
@@ -175,10 +194,12 @@ svg {
 .edition-buttons {
   width: 150px;
   text-align: center;
+
   span {
     font-weight: 500;
     font-size: large;
   }
+
   button {
     width: 65px;
     margin: 0 2px;
@@ -193,19 +214,13 @@ svg {
   align-items: center;
 }
 
-.edition-form-header {
-  border-bottom: 1px solid $input-border-color;
-  margin-bottom: 10px;
-  padding: 5px 0;
-  background-color: $body-bg;
-}
-
 .code {
   font-family: 'consolas';
 }
 
 .edition-table {
   margin: 20px 0;
+
   th {
     border-bottom: 1px solid #989898;
   }
@@ -213,7 +228,10 @@ svg {
 
 .edition-row-disabled {
   pointer-events: none;
-  filter: brightness(40%);
+  color: var(--disabled-text);
+  img {
+    filter: brightness(40%);
+  }
 }
 
 .edition-row-number {
@@ -247,6 +265,7 @@ svg {
   align-items: center;
   margin: auto;
   padding: 20px;
+
   li {
     text-align: left;
   }
@@ -261,13 +280,9 @@ svg {
   border: none;
 }
 
-.modal-content {
-  background-color: $modal-background-color;
-}
-
 .modal-large {
   width: 65%;
-  max-width: none!important;
+  max-width: none !important;
 }
 
 .btn-close {
@@ -280,13 +295,17 @@ svg {
 
 .leaderboard-row {
   position: relative;
-  span, div {
+  border-radius: 100%;
+
+  span,
+  div {
     display: inline-block;
     line-height: normal;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .avatar {
     border-radius: 100%;
     height: 35px;
@@ -294,18 +313,24 @@ svg {
     border: 1.5px solid black;
     vertical-align: top;
   }
+
   .leaderboard-nick {
     max-width: 100%;
   }
+
   .leaderboard-buttons {
     button {
       vertical-align: sub
     }
   }
+
   &:hover {
+    background-color: var(--bs-body-bg);
+
     .leaderboard-buttons {
       right: 0;
     }
+
     .leaderboard-nick {
       max-width: calc(100% - 65px);
     }
@@ -316,12 +341,14 @@ svg {
   position: absolute;
   top: 0;
   right: -80px;
+
   button {
     width: 1.5rem;
     text-align: center;
     padding: 0;
     line-height: 1.4rem;
     margin-right: 5px;
+
     svg {
       margin-left: 0.04rem;
     }
@@ -337,6 +364,7 @@ svg {
   line-height: 400px;
   text-align: center;
   font-size: 80px;
+
   img {
     width: 100%;
     height: 100%;
@@ -352,6 +380,7 @@ svg {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -368,6 +397,7 @@ svg {
     }
 
     &.table-sm {
+
       td,
       th {
         padding: 8px;

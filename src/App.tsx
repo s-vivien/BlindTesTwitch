@@ -1,15 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Help from 'components/Help';
+import Playlist from 'components/Playlist';
 import { useAuthStore } from 'components/store/AuthStore';
 import { useBTTracksStore } from 'components/store/BlindTestTracksStore';
 import { useGlobalStore } from 'components/store/GlobalStore';
 import { usePlayerStore } from 'components/store/PlayerStore';
 import { useSettingsStore } from 'components/store/SettingsStore';
-import Help from 'components/Help';
-import Playlist from 'components/Playlist';
 import { useEffect, useState } from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { setDefaultAuth, validateToken } from 'services/TwitchAPI';
+import { getUsers, setDefaultAuth, validateToken } from 'services/TwitchAPI';
 import BlindTest from './components/BlindTest';
 import Login from './components/Login';
 import LoginCallback from './components/LoginCallback';
@@ -42,7 +42,11 @@ function App() {
           authStore.deleteTwitchOAuthToken();
         } else {
           setDefaultAuth(authStore.twitchOauthToken || '');
-          response.json().then(body => authStore.setTwitchNick(body['login']));
+          response.json().then(body => {
+            getUsers([body['user_id']]).then(response => {
+              authStore.setTwitchNickAndAvatar(body['login'], response.data.data[0].profile_image_url);
+            });
+          });
         }
       });
     }
@@ -104,12 +108,16 @@ function App() {
           {loggedIn && <Button id="logoutButton" type="submit" variant="link" size="sm" onClick={logout} title="Logout">
             <FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" />
           </Button>}
+
+          {/* {loggedIn &&
+            <GlobalMenu></GlobalMenu>
+          } */}
         </div>
         <p id="subtitle" className="lead text-secondary">
           {globalStore.subtitle}
         </p>
       </header>
-      <div className={"app container"} >
+      <div className={"app container"}>
         {errorMessage &&
           <div className="alert-modal-bg">
             <Alert className="alert-modal" variant="danger" >

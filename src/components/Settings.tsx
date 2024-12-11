@@ -96,7 +96,7 @@ const Settings = () => {
           <Button style={{ width: "80px" }} size="sm" className="mr-2" variant="primary" type="submit">
             <b>Save</b>
           </Button>
-          <Button disabled={!settingsStore.isInitialized()} style={{ width: "80px" }} size="sm" className="mr-2" variant="secondary" onClick={() => navigate("/")}>
+          <Button disabled={!settingsStore.isInitialized()} style={{ width: "80px" }} size="sm" className="mx-2" variant="secondary" onClick={() => navigate("/")}>
             <b>Cancel</b>
           </Button>
         </Form>

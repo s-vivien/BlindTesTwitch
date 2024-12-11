@@ -40,10 +40,7 @@ const initialState: SettingsData & ExtraSettingsData = {
 }
 
 const setTheme = (theme: number) => {
-  for (let name of themeNames) {
-    document.documentElement.classList.remove(name);
-  }
-  document.documentElement.classList.add(themeNames[theme]);
+  document.documentElement.setAttribute('data-bs-theme', themeNames[theme]);
 };
 
 export const useSettingsStore = create<SettingsData & ExtraSettingsData & Actions>()(

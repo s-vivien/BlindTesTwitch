@@ -181,7 +181,7 @@ const PlaylistEdition = (props: any) => {
       <Modal show={edition} centered size="lg" dialogClassName="modal-large">
         <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }}>
           <Modal.Body style={{ paddingTop: 0 }}>
-            <Form.Group as={Row} controlId="formHeader" className='edition-form-header'>
+            <Form.Group as={Row} controlId="formHeader">
               <Form.Label column sm={2}>
               </Form.Label>
               <Form.Label column sm={1}>

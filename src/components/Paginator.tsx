@@ -19,7 +19,7 @@ const Paginator = (props: any) => {
 
   return (
     <div className="mr-2">
-      <Button disabled={props.currentPage <= 1} variant="primary" onClick={prevClick} className="ml-1 btn-xs" style={{ height: '100%' }}>
+      <Button disabled={props.currentPage <= 1} variant="primary" onClick={prevClick} className="mx-1 btn-xs" style={{ height: '100%' }}>
         <FontAwesomeIcon icon={['fas', 'chevron-left']} size="sm" />
       </Button>
       <Button disabled={props.currentPage >= totalPages()} variant="primary" onClick={nextClick} className="ml-1 btn-xs" style={{ height: '100%' }}>

@@ -2,41 +2,39 @@ $input-btn-focus-box-shadow: none;
 $input-btn-focus-width: 0;
 $btn-transition: none;
 
-.light {
-  $link-color: #337ab7;
-  $primary: #a8a8a8;
-  $table-hover-bg: rgba(#000, 0.025);
-  $body-color: #191414;
-  $header-color: #e6e6e6;
-  $panel-bg: #f8f9fa;
-  $panel-border-color: #dee2e6;
-  $top-button-color: #a0a3a5;
-  $top-button-hover-color: #828586;
-  $input-focus-border-color: #b4b7b9;
-  $input-placeholder-color: #c3c6c9;
-  $modal-background-color: #d8d8d8;
-  @import "~bootstrap/scss/bootstrap";
-  @import "global.scss";
+@import '~bootstrap/scss/bootstrap';
+
+@include color-mode(light) {
+
+  --bs-border-color: #adadad;
+
+  $button-color: #747474;
+
+  .btn-primary {
+    @include button-variant($button-color, $button-color);
+  }
+
+  --header-color: #d1d1d1;
+  --disabled-text: #b1b1b1;
+  --panel-bg: #e4e4e4;
 }
-.dark {
-  $link-color: #4896db;
-  $primary: #5e5e5e;
-  $table-hover-bg: rgba(#000, 0.25);
-  $table-border-color: #484848;
-  $body-color: #bdbdbd;
-  $header-color: #0e0f0f;
-  $panel-bg: #242526;
-  $panel-border-color: transparent;
-  $top-button-color: #5e5e5e;
-  $top-button-hover-color: #b5b9bb;
-  $body-bg: #18191a;
-  $input-bg: #242526;
-  $input-border-color: #424242;
-  $input-focus-border-color: #686868;
-  $input-color: #d7d9de;
-  $input-disabled-bg: #66696b;
-  $input-placeholder-color: #525252;
-  $modal-background-color: #1f1f1f;
-  @import "~bootstrap/scss/bootstrap";
-  @import "global.scss";
+
+@include color-mode(dark) {
+  --bs-body-bg: #18191a;
+  --bs-border-color: #3c3e41;
+
+  $button-color: #5e5e5e;
+
+  .btn-primary {
+    @include button-variant($button-color, $button-color);
+  }
+
+  --header-color: #0e0f0f;
+  --disabled-text: #686868;
+  --top-button-color: #5e5e5e;
+  --top-button-hover-color: #b5b9bb;
+  --panel-bg: #242526;
+  --modal-background-color: #1f1f1f;
 }
+
+@import "global.scss";

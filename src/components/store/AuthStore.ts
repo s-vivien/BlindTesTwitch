@@ -6,7 +6,8 @@ export type AuthData = {
   spotifyAccessToken?: string,
   twitchOauthToken?: string,
   spotifyUserCountry?: string,
-  twitchNick?: string
+  twitchNick?: string,
+  twitchAvatar?: string
 }
 
 type Actions = {
@@ -19,7 +20,7 @@ type Actions = {
   getSpotifyRefreshToken: () => string | undefined;
   deleteSpotifyRefreshToken: () => void;
   setSpotifyRefreshToken: (token: string) => void;
-  setTwitchNick: (nick: string) => void;
+  setTwitchNickAndAvatar: (nick: string, avatar: string) => void;
   getSpotifyUserCountry: () => string | undefined;
   setSpotifyUserCountry: (country: string) => void;
   isLoggedIn: () => boolean;
@@ -60,8 +61,8 @@ export const useAuthStore = create<AuthData & Actions>()(
       setSpotifyRefreshToken: (token: string) => {
         set(() => ({ spotifyRefreshToken: token }));
       },
-      setTwitchNick: (nick: string) => {
-        set(() => ({ twitchNick: nick }));
+      setTwitchNickAndAvatar: (nick: string, avatar: string) => {
+        set(() => ({ twitchNick: nick, twitchAvatar: avatar }));
       },
       getSpotifyUserCountry: (): string | undefined => {
         return get().spotifyUserCountry;
