@@ -25,7 +25,7 @@ type Actions = {
 let avatarFetchTimeout: NodeJS.Timeout | undefined = undefined;
 const avatarFetchTimeoutDuration: number = 2500;
 
-// storage is done manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
+// storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
 const restoredState: Players = JSON.parse(localStorage.getItem(localStorageKey) || "{}");

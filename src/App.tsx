@@ -1,10 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Help from 'components/Help';
+import GlobalMenu from 'components/GlobalMenu';
 import Playlist from 'components/Playlist';
 import { useAuthStore } from 'components/store/AuthStore';
 import { useBTTracksStore } from 'components/store/BlindTestTracksStore';
 import { useGlobalStore } from 'components/store/GlobalStore';
-import { usePlayerStore } from 'components/store/PlayerStore';
 import { useSettingsStore } from 'components/store/SettingsStore';
 import { useEffect, useState } from 'react';
 import { Alert, Button } from 'react-bootstrap';
@@ -24,8 +23,6 @@ function App() {
   const authStore = useAuthStore();
   const globalStore = useGlobalStore();
   const btTotalTracks = useBTTracksStore((state) => state.totalTracks);
-  const btClear = useBTTracksStore((state) => state.clear);
-  const clearPlayers = usePlayerStore((state) => state.clear);
 
   const [view, setView] = useState(<div />);
   const [errorMessage, setErrorMessage] = useState('');
@@ -73,14 +70,6 @@ function App() {
     navigate('/');
   };
 
-  const logout = () => {
-    btClear();
-    clearPlayers();
-    authStore.clear();
-    settingsStore.reset();
-    navigate("/");
-  }
-
   console.log('render App');
 
   const loggedIn = authStore.isLoggedIn();
@@ -88,30 +77,13 @@ function App() {
     <>
       <header className="app-header">
         <div style={{ position: 'absolute', left: 0, fontSize: '1.3333rem', padding: '4px' }}>
-          <FontAwesomeIcon icon={['fab', 'spotify']} color="#1ED760" size="sm" />
-          <a href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
+          <FontAwesomeIcon icon={['fab', 'spotify']} color="var(--spot-color)" size="sm" />
+          <a className="btt" href={process.env.PUBLIC_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
         </div>
         <div style={{ position: 'absolute', right: 0 }}>
-          {loggedIn && btTotalTracks > 0 && <Button id="playButton" type="submit" variant="link" size="sm" onClick={() => navigate("/")} title="Play">
-            <FontAwesomeIcon icon={['fas', 'music']} size="lg" />
-          </Button>}
-          {loggedIn && <Button id="listButton" type="submit" variant="link" size="sm" onClick={() => navigate("/playlist")} title="Playlists">
-            <FontAwesomeIcon icon={['fas', 'list']} size="lg" />
-          </Button>}
-          <Button id="toggleButton" type="submit" variant="link" size="sm" onClick={() => settingsStore.toggleTheme()} title="Switch theme">
-            <FontAwesomeIcon icon={['fas', 'adjust']} size="lg" />
-          </Button>
-          {loggedIn && <Button id="settingButton" type="submit" variant="link" size="sm" onClick={() => navigate("/settings")} title="Settings">
-            <FontAwesomeIcon icon={['fas', 'cog']} size="lg" />
-          </Button>}
-          {loggedIn && btTotalTracks > 0 && <Help />}
-          {loggedIn && <Button id="logoutButton" type="submit" variant="link" size="sm" onClick={logout} title="Logout">
-            <FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" />
-          </Button>}
-
-          {/* {loggedIn &&
-            <GlobalMenu></GlobalMenu>
-          } */}
+          {loggedIn &&
+            <GlobalMenu />
+          }
         </div>
         <p id="subtitle" className="lead text-secondary">
           {globalStore.subtitle}
