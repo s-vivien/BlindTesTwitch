@@ -4,9 +4,19 @@ $btn-transition: none;
 
 @import '~bootstrap/scss/bootstrap';
 
+:root {
+  --spot-color: #1ed760;
+}
+
 @include color-mode(light) {
 
   --bs-border-color: #adadad;
+  --bs-dropdown-link-active-bg: #3c3e41;
+
+  .dropdown-menu {
+    --bs-dropdown-link-active-color: none;
+    --bs-dropdown-link-active-bg: none;
+  }
 
   $button-color: #747474;
 
@@ -21,7 +31,12 @@ $btn-transition: none;
 
 @include color-mode(dark) {
   --bs-body-bg: #18191a;
-  --bs-border-color: #3c3e41;
+  --bs-border-color: #413c3c;
+
+  .dropdown-menu {
+    --bs-dropdown-link-active-color: none;
+    --bs-dropdown-link-active-bg: none;
+  }
 
   $button-color: #5e5e5e;
 

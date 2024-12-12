@@ -25,7 +25,7 @@ type Actions = {
 let avatarFetchTimeout: NodeJS.Timeout | undefined = undefined;
 const avatarFetchTimeoutDuration: number = 2500;
 
-// storage is done manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
+// storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
 const restoredState: Players = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
@@ -63,9 +63,9 @@ export const usePlayerStore = create<Players & Actions>()(
               const updated = state.players;
               for (let u of response.data.data) {
                 const nick = u.display_name;
-                if (!updated[nick]) {
-                  debugger; // TODO remove
-                }
+                // if (!updated[nick]) {
+                //   debugger; // TODO remove
+                // }
                 updated[nick].avatar = u.profile_image_url;
               }
               return ({ players: updated });
@@ -76,17 +76,15 @@ export const usePlayerStore = create<Players & Actions>()(
 
       set((state) => {
         const updated = state.players;
-        if (updated[nick]) {
-          debugger; // TODO remove
-        }
+        // if (updated[nick]) {
+        //   debugger; // TODO remove
+        // }
         updated[nick] = { tid: tid, score: 0 };
 
         if (avatarFetchTimeout == undefined) {
-          console.log('--> right away');
           downloadAvatar(updated);
           avatarFetchTimeout = setTimeout(() => {
             avatarFetchTimeout = undefined;
-            console.log('--> after right away TO');
             downloadAvatar(get().players);
           }, avatarFetchTimeoutDuration);
         }
@@ -97,9 +95,9 @@ export const usePlayerStore = create<Players & Actions>()(
     addPoints: (nick: string, points: number) => {
       set((state) => {
         const updated = state.players;
-        if (!updated[nick]) {
-          debugger; // TODO remove
-        }
+        // if (!updated[nick]) {
+        //   debugger; // TODO remove
+        // }
         updated[nick].score += points;
         return ({ players: updated });
       });
@@ -108,9 +106,9 @@ export const usePlayerStore = create<Players & Actions>()(
       set((state) => {
         const updated = state.players;
         for (const nick of Object.keys(points)) {
-          if (!updated[nick]) {
-            debugger; // TODO remove
-          }
+          // if (!updated[nick]) {
+          //   debugger; // TODO remove
+          // }
           updated[nick].score += points[nick];
         }
         return ({ players: updated });

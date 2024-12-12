@@ -69,8 +69,8 @@ const BlindTest = () => {
   }, [twitchNick]);
 
   useEffect(() => {
-    if (playing) {
-      globalStore.setSubtitle(`Playing song #${btStore.doneTracks} out of ${btStore.tracks.length}`)
+    if (playing && !currentTrack?.done) {
+      globalStore.setSubtitle(`Playing song #${btStore.doneTracks + 1} out of ${btStore.tracks.length}`)
     } else if (btStore.tracks.length - btStore.doneTracks > 0) {
       globalStore.setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
@@ -269,6 +269,7 @@ const BlindTest = () => {
   const endSong = () => {
     if (currentTrack && !currentTrack.done) {
       currentTrack.done = true;
+      btStore.incrementDoneTracks();
       backupState();
     }
   }
@@ -293,7 +294,6 @@ const BlindTest = () => {
     launchTrack(track.track_uri, settings.deviceId).then(() => {
       setRepeatMode(true, settings.deviceId);
       setCurrentTrack(track);
-      btStore.incrementDoneTracks();
       const newGuesses = [];
       delayedPoints.current = [];
       guessTimeouts.current = [];
@@ -361,8 +361,6 @@ const BlindTest = () => {
     }
   }
 
-  console.log('render BlindTest');
-
   return (
     <div id="blindtest">
       <div className="row mb-4">
@@ -425,20 +423,20 @@ const BlindTest = () => {
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
             <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: "35px" }}>
-              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? '#1ed760' : '#242526'} size="lg" />
+              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
             </Button>
             &nbsp;
             <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length || (playing && !allGuessed())} type="submit" size="sm" onClick={handleNextSong}>
-              <FontAwesomeIcon icon={['fas', 'step-forward']} color="#1ed760" size="lg" /> <b>NEXT</b>
+              <FontAwesomeIcon icon={['fas', 'step-forward']} color="var(--spot-color)" size="lg" /> <b>NEXT</b>
             </Button>
             &nbsp;
             <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
-              <FontAwesomeIcon icon={['fas', 'eye']} color="#1ed760" size="lg" /> <b>REVEAL</b>
+              <FontAwesomeIcon icon={['fas', 'eye']} color="var(--spot-color)" size="lg" /> <b>REVEAL</b>
             </Button>
             &nbsp;
             <Dropdown>
               <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: "35px" }}>
-                <FontAwesomeIcon icon={['fas', 'ellipsis']} color="#1ed760" size="lg" />
+                <FontAwesomeIcon icon={['fas', 'ellipsis']} color="var(--spot-color)" size="lg" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>

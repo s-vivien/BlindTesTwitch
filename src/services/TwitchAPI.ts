@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useAuthStore } from "components/store/AuthStore";
 
 const instance = axios.create({
   headers: {
