@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
 import { computeGuessable, getGuessables, Guessable, GuessableState, GuessableType, useBTTracksStore } from './store/BlindTestTracksStore';
 import { useGlobalStore } from './store/GlobalStore';
+import { useNavigate } from 'react-router-dom';
 
 type EditedGuessable = {
   value: string,
@@ -12,7 +13,7 @@ type EditedGuessable = {
 }
 
 const PlaylistEdition = (props: any) => {
-
+  const navigate = useNavigate();
   const globalStore = useGlobalStore();
 
   const btStore = useBTTracksStore();
@@ -35,8 +36,9 @@ const PlaylistEdition = (props: any) => {
       updatedTrack.guessables = editedValues.map((g) => computeGuessable(g.value, g.type, g.state));
       btStore.backup();
       endEdit();
+    } else {
+      setValidated(true);
     }
-    setValidated(true);
   }
 
   const restart = () => {
@@ -67,6 +69,7 @@ const PlaylistEdition = (props: any) => {
   const endEdit = () => {
     setSelectedIndex(-1);
     setEdition(false);
+    setValidated(false);
   }
 
   const updateState = (index: number, state: string) => {
@@ -243,8 +246,11 @@ const PlaylistEdition = (props: any) => {
       </Modal>
 
       <div className="playlist-load-button mb-2">
-        <Button id="selectList" type="submit" onClick={() => setRestartModal(true)}>
-          <b>Load another playlist from Spotify</b>
+        <Button id="selectList" type="submit" className="mx-1" onClick={() => navigate("/")} style={{ gridColumnStart: '2', width: '400px' }}>
+          <b>Play</b>
+        </Button>
+        <Button id="selectList" type="submit" className="mx-1" variant="danger" onClick={() => setRestartModal(true)} style={{ width: '100px' }}>
+          <b>Clear</b>
         </Button>
       </div>
 
@@ -271,10 +277,10 @@ const PlaylistEdition = (props: any) => {
                 <td className="edition-row-number">
                   #{1 + index}
                 </td>
-                <td id="cover">
+                <td id="cover" style={{ textAlign: 'center' }}>
                   <img className="edition-cover" id="cover-image" src={track.img} alt="cover" />
                 </td>
-                <td style={{ flex: 1 }} className={"px-3"}>
+                <td className={"px-3"}>
                   <div>
                     <b>{renderGuessables(getGuessables(track, GuessableType.Title))}</b>
                   </div>
@@ -285,7 +291,7 @@ const PlaylistEdition = (props: any) => {
                     {renderGuessables(getGuessables(track, GuessableType.Misc))}
                   </div>
                 </td>
-                <td style={{ flex: 1 }} className={"px-3 code"}>
+                <td className={"px-3 code"}>
                   <div>
                     <b>{renderGuessables(getGuessables(track, GuessableType.Title), true)}</b>
                   </div>

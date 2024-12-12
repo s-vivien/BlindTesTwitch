@@ -2,7 +2,7 @@ import { instanceToPlain, plainToInstance } from "class-transformer";
 import { cleanSpoiler, cleanValue, specialCharactersAlternatives } from "helpers";
 import { create } from "zustand";
 
-const localStorageKey: string = "blind_test_tracks";
+const localStorageKey: string = "blind_test_tracks_storage";
 
 export enum GuessableState {
   Enabled = 0,
@@ -44,7 +44,7 @@ type Actions = {
   incrementDoneTracks: () => void;
 }
 
-// storage is done manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
+// storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
 const plain: BlindTestTracks = JSON.parse(localStorage.getItem(localStorageKey) || "{}");

@@ -59,7 +59,7 @@ export const useSettingsStore = create<SettingsData & ExtraSettingsData & Action
       }
     }),
     {
-      name: 'settings',
+      name: 'settings_storage',
       onRehydrateStorage: () => {
         return (state, error) => {
           if (!error && state) {

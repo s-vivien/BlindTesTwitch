@@ -4,9 +4,21 @@ $btn-transition: none;
 
 @import '~bootstrap/scss/bootstrap';
 
+:root {
+  --spot-color: #1ed760;
+}
+
+// ==================================== light
+
 @include color-mode(light) {
 
   --bs-border-color: #adadad;
+  --bs-dropdown-link-active-bg: #3c3e41;
+
+  .dropdown-menu {
+    --bs-dropdown-link-active-color: none;
+    --bs-dropdown-link-active-bg: none;
+  }
 
   $button-color: #747474;
 
@@ -14,14 +26,24 @@ $btn-transition: none;
     @include button-variant($button-color, $button-color);
   }
 
+  --alt-text-color: #7a7a7a;
   --header-color: #d1d1d1;
+  --header-body-color: #555555;
   --disabled-text: #b1b1b1;
   --panel-bg: #e4e4e4;
+  --global-menu-color: #8d8d8d;
 }
+
+// ==================================== dark
 
 @include color-mode(dark) {
   --bs-body-bg: #18191a;
-  --bs-border-color: #3c3e41;
+  --bs-border-color: #413c3c;
+
+  .dropdown-menu {
+    --bs-dropdown-link-active-color: none;
+    --bs-dropdown-link-active-bg: none;
+  }
 
   $button-color: #5e5e5e;
 
@@ -29,12 +51,12 @@ $btn-transition: none;
     @include button-variant($button-color, $button-color);
   }
 
+  --alt-text-color: #999999;
   --header-color: #0e0f0f;
+  --header-body-color: #5e5e5e;
   --disabled-text: #686868;
-  --top-button-color: #5e5e5e;
-  --top-button-hover-color: #b5b9bb;
   --panel-bg: #242526;
-  --modal-background-color: #1f1f1f;
+  --global-menu-color: #363636;
 }
 
 @import "global.scss";

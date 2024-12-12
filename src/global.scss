@@ -34,6 +34,10 @@ button {
   border-radius: 999rem !important;
 }
 
+.spot-color {
+  color: #1ed760;
+}
+
 body {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -50,32 +54,34 @@ input:-webkit-autofill {
   text-align: center;
   position: fixed;
   top: 0;
-  height: 42px;
+  height: 45px;
   width: 100%;
   z-index: 100;
   background-color: var(--header-color);
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   p {
     margin-top: 0.3rem;
+    margin: 0;
   }
 
-  a {
+  .btt {
     font-size: "large";
     letter-spacing: 0.05rem;
-    color: var(--top-button-color);
+    color: var(--header-body-color);
 
     &:hover {
-      color: var(--top-button-color);
+      color: var(--header-body-color);
       text-decoration: none;
     }
   }
 
-  button {
-    color: var(--top-button-color);
-    padding: 10px;
-
-    &:hover {
-      color: var(--top-button-hover-color);
+  .dropdown {
+    button {
+      border-radius: 0 !important;
     }
   }
 }
@@ -160,7 +166,7 @@ svg {
 }
 
 .bt-gb {
-  color: rgb(153, 153, 153);
+  color: var(--alt-text-color);
   line-height: 22px;
 }
 
@@ -169,16 +175,9 @@ svg {
 }
 
 .playlist-load-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: larger;
-
-  button {
-    width: 30rem;
-    background-color: #1ED760;
-    border: none;
-  }
+  display: grid;
+  grid-template-columns: 15% 70% 15%;
+  justify-items: center;
 }
 
 .edition-cover {
@@ -219,6 +218,7 @@ svg {
 }
 
 .edition-table {
+  width: 100%;
   margin: 20px 0;
 
   th {
@@ -229,6 +229,7 @@ svg {
 .edition-row-disabled {
   pointer-events: none;
   color: var(--disabled-text);
+
   img {
     filter: brightness(40%);
   }
@@ -248,6 +249,47 @@ svg {
   bottom: 0;
   background-color: rgba(131, 131, 131, 0.5);
   z-index: 2147483646;
+}
+
+.changelog-modal {
+  padding-top: calc(var(--bs-modal-margin) * 2);
+  justify-content: center;
+  margin: auto;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+
+  .h5-with-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .h5-with-line::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: #353535;
+    margin-left: 10px;
+  }
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+.help-modal {
+  justify-content: center;
+  margin: auto;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-box-align: center;
+  text-align: center;
+
+  li {
+    text-align: left;
+  }
 }
 
 .alert-modal {

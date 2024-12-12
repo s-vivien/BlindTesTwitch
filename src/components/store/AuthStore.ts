@@ -1,3 +1,4 @@
+import { getUsers, setDefaultAuth, validateToken } from "services/TwitchAPI";
 import { create } from "zustand";
 import { persist } from 'zustand/middleware';
 
@@ -14,6 +15,7 @@ type Actions = {
   clear: () => void;
   deleteTwitchOAuthToken: () => void;
   setTwitchOAuthToken: (token: string) => void;
+  validateTwitchOAuthToken: () => void;
   getSpotifyAccessToken: () => string | undefined;
   deleteSpotifyAccessToken: () => void;
   setSpotifyAccessToken: (token: string) => void;
@@ -42,6 +44,23 @@ export const useAuthStore = create<AuthData & Actions>()(
       },
       setTwitchOAuthToken: (token: string) => {
         set(() => ({ twitchOauthToken: token }));
+      },
+      validateTwitchOAuthToken: () => {
+        const current = get();
+        if (current.twitchOauthToken) {
+          validateToken(current.twitchOauthToken).then(response => {
+            if (response.status !== 200) {
+              current.deleteTwitchOAuthToken();
+            } else {
+              setDefaultAuth(current.twitchOauthToken || '');
+              response.json().then(body => {
+                getUsers([body['user_id']]).then(response => {
+                  set(() => ({ twitchNick: body['login'], twitchAvatar: response.data.data[0].profile_image_url }));
+                });
+              });
+            }
+          });
+        }
       },
       getSpotifyAccessToken: (): string | undefined => {
         return get().spotifyAccessToken;
