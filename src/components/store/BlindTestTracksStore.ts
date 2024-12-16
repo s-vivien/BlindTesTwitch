@@ -40,6 +40,7 @@ type Actions = {
   backup: () => void;
   clear: () => void;
   setTracksFromRaw: (spotTracks: any[]) => void;
+  updateTrack: (track: BlindTestTrack, index: number) => void;
   getNextTrack: (random: boolean) => BlindTestTrack;
   incrementDoneTracks: () => void;
 }
@@ -83,6 +84,13 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
       }
       set({ tracks: tracks, totalTracks: tracks.length, doneTracks: 0 });
     },
+    updateTrack: (track: BlindTestTrack, index: number) => {
+      set((state) => {
+        const updatedTracks = state.tracks;
+        updatedTracks[index] = track;
+        return { tracks: updatedTracks };
+      })
+    },
     getNextTrack: (shuffled: boolean) => {
       const leftTracks = get().tracks.filter(t => !t.done);
       return shuffled ? leftTracks[Math.floor(Math.random() * leftTracks.length)] : leftTracks[0];
@@ -104,8 +112,8 @@ export const mapGuessables = <U>(track: BlindTestTrack, type: GuessableType, cal
   return values;
 }
 
-export const getGuessables = (track: BlindTestTrack, type: GuessableType): Guessable[] => {
-  return (track.guessables.filter(e => e.type == type && e.state != GuessableState.DisabledHidden) || []);
+export const getGuessables = (track: BlindTestTrack, type: GuessableType, filterDisabled: boolean = true): Guessable[] => {
+  return (track.guessables.filter(e => e.type === type && (!filterDisabled || e.state !== GuessableState.DisabledHidden)) || []);
 }
 
 export const computeGuessable = (value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled): Guessable => {

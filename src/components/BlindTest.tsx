@@ -142,8 +142,7 @@ const BlindTest = () => {
   }
 
   const pickRandomPlayer = () => {
-    const nicks = Object.keys(playerStore.players)
-      .filter((k) => playerStore.players[k].score > 0);
+    const nicks = Object.keys(playerStore.players).filter((k) => playerStore.players[k].score > 0);
     if (nicks.length > 0) {
       setNickFilter(nicks[Math.floor(Math.random() * nicks.length)].toLowerCase());
     }
@@ -316,15 +315,15 @@ const BlindTest = () => {
 
   const CrossEmoji = <FontAwesomeIcon color="#de281b" icon={['fas', 'times']} size="lg" />;
   const BubbleEmoji = <FontAwesomeIcon icon={['far', 'comment']} size="lg" />;
-  const CheckEmoji = <FontAwesomeIcon color="#18ad1d" icon={['fas', 'check']} size="lg" />;
-  const InfoEmoji = <FontAwesomeIcon color="#367ac2" icon={['fas', 'lock']} size="lg" />;
+  const CheckEmoji = <FontAwesomeIcon color="var(--icon-green-color)" icon={['fas', 'check']} size="lg" />;
+  const LockEmoji = <FontAwesomeIcon color="var(--icon-blue-color)" icon={['fas', 'lock']} size="lg" />;
 
   const GuessableView = (props: any) => {
     const guessable: Guessable = props.guessable
     const guess: Guess = props.guess
     if (guess.guessed) {
       return <div className="mb-3">
-        <div className="bt-guess" title={guessable.toGuess[0]}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? InfoEmoji : CrossEmoji)} {guessable.original}</div>
+        <div className="bt-guess" title={guessable.toGuess[0]}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? LockEmoji : CrossEmoji)} {guessable.original}</div>
         {guess.guessedBy.length > 0 &&
           <div className="bt-gb">
             {BubbleEmoji}&nbsp;

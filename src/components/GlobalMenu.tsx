@@ -54,7 +54,7 @@ const GlobalMenu = () => {
   const CustomToggle = React.forwardRef<HTMLDivElement, { onClick: (e: React.MouseEvent<HTMLDivElement>) => void }>(
     ({ onClick }, ref) => (
       <div ref={ref} onClick={(e) => { e.preventDefault(); onClick(e); }} style={{ fontSize: 'large', backgroundColor: 'var(--global-menu-color)', borderRadius: '35px', display: "inline-block" }}    >
-        <FontAwesomeIcon icon={['fas', 'bars']} size="lg" style={{ margin: '0 0.5rem 0 0.75rem', verticalAlign: 'middle' }} />
+        <FontAwesomeIcon icon={['fas', 'bars']} style={{ margin: '0 0.5rem 0 0.75rem', verticalAlign: 'middle' }} />
         <img src={twitchAvatar} style={{ height: '35px', borderRadius: '100%' }} />
       </div>
     )

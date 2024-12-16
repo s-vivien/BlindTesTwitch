@@ -25,9 +25,9 @@ a {
 .btn.btn-xs {
   // line-height: ensure proper height of button next to small input
   @include button-size($btn-padding-y-xs,
-    $btn-padding-x-xs,
-    $font-size-sm,
-    $btn-border-radius-sm );
+          $btn-padding-x-xs,
+          $font-size-sm,
+          $btn-border-radius-sm);
 }
 
 button {
@@ -205,6 +205,23 @@ svg {
   }
 }
 
+.guessable-state-icon {
+  display: inline-block;
+  align-content: center;
+  text-align: center;;
+  &.active {
+    border-radius: 4px;
+    border: 1px solid var(--alt-text-color);
+    background-color: var(--header-color);
+  }
+}
+
+.editable-value:hover,
+.editable-value-hover {
+  background-color: var(--alt-text-color);
+  border-radius: 4px;
+}
+
 .edition-form-left-buttons {
   margin-right: auto !important;
 }
@@ -277,6 +294,12 @@ svg {
     display: block;
     margin: 0 auto;
   }
+
+  .img-caption {
+    padding-top: 10px;
+    text-align: center;
+    font-style: italic;
+  }
 }
 
 .help-modal {
@@ -320,11 +343,6 @@ svg {
 
 .modal-footer {
   border: none;
-}
-
-.modal-large {
-  width: 65%;
-  max-width: none !important;
 }
 
 .btn-close {
