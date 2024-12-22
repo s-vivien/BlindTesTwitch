@@ -105,7 +105,7 @@ export const mapGuessables = <U>(track: BlindTestTrack, type: GuessableType, cal
   let values: U[] = [];
   for (let i = 0; i < track.guessables.length; ++i) {
     const elt = track.guessables[i];
-    if (type && elt.type === type) {
+    if (type && elt.type === type && elt.state !== GuessableState.DisabledHidden) {
       values.push(callbackfn(elt, i));
     }
   }
