@@ -27,7 +27,6 @@ const Changelog = ({show, onClose}: any) => {
         <ul>
           <li><i><b>Shuffle</b></i> : the next track will be chosen randomly</li>
           <li><i><b>Cancel last track points</b></i> : removes the points awarded by the last track</li>
-          <li><i><b>Pick random player</b></i> : randomly selects a player with at least 1 point</li>
         </ul>
         <br/>
         <h5 className="h5-with-line">Playlist edition rework</h5>

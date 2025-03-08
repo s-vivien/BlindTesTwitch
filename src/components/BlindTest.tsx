@@ -141,13 +141,6 @@ const BlindTest = () => {
     playerStore.backup();
   }
 
-  const pickRandomPlayer = () => {
-    const nicks = Object.keys(playerStore.players).filter((k) => playerStore.players[k].score > 0);
-    if (nicks.length > 0) {
-      setNickFilter(nicks[Math.floor(Math.random() * nicks.length)].toLowerCase());
-    }
-  }
-
   const cancelLastTrackPoints = () => {
     playerStore.setScores(scoresBackup.current);
     playerStore.backup();
@@ -439,7 +432,6 @@ const BlindTest = () => {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>
-                <Dropdown.Item onClick={pickRandomPlayer}>Pick random player</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 
