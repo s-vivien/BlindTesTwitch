@@ -1,7 +1,7 @@
-import { getUsers } from "services/TwitchAPI";
-import { create } from "zustand";
+import { getUsers } from 'services/TwitchAPI';
+import { create } from 'zustand';
 
-const localStorageKey: string = "blind_test_players";
+const localStorageKey: string = 'blind_test_players';
 
 export type Player = {
   tid: string;
@@ -28,7 +28,7 @@ const avatarFetchTimeoutDuration: number = 2500;
 // storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
-const restoredState: Players = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+const restoredState: Players = JSON.parse(localStorage.getItem(localStorageKey) || '{}');
 
 export const usePlayerStore = create<Players & Actions>()(
   (set, get) => ({
@@ -69,10 +69,10 @@ export const usePlayerStore = create<Players & Actions>()(
                 updated[nick].avatar = u.profile_image_url;
               }
               return ({ players: updated });
-            })
+            });
           });
         }
-      }
+      };
 
       set((state) => {
         const updated = state.players;
@@ -113,6 +113,6 @@ export const usePlayerStore = create<Players & Actions>()(
         }
         return ({ players: updated });
       });
-    }
-  })
+    },
+  }),
 );

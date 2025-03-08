@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export type Global = {
   subtitle: string,
@@ -13,6 +13,6 @@ export const useGlobalStore = create<Global & Actions>()(
     subtitle: '',
     setSubtitle: (subtitle: string) => {
       set(() => ({ subtitle: subtitle }));
-    }
-  })
+    },
+  }),
 );

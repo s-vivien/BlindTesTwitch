@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 const themeNames = ['dark', 'light'];
@@ -36,8 +36,8 @@ const initialState: SettingsData & ExtraSettingsData = {
   previewGuessNumber: false,
   acceptanceDelay: 5,
   scoreCommandMode: TwitchMode.Channel,
-  theme: 0
-}
+  theme: 0,
+};
 
 const setTheme = (theme: number) => {
   document.documentElement.setAttribute('data-bs-theme', themeNames[theme]);
@@ -47,7 +47,7 @@ export const useSettingsStore = create<SettingsData & ExtraSettingsData & Action
   persist(
     (set, get) => ({
       ...initialState,
-      isInitialized: () => { return get().deviceId !== '' },
+      isInitialized: () => { return get().deviceId !== ''; },
       reset: () => set(initialState),
       update: (data: SettingsData) => set(data),
       toggleTheme: () => {
@@ -56,7 +56,7 @@ export const useSettingsStore = create<SettingsData & ExtraSettingsData & Action
           setTheme(newTheme);
           return ({ theme: newTheme });
         });
-      }
+      },
     }),
     {
       name: 'settings_storage',
@@ -65,8 +65,8 @@ export const useSettingsStore = create<SettingsData & ExtraSettingsData & Action
           if (!error && state) {
             setTheme(state.theme);
           }
-        }
-      }
-    }
-  )
+        };
+      },
+    },
+  ),
 );

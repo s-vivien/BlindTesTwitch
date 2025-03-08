@@ -39,7 +39,7 @@ function App() {
       navigate('/');
     } else if (!settingsStore.isInitialized()) {
       navigate('/settings');
-    } else if (location.pathname === "/") {
+    } else if (location.pathname === '/') {
       if (btTotalTracks == 0) {
         navigate('/playlist');
       } else {
@@ -71,10 +71,10 @@ function App() {
           {globalStore.subtitle}
         </p>
       </header>
-      <div className={"app container"}>
+      <div className={'app container'}>
         {errorMessage &&
           <div className="alert-modal-bg">
-            <Alert className="alert-modal" variant="danger" >
+            <Alert className="alert-modal" variant="danger">
               <Alert.Heading>Error</Alert.Heading>
               <p>
                 Spotify server returned : {errorMessage}

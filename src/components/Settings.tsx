@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button } from "react-bootstrap";
+import { Button } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
-import { useNavigate } from "react-router-dom";
-import { getDevices } from "services/SpotifyAPI";
-import { useGlobalStore } from "./store/GlobalStore";
-import { TwitchMode, useSettingsStore } from "./store/SettingsStore";
+import { useNavigate } from 'react-router-dom';
+import { getDevices } from 'services/SpotifyAPI';
+import { useGlobalStore } from './store/GlobalStore';
+import { TwitchMode, useSettingsStore } from './store/SettingsStore';
 
 const Settings = () => {
 
@@ -27,12 +27,12 @@ const Settings = () => {
     globalStore.setSubtitle('Settings');
     getDevices().then(response => {
       setDevices(response.data.devices);
-      const found = response.data.devices.find((d: any) => d.id === settingsStore.deviceId)
+      const found = response.data.devices.find((d: any) => d.id === settingsStore.deviceId);
       if (found) {
-        setSelectedDevice(found.id)
+        setSelectedDevice(found.id);
       }
       setInitialized(true);
-    })
+    });
   }, []);
 
   const submit = (e: any) => {
@@ -47,10 +47,10 @@ const Settings = () => {
         acceptanceDelay: acceptanceDelay,
         scoreCommandMode: scoreCommandMode,
       });
-      navigate("/");
+      navigate('/');
     }
     setValidated(true);
-  }
+  };
 
   if (initialized) {
     return (
@@ -61,7 +61,7 @@ const Settings = () => {
 
           <Form.Group className="mb-3" controlId="formGroupDevice">
             <Form.Label>Spotify playing device</Form.Label>
-            <Form.Select required className="form-control" value={selectedDevice} onChange={(e) => { setSelectedDevice(e.target.value) }}>
+            <Form.Select required className="form-control" value={selectedDevice} onChange={(e) => { setSelectedDevice(e.target.value); }}>
               <option value="">Select device...</option>
               {devices.map((d) => <option key={d.id} value={d.id}>{d.name} ({d.type})</option>)}
             </Form.Select>
@@ -72,10 +72,10 @@ const Settings = () => {
             <Form.Label style={{ width: '100%', textAlign: 'center', marginTop: '-10px' }}><i>{acceptanceDelay} second{acceptanceDelay > 1 ? 's' : ''}</i></Form.Label>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formPreviewGuessNumber">
-            <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked) }} />
+            <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked); }} />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAddEveryUser">
-            <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked) }} />
+            <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked); }} />
           </Form.Group>
 
           <br></br>
@@ -83,28 +83,28 @@ const Settings = () => {
 
           <Form.Group className="mb-3" controlId="formGroupScoreCommandMode">
             <Form.Label>Score command mode (<i>!score</i>)</Form.Label>
-            <Form.Select required className="form-control" value={scoreCommandMode} onChange={(e) => { setScoreCommandMode(+(e.target.value)) }}>
+            <Form.Select required className="form-control" value={scoreCommandMode} onChange={(e) => { setScoreCommandMode(+(e.target.value)); }}>
               <option value={TwitchMode.Disabled}>Disabled</option>
               <option value={TwitchMode.Channel}>The bot will respond in the channel</option>
               <option value={TwitchMode.Whisper}>The bot will respond in DM</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupChatNotifications">
-            <Form.Check type="checkbox" checked={chatNotifications} label="Channel notifications (display guesses in the chat)" onChange={(e) => { setChatNotifications(e.target.checked) }} />
+            <Form.Check type="checkbox" checked={chatNotifications} label="Channel notifications (display guesses in the chat)" onChange={(e) => { setChatNotifications(e.target.checked); }} />
           </Form.Group>
 
-          <Button style={{ width: "80px" }} size="sm" className="mr-2" variant="primary" type="submit">
+          <Button style={{ width: '80px' }} size="sm" className="mr-2" variant="primary" type="submit">
             <b>Save</b>
           </Button>
-          <Button disabled={!settingsStore.isInitialized()} style={{ width: "80px" }} size="sm" className="mx-2" variant="secondary" onClick={() => navigate("/")}>
+          <Button disabled={!settingsStore.isInitialized()} style={{ width: '80px' }} size="sm" className="mx-2" variant="secondary" onClick={() => navigate('/')}>
             <b>Cancel</b>
           </Button>
         </Form>
       </div>
-    )
+    );
   } else {
-    return <div className="spinner"></div>
+    return <div className="spinner"></div>;
   }
-}
+};
 
-export default Settings
+export default Settings;

@@ -1,77 +1,77 @@
-import { instanceToPlain, plainToInstance } from 'class-transformer'
-import { createPKCECodes, PKCECodePair } from 'pkce'
+import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { createPKCECodes, PKCECodePair } from 'pkce';
 
 export const getAppHomeURL = () => {
   return new URL(window.location.href).origin + process.env.PUBLIC_URL;
-}
+};
 
 export const getQueryParam = (name: string) => {
   return getParam(name, window.location.search);
-}
+};
 
 export const getHashParam = (name: string) => {
   return getParam(name, window.location.hash);
-}
+};
 
 const getParam = (name: string, value: string) => {
-  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]")
-  var regex = new RegExp("[\\?&#]" + name + "=([^&#]*)"),
-    results = regex.exec(value)
-  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "))
-}
+  name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+  var regex = new RegExp('[\\?&#]' + name + '=([^&#]*)'),
+    results = regex.exec(value);
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
 
 export const computePkcePair = async () => {
   const codePair: PKCECodePair = await createPKCECodes();
-  localStorage.setItem("pkce_pair", JSON.stringify(instanceToPlain(codePair)));
+  localStorage.setItem('pkce_pair', JSON.stringify(instanceToPlain(codePair)));
   return codePair;
-}
+};
 
 export const consumePkcePair = () => {
-  const plain: PKCECodePair = JSON.parse(localStorage.getItem("pkce_pair") || "{}");
+  const plain: PKCECodePair = JSON.parse(localStorage.getItem('pkce_pair') || '{}');
   const codePair: PKCECodePair = plainToInstance(PKCECodePair, plain);
-  localStorage.removeItem("pkce_pair");
+  localStorage.removeItem('pkce_pair');
   return codePair;
-}
+};
 
 export const colors: string[] = ['#D23F9A', '#7FBB61', '#2C75C2', '#F2A83A', '#6456F1', '#19E3B2', '#FA6B4D', '#8C84D4', '#D3F721', '#4A4A47'];
 
 // light clean + trailing parts (- X || (X))
 export const cleanValue = (value: string) => {
-  return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, "")).trim();
-}
+  return cleanValueLight(value.replaceAll(/ \(.+\).*| \[.+\].*| -.+/g, '')).trim();
+};
 
 // lower-case + remove diacritic + remove some special characters
 export const cleanValueLight = (value: string) => {
   return value
     .toLowerCase()
-    .normalize("NFD")
-    .replaceAll(/\p{Diacritic}/gu, "")
-    .replaceAll(/[!?]+$/g, "")
-    .replaceAll(/^[!?]+/g, "")
-    .replaceAll(/ [!?]+/g, " ")
-    .replaceAll(/[!?]+ /g, " ")
-    .replaceAll(/[¿¡*,.’':_\/-]/g, "")
-    .replaceAll("œ", "oe")
-    .replaceAll(/[$]/g, "s")
-    .replaceAll(/[ø]/g, "o")
+    .normalize('NFD')
+    .replaceAll(/\p{Diacritic}/gu, '')
+    .replaceAll(/[!?]+$/g, '')
+    .replaceAll(/^[!?]+/g, '')
+    .replaceAll(/ [!?]+/g, ' ')
+    .replaceAll(/[!?]+ /g, ' ')
+    .replaceAll(/[¿¡*,.’':_\/-]/g, '')
+    .replaceAll('œ', 'oe')
+    .replaceAll(/[$]/g, 's')
+    .replaceAll(/[ø]/g, 'o')
     .trim();
-}
+};
 
 export const specialCharactersAlternatives = new Map<RegExp, string[]>([
-  [/ & /g, [" and ", " et "]],
-  [/ \+ /g, [" and ", " et "]],
-  [/^the /g, [""]],
+  [/ & /g, [' and ', ' et ']],
+  [/ \+ /g, [' and ', ' et ']],
+  [/^the /g, ['']],
 ]);
 
 export const cleanSpoiler = (title: string, artists: string[]) => {
   let cleaned = title;
   for (let artist of artists) {
     var escapedArtist = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    var regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, "gi");
-    cleaned = cleaned.replaceAll(regExp, "").trim();
+    var regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, 'gi');
+    cleaned = cleaned.replaceAll(regExp, '').trim();
   }
   return cleaned;
-}
+};
 
 // ref, input
 export const sorensenDiceScore = (first: string, second: string) => {
@@ -98,7 +98,8 @@ export const sorensenDiceScore = (first: string, second: string) => {
       const altCount = firstAltBigrams.has(altBigram) ? firstAltBigrams.get(altBigram) + 1 : 1;
       firstAltBigrams.set(altBigram, altCount);
     }
-  };
+  }
+  ;
 
   let intersectionSize = 0;
   const altRatio = Math.max(0.2, 1.0 - 0.05 * first.length);
@@ -132,4 +133,4 @@ export const sorensenDiceScore = (first: string, second: string) => {
   }
 
   return (2.0 * intersectionSize) / (first.length + second.length - 2);
-}
+};

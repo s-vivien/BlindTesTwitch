@@ -1,5 +1,5 @@
-import { getUsers, setDefaultAuth, validateToken } from "services/TwitchAPI";
-import { create } from "zustand";
+import { getUsers, setDefaultAuth, validateToken } from 'services/TwitchAPI';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type AuthData = {
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthData & Actions>()(
           spotifyRefreshToken: undefined,
           spotifyAccessToken: undefined,
           twitchOauthToken: undefined,
-          spotifyUserCountry: undefined
+          spotifyUserCountry: undefined,
         });
       },
       deleteTwitchOAuthToken: () => {
@@ -92,7 +92,7 @@ export const useAuthStore = create<AuthData & Actions>()(
       isLoggedIn: (): boolean => {
         const current = get();
         return current.twitchOauthToken !== undefined && current.spotifyRefreshToken !== undefined;
-      }
+      },
     }),
     {
       name: 'auth_data',
@@ -100,6 +100,6 @@ export const useAuthStore = create<AuthData & Actions>()(
         Object.fromEntries(
           Object.entries(state).filter(([key]) => !['twitchNick'].includes(key)),
         ),
-    }
-  )
+    },
+  ),
 );

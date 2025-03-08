@@ -1,9 +1,9 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useState } from "react"
-import { Button, Modal } from "react-bootstrap"
-import TracksBaseData from "./data/TracksBaseData"
-import { useBTTracksStore } from "./store/BlindTestTracksStore"
-import { usePlayerStore } from "./store/PlayerStore"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
+import TracksBaseData from './data/TracksBaseData';
+import { useBTTracksStore } from './store/BlindTestTracksStore';
+import { usePlayerStore } from './store/PlayerStore';
 
 const PlaylistSelectionRow = (props: any) => {
 
@@ -17,7 +17,7 @@ const PlaylistSelectionRow = (props: any) => {
     } else {
       loadPlaylist(false);
     }
-  }
+  };
 
   const loadPlaylist = async (keepScores: boolean) => {
     if (!keepScores) {
@@ -26,13 +26,13 @@ const PlaylistSelectionRow = (props: any) => {
     let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     btStore.setTracksFromRaw(tracks.filter(t => t.track.is_playable));
     btStore.backup();
-  }
+  };
 
   const renderTickCross = (condition: boolean) => {
     if (condition) {
-      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{ color: "green" }} />
+      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{ color: 'green' }} />;
     } else {
-      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{ color: "red" }} />
+      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{ color: 'red' }} />;
     }
   };
 
@@ -57,13 +57,13 @@ const PlaylistSelectionRow = (props: any) => {
           Do you want to reset the leaderboard scores ?
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
+          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
             <b>Yes</b>
           </Button>
-          <Button style={{ width: "65px" }} size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
+          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
             <b>No</b>
           </Button>
-          <Button style={{ width: "65px" }} size="sm" variant="secondary" onClick={() => setConfirmationDisplayed(false)}>
+          <Button style={{ width: '65px' }} size="sm" variant="secondary" onClick={() => setConfirmationDisplayed(false)}>
             <b>Cancel</b>
           </Button>
         </Modal.Footer>
@@ -85,4 +85,4 @@ const PlaylistSelectionRow = (props: any) => {
   );
 };
 
-export default PlaylistSelectionRow
+export default PlaylistSelectionRow;

@@ -1,5 +1,5 @@
 import PlaylistEdition from './PlaylistEdition';
-import PlaylistSelection from "./PlaylistSelection";
+import PlaylistSelection from './PlaylistSelection';
 import { useBTTracksStore } from './store/BlindTestTracksStore';
 
 const Playlist = () => {
@@ -9,7 +9,7 @@ const Playlist = () => {
 
   const restart = () => {
     btStoreClear();
-  }
+  };
 
   return (
     <div>
@@ -19,6 +19,6 @@ const Playlist = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Playlist
+export default Playlist;

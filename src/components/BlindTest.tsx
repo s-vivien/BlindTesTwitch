@@ -1,15 +1,16 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { AnimatePresence, motion } from "framer-motion"
-import { cleanValueLight, colors, sorensenDiceScore } from "helpers"
-import { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, FormControl } from "react-bootstrap"
-import { Client, Options } from "tmi.js"
-import { launchTrack, setRepeatMode } from "../services/SpotifyAPI"
-import { useAuthStore } from "./store/AuthStore"
-import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from "./store/BlindTestTracksStore"
-import { useGlobalStore } from "./store/GlobalStore"
-import { usePlayerStore } from "./store/PlayerStore"
-import { TwitchMode, useSettingsStore } from "./store/SettingsStore"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { AnimatePresence, motion } from 'framer-motion';
+import { cleanValueLight, sorensenDiceScore } from 'helpers';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Dropdown, FormControl } from 'react-bootstrap';
+import { Client, Options } from 'tmi.js';
+import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
+import { useAuthStore } from './store/AuthStore';
+import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from './store/BlindTestTracksStore';
+import { useGlobalStore } from './store/GlobalStore';
+import { usePlayerStore } from './store/PlayerStore';
+import { TwitchMode, useSettingsStore } from './store/SettingsStore';
+import TwitchAvatar from './TwitchAvatar';
 
 type DisplayableScore = {
   nick: string,
@@ -30,7 +31,7 @@ type Guess = {
   guessedBy: Guesser[]
 };
 
-let twitchCallback: (nick: string, tid: string, msg: string) => void = () => { };
+let twitchCallback: (nick: string, tid: string, msg: string) => void = () => {};
 
 const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
@@ -64,13 +65,13 @@ const BlindTest = () => {
       twitchConnection(twitchNick, settings.chatNotifications);
       return () => {
         twitchDisconnection();
-      }
+      };
     }
   }, [twitchNick]);
 
   useEffect(() => {
     if (playing && !currentTrack?.done) {
-      globalStore.setSubtitle(`Playing song #${btStore.doneTracks + 1} out of ${btStore.tracks.length}`)
+      globalStore.setSubtitle(`Playing song #${btStore.doneTracks + 1} out of ${btStore.tracks.length}`);
     } else if (btStore.tracks.length - btStore.doneTracks > 0) {
       globalStore.setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
@@ -79,18 +80,18 @@ const BlindTest = () => {
   }, [btStore.tracks.length, playing, btStore.doneTracks]);
 
   useEffect(() => {
-    let flat: DisplayableScore[] = []
+    let flat: DisplayableScore[] = [];
     for (const _key of Object.keys(playerStore.players)) {
       const _val = playerStore.players[_key];
       flat.push({
         nick: _key,
         score: _val.score,
         tid: _val.tid,
-        avatar: _val.avatar
-      })
+        avatar: _val.avatar,
+      });
     }
-    flat.sort((a, b) => a.nick.localeCompare(b.nick))
-    flat.sort((a, b) => b.score - a.score)
+    flat.sort((a, b) => a.nick.localeCompare(b.nick));
+    flat.sort((a, b) => b.score - a.score);
     if (nickFilter) {
       flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
     }
@@ -111,47 +112,47 @@ const BlindTest = () => {
     if (twitchClient.current !== null) {
       twitchClient.current.disconnect();
     }
-  }
+  };
 
   const twitchConnection = (chan: string, chatNotifications: boolean) => {
     let opts: Options = {
       options: {
-        skipUpdatingEmotesets: true
+        skipUpdatingEmotesets: true,
       },
-      channels: [chan]
+      channels: [chan],
     };
     if (chatNotifications) {
       opts.identity = {
         username: 'foo',
-        password: twitchToken || ""
-      }
+        password: twitchToken || '',
+      };
     }
     twitchClient.current = new Client(opts);
     twitchClient.current.connect();
     twitchClient.current.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
       if (_self) return;
-      if (_tags['message-type'] !== "whisper") {
+      if (_tags['message-type'] !== 'whisper') {
         return twitchCallback(_tags['display-name'], _tags['user-id'], _message);
       }
     });
-  }
+  };
 
   const backupState = () => {
     btStore.backup();
     playerStore.backup();
-  }
+  };
 
   const cancelLastTrackPoints = () => {
     playerStore.setScores(scoresBackup.current);
     playerStore.backup();
-  }
+  };
 
   const onProposition = (nick: string, tid: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
     if (settings.addEveryUser && !playerStore.players[nick]) {
       playerStore.initPlayer(nick, tid);
     }
-    if (message === "!score") {
+    if (message === '!score') {
       if (settings.scoreCommandMode !== TwitchMode.Disabled) {
         const rank = leaderboardRows.find(row => row.nick === nick);
         if (rank !== undefined) {
@@ -163,7 +164,7 @@ const BlindTest = () => {
         }
       }
     } else if (playing && currentTrack !== null) {
-      const proposition = cleanValueLight(message)
+      const proposition = cleanValueLight(message);
       for (let i = 0; i < currentTrack.guessables.length; i++) {
         const guess = guesses[i];
         if (guess.guessed) continue; // guess is no longer active
@@ -193,7 +194,7 @@ const BlindTest = () => {
         if (matched) break;
       }
     }
-  }
+  };
   twitchCallback = onProposition;
 
   const endGuess = (index: number, delayed: boolean) => {
@@ -210,11 +211,11 @@ const BlindTest = () => {
     if (delayed) {
       playerStore.addMultiplePoints(delayedPoints.current[index]);
     }
-  }
+  };
 
   const addPointToPlayer = (nick: string, points: number) => {
     playerStore.addPoints(nick, points);
-  }
+  };
 
   const updateGuessState = (index: number, nick: string, points: number) => {
     setGuesses(guesses => {
@@ -236,11 +237,11 @@ const BlindTest = () => {
       }
       return newGuesses;
     });
-  }
+  };
 
   const allGuessed = () => {
     return playing && guesses.reduce((prev, curr) => prev && curr.guessed, true);
-  }
+  };
 
   const triggerTimeouts = () => {
     for (let index = 0; index < guessTimeouts.current.length; index++) {
@@ -250,7 +251,7 @@ const BlindTest = () => {
         guessTimeouts.current[index] = undefined;
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (currentTrack && !currentTrack.done && allGuessed()) {
@@ -264,7 +265,7 @@ const BlindTest = () => {
       btStore.incrementDoneTracks();
       backupState();
     }
-  }
+  };
 
   const handleReveal = () => {
     if (currentTrack && !currentTrack.done) {
@@ -274,7 +275,7 @@ const BlindTest = () => {
       setGuesses(newGuesses);
       endSong();
     }
-  }
+  };
 
   const handleNextSong = async () => {
     handleReveal();
@@ -300,11 +301,11 @@ const BlindTest = () => {
     }).catch(() => {
       setLoading(false);
     });
-  }
+  };
 
   const toggleShuffle = () => {
     setShuffled(!shuffled);
-  }
+  };
 
   const CrossEmoji = <FontAwesomeIcon color="#de281b" icon={['fas', 'times']} size="lg" />;
   const BubbleEmoji = <FontAwesomeIcon icon={['far', 'comment']} size="lg" />;
@@ -312,8 +313,8 @@ const BlindTest = () => {
   const LockEmoji = <FontAwesomeIcon color="var(--icon-blue-color)" icon={['fas', 'lock']} size="lg" />;
 
   const GuessableView = (props: any) => {
-    const guessable: Guessable = props.guessable
-    const guess: Guess = props.guess
+    const guessable: Guessable = props.guessable;
+    const guess: Guess = props.guess;
     if (guess.guessed) {
       return <div className="mb-3">
         <div className="bt-guess" title={guessable.toGuess[0]}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? LockEmoji : CrossEmoji)} {guessable.original}</div>
@@ -321,49 +322,39 @@ const BlindTest = () => {
           <div className="bt-gb">
             {BubbleEmoji}&nbsp;
             {guess.guessedBy.slice(0, DISPLAYED_GUESS_NICK_LIMIT).map((gb, i) => {
-              return <span key={"gb_" + i}>
+              return <span key={'gb_' + i}>
                 {i > 0 && <>, </>}
                 {gb.nick} <b>[+{gb.points}]</b>
-              </span>
+              </span>;
             })}
             {guess.guessedBy.length > DISPLAYED_GUESS_NICK_LIMIT && <span>, and {guess.guessedBy.length - DISPLAYED_GUESS_NICK_LIMIT} more</span>}
           </div>
         }
-      </div>
+      </div>;
     } else if (guess.guessedBy.length > 0 && settings.previewGuessNumber) {
       return <div className="mb-3">
-        {CheckEmoji}<div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
-      </div>
+        {CheckEmoji}
+        <div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
+      </div>;
     } else {
       return <div className="mb-3">
-        {CrossEmoji}<div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
-      </div>
+        {CrossEmoji}
+        <div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
+      </div>;
     }
-  }
-
-  const computeDomAvatar = (displayable: DisplayableScore) => {
-    if (displayable.avatar) {
-      return <img className="avatar" src={displayable.avatar} onError={({ currentTarget }) => {
-        currentTarget.onerror = null;
-        currentTarget.src = "/BlindTesTwitch/avatar.png";
-      }}
-        style={{ backgroundColor: colors[(+displayable.tid) % colors.length] }}></img>
-    } else {
-      return <div className="avatar" style={{ backgroundColor: colors[(+displayable.tid) % colors.length] }}></div>
-    }
-  }
+  };
 
   return (
     <div id="blindtest">
       <div className="row mb-4">
         <div className="col-md-8">
-          <div className="p-3 mb-2 bt-left-panel border rounded-3" >
+          <div className="p-3 mb-2 bt-left-panel border rounded-3">
             <div id="cover" className="cover ">
               {allGuessed() &&
                 <img id="cover-image" src={currentTrack?.img} alt="cover" />
               }
               {(playing || loading) && !allGuessed() &&
-                <img src='/BlindTesTwitch/audio-wave.svg' />
+                <img src="/BlindTesTwitch/audio-wave.svg" />
               }
               {!playing && !loading &&
                 <FontAwesomeIcon icon={['fas', 'volume-mute']} size="sm" />
@@ -372,7 +363,7 @@ const BlindTest = () => {
             {playing && currentTrack !== null &&
               <div style={{ flex: 1 }}>
                 {getGuessables(currentTrack, GuessableType.Title).length > 0 &&
-                  <div className="px-3 pb-3" >
+                  <div className="px-3 pb-3">
                     <div className="bt-h">
                       <h2>TITLE</h2>
                     </div>
@@ -382,25 +373,25 @@ const BlindTest = () => {
                   </div>
                 }
                 {getGuessables(currentTrack, GuessableType.Artist).length > 0 &&
-                  <div className="px-3 pb-3" >
+                  <div className="px-3 pb-3">
                     <div className="bt-h">
                       <h2>ARTIST(S)</h2>
                     </div>
                     <div>
                       {mapGuessables(currentTrack, GuessableType.Artist, (guessable: Guessable, index: number) => {
-                        return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
+                        return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
                       })}
                     </div>
                   </div>
                 }
                 {getGuessables(currentTrack, GuessableType.Misc).length > 0 &&
-                  <div className="px-3 mb-2" >
+                  <div className="px-3 mb-2">
                     <div className="bt-h">
                       <h2>MISC</h2>
                     </div>
                     <div>
                       {mapGuessables(currentTrack, GuessableType.Misc, (guessable: Guessable, index: number) => {
-                        return <GuessableView key={"guess_" + index} guessable={guessable} guess={guesses[index]} />
+                        return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
                       })}
                     </div>
                   </div>
@@ -414,7 +405,7 @@ const BlindTest = () => {
         </div>
         <div className="col-md-4">
           <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: "35px" }}>
+            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
               <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
             </Button>
             &nbsp;
@@ -427,7 +418,7 @@ const BlindTest = () => {
             </Button>
             &nbsp;
             <Dropdown>
-              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: "35px" }}>
+              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: '35px' }}>
                 <FontAwesomeIcon icon={['fas', 'ellipsis']} color="var(--spot-color)" size="lg" />
               </Dropdown.Toggle>
               <Dropdown.Menu>
@@ -437,63 +428,63 @@ const BlindTest = () => {
 
           </div>
           <div id="leaderboard" className="p-3 bt-panel border rounded-3">
-            <FormControl value={nickFilter} className={"mb-2"} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
+            <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
             <table className="table-hover bt-t">
               <thead>
-                <tr>
-                  <th style={{ width: "10%", textAlign: 'center' }}>#</th>
-                  <th style={{ width: "12%" }}></th>
-                  <th style={{ width: "61%" }}>Nick</th>
-                  <th style={{ width: "17%", textAlign: 'center' }}>Score</th>
-                </tr>
+              <tr>
+                <th style={{ width: '10%', textAlign: 'center' }}>#</th>
+                <th style={{ width: '12%' }}></th>
+                <th style={{ width: '61%' }}>Nick</th>
+                <th style={{ width: '17%', textAlign: 'center' }}>Score</th>
+              </tr>
               </thead>
               <tbody>
-                <AnimatePresence>
-                  {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
-                    <motion.tr
-                      key={sc.nick}
-                      className="leaderboard-row"
-                      initial={{ opacity: 0, top: -20 }}
-                      animate={{ opacity: 1, top: 0 }}
-                      exit={{ opacity: 0, top: 20 }}
-                      transition={{ duration: 0.3 }}
-                      layout="position"
-                    >
-                      <td style={{ textAlign: 'center' }}>
-                        <span>{sc.displayedRank}</span>
-                      </td>
-                      <td>
-                        {computeDomAvatar(sc)}
-                      </td>
-                      <td style={{ position: "relative" }}>
-                        <span className="leaderboard-nick">{sc.nick}</span>
-                        <div className="leaderboard-buttons">
-                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
-                            <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
-                          </Button>
-                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
-                            <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
-                          </Button>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <span>{sc.score}</span>
-                      </td>
-                    </motion.tr>
-                  ))}
-                  {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
-                    <tr style={{ textAlign: "center" }}>
-                      <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
-                    </tr>
-                  }
-                </AnimatePresence>
+              <AnimatePresence>
+                {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
+                  <motion.tr
+                    key={sc.nick}
+                    className="leaderboard-row"
+                    initial={{ opacity: 0, top: -20 }}
+                    animate={{ opacity: 1, top: 0 }}
+                    exit={{ opacity: 0, top: 20 }}
+                    transition={{ duration: 0.3 }}
+                    layout="position"
+                  >
+                    <td style={{ textAlign: 'center' }}>
+                      <span>{sc.displayedRank}</span>
+                    </td>
+                    <td>
+                      <TwitchAvatar tid={sc.tid} avatar={sc.avatar} className="leaderboard-avatar" />
+                    </td>
+                    <td style={{ position: 'relative' }}>
+                      <span className="leaderboard-nick">{sc.nick}</span>
+                      <div className="leaderboard-buttons">
+                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
+                          <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
+                        </Button>
+                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
+                          <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
+                        </Button>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <span>{sc.score}</span>
+                    </td>
+                  </motion.tr>
+                ))}
+                {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
+                  <tr style={{ textAlign: 'center' }}>
+                    <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
+                  </tr>
+                }
+              </AnimatePresence>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
-}
+};
 
-export default BlindTest
+export default BlindTest;

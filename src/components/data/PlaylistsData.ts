@@ -1,4 +1,4 @@
-import { getPlaylists } from "services/SpotifyAPI"
+import { getPlaylists } from 'services/SpotifyAPI';
 
 // Handles cached loading of all or subsets of playlist data
 class PlaylistsData {

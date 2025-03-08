@@ -1,17 +1,17 @@
-import { getHashParam, getQueryParam } from "helpers";
+import { getHashParam, getQueryParam } from 'helpers';
 import { useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import instance, { getUserProfile, retrieveAccessToken } from 'services/SpotifyAPI';
-import { useAuthStore } from "./store/AuthStore";
+import { useAuthStore } from './store/AuthStore';
 
 const LoginCallback = () => {
 
   const authStore = useAuthStore();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const twitchToken = getHashParam('access_token')
-    const spotifyCode = getQueryParam('code')
+    const twitchToken = getHashParam('access_token');
+    const spotifyCode = getQueryParam('code');
 
     if (twitchToken) { // Twitch logging callback
       authStore.setTwitchOAuthToken(twitchToken);
@@ -24,14 +24,14 @@ const LoginCallback = () => {
         getUserProfile().then(response => {
           authStore.setSpotifyUserCountry(response.data.country);
         });
-      })
+      });
     }
-    navigate("/");
+    navigate('/');
   }, [navigate]);
 
   return (
     <div className="spinner"></div>
-  )
-}
+  );
+};
 
-export default LoginCallback
+export default LoginCallback;

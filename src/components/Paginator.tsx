@@ -1,21 +1,21 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button } from 'react-bootstrap';
 
 const Paginator = (props: any) => {
 
   const nextClick = (e: any) => {
-    e.preventDefault()
+    e.preventDefault();
     props.onPageChanged(props.currentPage + 1);
-  }
+  };
 
   const prevClick = (e: any) => {
-    e.preventDefault()
+    e.preventDefault();
     props.onPageChanged(props.currentPage - 1);
-  }
+  };
 
   const totalPages = () => {
     return Math.ceil(props.totalRecords / props.pageLimit);
-  }
+  };
 
   return (
     <div className="mr-2">
@@ -26,7 +26,7 @@ const Paginator = (props: any) => {
         <FontAwesomeIcon icon={['fas', 'chevron-right']} size="sm" />
       </Button>
     </div>
-  )
-}
+  );
+};
 
 export default Paginator;

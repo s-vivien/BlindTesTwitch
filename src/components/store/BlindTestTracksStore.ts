@@ -1,8 +1,8 @@
-import { instanceToPlain, plainToInstance } from "class-transformer";
-import { cleanSpoiler, cleanValue, specialCharactersAlternatives } from "helpers";
-import { create } from "zustand";
+import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { cleanSpoiler, cleanValue, specialCharactersAlternatives } from 'helpers';
+import { create } from 'zustand';
 
-const localStorageKey: string = "blind_test_tracks_storage";
+const localStorageKey: string = 'blind_test_tracks_storage';
 
 export enum GuessableState {
   Enabled = 0,
@@ -48,7 +48,7 @@ type Actions = {
 // storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
 
 // restore persisted state for initialization
-const plain: BlindTestTracks = JSON.parse(localStorage.getItem(localStorageKey) || "{}");
+const plain: BlindTestTracks = JSON.parse(localStorage.getItem(localStorageKey) || '{}');
 const restoredState = plainToInstance(BlindTestTracks, plain);
 
 export const useBTTracksStore = create<BlindTestTracks & Actions>()(
@@ -61,7 +61,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
       const backedUp = {
         tracks: current.tracks,
         doneTracks: current.doneTracks,
-        totalTracks: current.totalTracks
+        totalTracks: current.totalTracks,
       };
       localStorage.setItem(localStorageKey, JSON.stringify(instanceToPlain(backedUp)));
     },
@@ -79,7 +79,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
           done: false,
           guessables: [computeGuessable(title, GuessableType.Title), ...t.artists.map((a: { name: string }) => computeGuessable(a.name, GuessableType.Artist))],
           track_uri: t.uri,
-          img: t.album.images[0]?.url || ""
+          img: t.album.images[0]?.url || '',
         });
       }
       set({ tracks: tracks, totalTracks: tracks.length, doneTracks: 0 });
@@ -89,7 +89,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
         const updatedTracks = state.tracks;
         updatedTracks[index] = track;
         return { tracks: updatedTracks };
-      })
+      });
     },
     getNextTrack: (shuffled: boolean) => {
       const leftTracks = get().tracks.filter(t => !t.done);
@@ -97,8 +97,8 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
     },
     incrementDoneTracks: () => {
       set((state) => ({ doneTracks: state.doneTracks + 1 }));
-    }
-  })
+    },
+  }),
 );
 
 export const mapGuessables = <U>(track: BlindTestTrack, type: GuessableType, callbackfn: (value: Guessable, index: number) => U): U[] => {
@@ -110,11 +110,11 @@ export const mapGuessables = <U>(track: BlindTestTrack, type: GuessableType, cal
     }
   }
   return values;
-}
+};
 
 export const getGuessables = (track: BlindTestTrack, type: GuessableType, filterDisabled: boolean = true): Guessable[] => {
   return (track.guessables.filter(e => e.type === type && (!filterDisabled || e.state !== GuessableState.DisabledHidden)) || []);
-}
+};
 
 export const computeGuessable = (value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled): Guessable => {
   let cleaned = [cleanValue(value)];
@@ -129,6 +129,6 @@ export const computeGuessable = (value: string, type: GuessableType, state: Gues
     original: value,
     toGuess: cleaned,
     state: state,
-    type: type
+    type: type,
   };
-}
+};
