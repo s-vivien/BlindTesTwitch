@@ -1,8 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AnimatePresence, motion } from 'framer-motion';
 import { cleanValueLight, sorensenDiceScore } from 'helpers';
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Dropdown, FormControl } from 'react-bootstrap';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
 import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
 import { useAuthStore } from './store/AuthStore';
@@ -11,16 +10,7 @@ import { useGlobalStore } from './store/GlobalStore';
 import { usePlayerStore } from './store/PlayerStore';
 import { TwitchMode, useSettingsStore } from './store/SettingsStore';
 import Podium from './Podium';
-import TwitchAvatar from './TwitchAvatar';
-
-type DisplayableScore = {
-  nick: string,
-  rank?: number,
-  displayedRank?: number,
-  score: number,
-  tid: string,
-  avatar?: string
-};
+import Leaderboard from './Leaderboard';
 
 type Guesser = {
   nick: string,
@@ -34,7 +24,6 @@ type Guess = {
 
 let twitchCallback: (nick: string, tid: string, msg: string) => void = () => {};
 
-const DISPLAYED_USER_LIMIT = 150;
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
 const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 
@@ -53,8 +42,6 @@ const BlindTest = () => {
   const twitchToken = useAuthStore((state) => state.twitchOauthToken);
   const globalStore = useGlobalStore();
 
-  const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
-  const [nickFilter, setNickFilter] = useState('');
   const [isFinished, setFinished] = useState(false);
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -83,34 +70,6 @@ const BlindTest = () => {
       setFinished(true);
     }
   }, [btStore.tracks.length, playing, btStore.doneTracks]);
-
-  useEffect(() => {
-    let flat: DisplayableScore[] = [];
-    for (const _key of Object.keys(playerStore.players)) {
-      const _val = playerStore.players[_key];
-      flat.push({
-        nick: _key,
-        score: _val.score,
-        tid: _val.tid,
-        avatar: _val.avatar,
-      });
-    }
-    flat.sort((a, b) => a.nick.localeCompare(b.nick));
-    flat.sort((a, b) => b.score - a.score);
-    if (nickFilter) {
-      flat = flat.filter(s => s.nick.toLowerCase().includes(nickFilter));
-    }
-    // Display rank only for the first of each group
-    let lastRankGroup = 1;
-    for (let i = 0; i < flat.length; i++) {
-      if (i === 0 || flat[i].score !== flat[i - 1].score) {
-        lastRankGroup = i + 1;
-        flat[i].displayedRank = lastRankGroup;
-      }
-      flat[i].rank = lastRankGroup;
-    }
-    setLeaderboardRows(flat);
-  }, [nickFilter, playerStore]);
 
   const twitchDisconnection = () => {
     console.log('Disconnecting from Twitch...');
@@ -159,12 +118,12 @@ const BlindTest = () => {
     }
     if (message === '!score') {
       if (settings.scoreCommandMode !== TwitchMode.Disabled) {
-        const rank = leaderboardRows.find(row => row.nick === nick);
-        if (rank !== undefined) {
+        const player = playerStore.players[nick];
+        if (player !== undefined) {
           if (settings.scoreCommandMode === TwitchMode.Whisper) {
-            twitchClient.current?.whisper(nick, `You are #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+            twitchClient.current?.whisper(nick, `You are #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
           } else if (twitchNick) {
-            twitchClient.current?.say(twitchNick, `@${nick} is #${rank.rank} [${rank.score} point${rank.score > 1 ? 's' : ''}]`);
+            twitchClient.current?.say(twitchNick, `@${nick} is #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
           }
         }
       }
@@ -223,9 +182,9 @@ const BlindTest = () => {
     }
   };
 
-  const addPointToPlayer = (nick: string, points: number) => {
+  const addPointToPlayer = useCallback((nick: string, points: number) => {
     playerStore.addPoints(nick, points);
-  };
+  }, []);
 
   const updateGuessState = (index: number, nick: string, points: number) => {
     setGuesses(guesses => {
@@ -434,7 +393,7 @@ const BlindTest = () => {
               }
               {isFinished &&
                 <>
-                  <Button className="col-sm" id="podiumButton" disabled={leaderboardRows.find(row => row.score > 0) === undefined} type="submit" size="sm" onClick={() => setPodiumDisplayed(true)}>
+                  <Button className="col-sm" id="podiumButton" type="submit" size="sm" onClick={() => setPodiumDisplayed(true)}>
                     <FontAwesomeIcon icon={['fas', 'crown']} color="var(--spot-color)" size="lg" /> <b>SHOW PODIUM</b>
                   </Button>
                 </>
@@ -451,60 +410,7 @@ const BlindTest = () => {
               </Dropdown>
 
             </div>
-            <div id="leaderboard" className="p-3 bt-panel border rounded-3">
-              <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
-              <table className="table-hover bt-t">
-                <thead>
-                <tr>
-                  <th style={{ width: '10%', textAlign: 'center' }}>#</th>
-                  <th style={{ width: '12%' }}></th>
-                  <th style={{ width: '61%' }}>Nick</th>
-                  <th style={{ width: '17%', textAlign: 'center' }}>Score</th>
-                </tr>
-                </thead>
-                <tbody>
-                <AnimatePresence>
-                  {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
-                    <motion.tr
-                      key={sc.nick}
-                      className="leaderboard-row"
-                      initial={{ opacity: 0, top: -20 }}
-                      animate={{ opacity: 1, top: 0 }}
-                      exit={{ opacity: 0, top: 20 }}
-                      transition={{ duration: 0.3 }}
-                      layout="position"
-                    >
-                      <td style={{ textAlign: 'center' }}>
-                        <span>{sc.displayedRank}</span>
-                      </td>
-                      <td>
-                        <TwitchAvatar tid={sc.tid} avatar={sc.avatar} className="leaderboard-avatar" />
-                      </td>
-                      <td style={{ position: 'relative' }}>
-                        <span className="leaderboard-nick">{sc.nick}</span>
-                        <div className="leaderboard-buttons">
-                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
-                            <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
-                          </Button>
-                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
-                            <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
-                          </Button>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <span>{sc.score}</span>
-                      </td>
-                    </motion.tr>
-                  ))}
-                  {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
-                    <tr style={{ textAlign: 'center' }}>
-                      <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
-                    </tr>
-                  }
-                </AnimatePresence>
-                </tbody>
-              </table>
-            </div>
+            <Leaderboard addPointFunction={addPointToPlayer}></Leaderboard>
           </div>
         </div>
       </div>
