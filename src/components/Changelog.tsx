@@ -6,6 +6,16 @@ const Changelog = ({ show, onClose }: any) => {
   return (
     <Modal scrollable={true} show={show} centered size="lg" dialogClassName="changelog-modal">
       <Modal.Body>
+        <h3><u>10/03/2025</u></h3>
+        <br />
+        <h5 className="h5-with-line">End-game podium</h5>
+        <br />
+        <img src="/BlindTesTwitch/chglg_3.png" className="border" />
+        <br />
+        <ul>
+          <li>Podium display at the end of the game</li>
+        </ul>
+        <br />
         <h3><u>16/12/2024</u></h3>
         <br />
         <h5 className="h5-with-line">UI rework</h5>

@@ -10,6 +10,7 @@ import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType
 import { useGlobalStore } from './store/GlobalStore';
 import { usePlayerStore } from './store/PlayerStore';
 import { TwitchMode, useSettingsStore } from './store/SettingsStore';
+import Podium from './Podium';
 import TwitchAvatar from './TwitchAvatar';
 
 type DisplayableScore = {
@@ -53,11 +54,13 @@ const BlindTest = () => {
 
   const [leaderboardRows, setLeaderboardRows] = useState<DisplayableScore[]>([]);
   const [nickFilter, setNickFilter] = useState('');
+  const [isFinished, setFinished] = useState(false);
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [shuffled, setShuffled] = useState(false);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
+  const [podiumDisplayed, setPodiumDisplayed] = useState(false);
 
   useEffect(() => {
     if (twitchNick) {
@@ -76,6 +79,7 @@ const BlindTest = () => {
       globalStore.setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
       globalStore.setSubtitle('Blind-test is finished !');
+      setFinished(true);
     }
   }, [btStore.tracks.length, playing, btStore.doneTracks]);
 
@@ -170,7 +174,7 @@ const BlindTest = () => {
         if (guess.guessed) continue; // guess is no longer active
         if (guess.guessedBy.find((g) => g.nick === nick)) continue; // the player already guessed this item
         const guessable = currentTrack.guessables[i];
-        var matched = false;
+        let matched = false;
         for (const toGuess of guessable.toGuess) {
           const d = sorensenDiceScore(toGuess, proposition);
           // console.log(`[${toGuess}] [${proposition}] ${d}`);
@@ -345,145 +349,160 @@ const BlindTest = () => {
   };
 
   return (
-    <div id="blindtest">
-      <div className="row mb-4">
-        <div className="col-md-8">
-          <div className="p-3 mb-2 bt-left-panel border rounded-3">
-            <div id="cover" className="cover ">
-              {allGuessed() &&
-                <img id="cover-image" src={currentTrack?.img} alt="cover" />
-              }
-              {(playing || loading) && !allGuessed() &&
-                <img src="/BlindTesTwitch/audio-wave.svg" />
-              }
-              {!playing && !loading &&
-                <FontAwesomeIcon icon={['fas', 'volume-mute']} size="sm" />
-              }
-            </div>
-            {playing && currentTrack !== null &&
-              <div style={{ flex: 1 }}>
-                {getGuessables(currentTrack, GuessableType.Title).length > 0 &&
-                  <div className="px-3 pb-3">
-                    <div className="bt-h">
-                      <h2>TITLE</h2>
-                    </div>
-                    <div>
-                      <GuessableView key="guess_0" guessable={currentTrack.guessables[0]} guess={guesses[0]} />
-                    </div>
-                  </div>
+    <>
+      <div id="blindtest">
+        <div className="row mb-4">
+          <div className="col-md-8">
+            <div className="p-3 mb-2 bt-left-panel border rounded-3">
+              <div id="cover" className="cover ">
+                {allGuessed() &&
+                  <img id="cover-image" src={currentTrack?.img} alt="cover" />
                 }
-                {getGuessables(currentTrack, GuessableType.Artist).length > 0 &&
-                  <div className="px-3 pb-3">
-                    <div className="bt-h">
-                      <h2>ARTIST(S)</h2>
-                    </div>
-                    <div>
-                      {mapGuessables(currentTrack, GuessableType.Artist, (guessable: Guessable, index: number) => {
-                        return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
-                      })}
-                    </div>
-                  </div>
+                {(playing || loading) && !allGuessed() &&
+                  <img src="/BlindTesTwitch/audio-wave.svg" />
                 }
-                {getGuessables(currentTrack, GuessableType.Misc).length > 0 &&
-                  <div className="px-3 mb-2">
-                    <div className="bt-h">
-                      <h2>MISC</h2>
-                    </div>
-                    <div>
-                      {mapGuessables(currentTrack, GuessableType.Misc, (guessable: Guessable, index: number) => {
-                        return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
-                      })}
-                    </div>
-                  </div>
+                {!playing && !loading &&
+                  <FontAwesomeIcon icon={['fas', 'volume-mute']} size="sm" />
                 }
               </div>
-            }
-            {!playing && !loading &&
-              <div style={{ margin: 'auto', color: 'grey' }}><i>Click NEXT to start playing</i></div>
-            }
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-            <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
-              <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
-            </Button>
-            &nbsp;
-            <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length || (playing && !allGuessed())} type="submit" size="sm" onClick={handleNextSong}>
-              <FontAwesomeIcon icon={['fas', 'step-forward']} color="var(--spot-color)" size="lg" /> <b>NEXT</b>
-            </Button>
-            &nbsp;
-            <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
-              <FontAwesomeIcon icon={['fas', 'eye']} color="var(--spot-color)" size="lg" /> <b>REVEAL</b>
-            </Button>
-            &nbsp;
-            <Dropdown>
-              <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: '35px' }}>
-                <FontAwesomeIcon icon={['fas', 'ellipsis']} color="var(--spot-color)" size="lg" />
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-
-          </div>
-          <div id="leaderboard" className="p-3 bt-panel border rounded-3">
-            <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
-            <table className="table-hover bt-t">
-              <thead>
-              <tr>
-                <th style={{ width: '10%', textAlign: 'center' }}>#</th>
-                <th style={{ width: '12%' }}></th>
-                <th style={{ width: '61%' }}>Nick</th>
-                <th style={{ width: '17%', textAlign: 'center' }}>Score</th>
-              </tr>
-              </thead>
-              <tbody>
-              <AnimatePresence>
-                {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
-                  <motion.tr
-                    key={sc.nick}
-                    className="leaderboard-row"
-                    initial={{ opacity: 0, top: -20 }}
-                    animate={{ opacity: 1, top: 0 }}
-                    exit={{ opacity: 0, top: 20 }}
-                    transition={{ duration: 0.3 }}
-                    layout="position"
-                  >
-                    <td style={{ textAlign: 'center' }}>
-                      <span>{sc.displayedRank}</span>
-                    </td>
-                    <td>
-                      <TwitchAvatar tid={sc.tid} avatar={sc.avatar} className="leaderboard-avatar" />
-                    </td>
-                    <td style={{ position: 'relative' }}>
-                      <span className="leaderboard-nick">{sc.nick}</span>
-                      <div className="leaderboard-buttons">
-                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
-                          <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
-                        </Button>
-                        <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
-                          <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
-                        </Button>
+              {playing && currentTrack !== null &&
+                <div style={{ flex: 1 }}>
+                  {getGuessables(currentTrack, GuessableType.Title).length > 0 &&
+                    <div className="px-3 pb-3">
+                      <div className="bt-h">
+                        <h2>TITLE</h2>
                       </div>
-                    </td>
-                    <td style={{ textAlign: 'center' }}>
-                      <span>{sc.score}</span>
-                    </td>
-                  </motion.tr>
-                ))}
-                {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
-                  <tr style={{ textAlign: 'center' }}>
-                    <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
-                  </tr>
-                }
-              </AnimatePresence>
-              </tbody>
-            </table>
+                      <div>
+                        <GuessableView key="guess_0" guessable={currentTrack.guessables[0]} guess={guesses[0]} />
+                      </div>
+                    </div>
+                  }
+                  {getGuessables(currentTrack, GuessableType.Artist).length > 0 &&
+                    <div className="px-3 pb-3">
+                      <div className="bt-h">
+                        <h2>ARTIST(S)</h2>
+                      </div>
+                      <div>
+                        {mapGuessables(currentTrack, GuessableType.Artist, (guessable: Guessable, index: number) => {
+                          return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
+                        })}
+                      </div>
+                    </div>
+                  }
+                  {getGuessables(currentTrack, GuessableType.Misc).length > 0 &&
+                    <div className="px-3 mb-2">
+                      <div className="bt-h">
+                        <h2>MISC</h2>
+                      </div>
+                      <div>
+                        {mapGuessables(currentTrack, GuessableType.Misc, (guessable: Guessable, index: number) => {
+                          return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
+                        })}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+              {!playing && !loading &&
+                <div style={{ margin: 'auto', color: 'grey' }}><i>Click NEXT to start playing</i></div>
+              }
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
+              <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
+                <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
+              </Button>
+              &nbsp;
+              {!isFinished &&
+                <>
+                  <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length || (playing && !allGuessed())} type="submit" size="sm" onClick={handleNextSong}>
+                    <FontAwesomeIcon icon={['fas', 'step-forward']} color="var(--spot-color)" size="lg" /> <b>NEXT</b>
+                  </Button>
+                  &nbsp;
+                  <Button className="col-sm" id="revealButton" disabled={!playing || allGuessed()} type="submit" size="sm" onClick={handleReveal}>
+                    <FontAwesomeIcon icon={['fas', 'eye']} color="var(--spot-color)" size="lg" /> <b>REVEAL</b>
+                  </Button>
+                </>
+              }
+              {isFinished &&
+                <>
+                  <Button className="col-sm" id="podiumButton" disabled={leaderboardRows.find(row => row.score > 0) === undefined} type="submit" size="sm" onClick={() => setPodiumDisplayed(true)}>
+                    <FontAwesomeIcon icon={['fas', 'crown']} color="var(--spot-color)" size="lg" /> <b>SHOW PODIUM</b>
+                  </Button>
+                </>
+              }
+              &nbsp;
+              <Dropdown>
+                <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: '35px' }}>
+                  <FontAwesomeIcon icon={['fas', 'ellipsis']} color="var(--spot-color)" size="lg" />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>
+                  <Dropdown.Item onClick={() => setPodiumDisplayed(true)}>Podium</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+
+            </div>
+            <div id="leaderboard" className="p-3 bt-panel border rounded-3">
+              <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
+              <table className="table-hover bt-t">
+                <thead>
+                <tr>
+                  <th style={{ width: '10%', textAlign: 'center' }}>#</th>
+                  <th style={{ width: '12%' }}></th>
+                  <th style={{ width: '61%' }}>Nick</th>
+                  <th style={{ width: '17%', textAlign: 'center' }}>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <AnimatePresence>
+                  {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
+                    <motion.tr
+                      key={sc.nick}
+                      className="leaderboard-row"
+                      initial={{ opacity: 0, top: -20 }}
+                      animate={{ opacity: 1, top: 0 }}
+                      exit={{ opacity: 0, top: 20 }}
+                      transition={{ duration: 0.3 }}
+                      layout="position"
+                    >
+                      <td style={{ textAlign: 'center' }}>
+                        <span>{sc.displayedRank}</span>
+                      </td>
+                      <td>
+                        <TwitchAvatar tid={sc.tid} avatar={sc.avatar} className="leaderboard-avatar" />
+                      </td>
+                      <td style={{ position: 'relative' }}>
+                        <span className="leaderboard-nick">{sc.nick}</span>
+                        <div className="leaderboard-buttons">
+                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
+                            <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
+                          </Button>
+                          <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
+                            <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
+                          </Button>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <span>{sc.score}</span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                  {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
+                    <tr style={{ textAlign: 'center' }}>
+                      <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
+                    </tr>
+                  }
+                </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {podiumDisplayed && <Podium onClose={() => setPodiumDisplayed(false)} />}
+    </>
   );
 };
 

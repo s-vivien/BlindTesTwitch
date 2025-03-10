@@ -5,6 +5,7 @@ const localStorageKey: string = 'blind_test_players';
 
 export type Player = {
   tid: string;
+  nick: string;
   score: number;
   avatar?: string;
 }
@@ -20,6 +21,7 @@ type Actions = {
   initPlayer: (nick: string, tid: string) => void;
   addPoints: (nick: string, points: number) => void;
   addMultiplePoints: (points: Record<string, number>) => void;
+  getSortedPlayers: () => Player[];
 }
 
 let avatarFetchTimeout: NodeJS.Timeout | undefined = undefined;
@@ -79,7 +81,7 @@ export const usePlayerStore = create<Players & Actions>()(
         // if (updated[nick]) {
         //   debugger; // TODO remove
         // }
-        updated[nick] = { tid: tid, score: 0 };
+        updated[nick] = { tid: tid, score: 0, nick: nick };
 
         if (avatarFetchTimeout == undefined) {
           downloadAvatar(updated);
@@ -113,6 +115,9 @@ export const usePlayerStore = create<Players & Actions>()(
         }
         return ({ players: updated });
       });
+    },
+    getSortedPlayers: () => {
+      return Object.values(get().players).sort((a, b) => b.score - a.score);
     },
   }),
 );
