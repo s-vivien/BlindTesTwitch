@@ -3,11 +3,11 @@ import { cleanValueLight, sorensenDiceScore } from 'helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
-import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
+import { launchTrack } from '../services/SpotifyAPI';
 import { useAuthStore } from './store/AuthStore';
 import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from './store/BlindTestTracksStore';
 import { useGlobalStore } from './store/GlobalStore';
-import { usePlayerStore } from './store/PlayerStore';
+import { Player, usePlayerStore } from './store/PlayerStore';
 import { TwitchMode, useSettingsStore } from './store/SettingsStore';
 import Podium from './Podium';
 import Leaderboard from './Leaderboard';
@@ -32,7 +32,7 @@ const BlindTest = () => {
   const twitchClient = useRef<Client | null>(null);
   const trackStart = useRef<number>(-1);
   const delayedPoints = useRef<Record<string, number>[]>([]);
-  const scoresBackup = useRef<Record<string, number>>({});
+  const playersBackup = useRef<Record<string, Player>>({});
   const settings = useSettingsStore();
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
 
@@ -107,7 +107,7 @@ const BlindTest = () => {
   };
 
   const cancelLastTrackPoints = () => {
-    playerStore.setScores(scoresBackup.current);
+    playerStore.restorePlayers(playersBackup.current);
     playerStore.backup();
   };
 
@@ -248,7 +248,7 @@ const BlindTest = () => {
 
   const handleNextSong = async () => {
     handleReveal();
-    scoresBackup.current = Object.fromEntries(Object.entries(playerStore.players).map(([key, value]) => [key, value.score]));
+    playersBackup.current = JSON.parse(JSON.stringify(playerStore.players)); // store a deep copy
     triggerTimeouts();
     const track = btStore.getNextTrack(shuffled);
     setPlaying(false);

@@ -10,6 +10,13 @@ export type PlayerStats = {
   fastestAnswer: number;
 }
 
+export const EMPTY_PLAYER_STATS: PlayerStats = {
+  answers: 0,
+  firsts: 0,
+  combos: 0,
+  fastestAnswer: Infinity,
+};
+
 export type Player = {
   tid: string;
   nick: string;
@@ -26,7 +33,7 @@ export class Players {
 type Actions = {
   backup: () => void;
   clear: () => void;
-  setScores: (players: Record<string, number>) => void;
+  restorePlayers: (players: Record<string, Player>) => void;
   addAnswerStats: (nick: string, isCombo: boolean, isFirst: boolean, timer: number) => void;
   initPlayer: (nick: string, tid: string) => void;
   addPoints: (nick: string, points: number) => void;
@@ -67,11 +74,18 @@ export const usePlayerStore = create<Players & Actions>()(
       localStorage.removeItem(localStorageKey);
       set({ players: {} });
     },
-    setScores: (players: Record<string, number>) => {
+    restorePlayers: (players: Record<string, Player>) => {
+      console.log(players);
       set((state) => {
         const updated = state.players;
         for (const nick of Object.keys(updated)) {
-          updated[nick].score = players[nick] || 0;
+          if (players[nick]) {
+            updated[nick].score = players[nick].score;
+            updated[nick].stats = players[nick].stats;
+          } else {
+            updated[nick].score = 0;
+            updated[nick].stats = { ...EMPTY_PLAYER_STATS };
+          }
         }
         return ({ players: updated });
       });
@@ -115,7 +129,7 @@ export const usePlayerStore = create<Players & Actions>()(
         // if (updated[nick]) {
         //   debugger; // TODO remove
         // }
-        updated[nick] = { tid: tid, rank: -1, score: 0, nick: nick, stats: { answers: 0, firsts: 0, combos: 0, fastestAnswer: 1e8 } };
+        updated[nick] = { tid: tid, rank: -1, score: 0, nick: nick, stats: { ...EMPTY_PLAYER_STATS } };
 
         if (avatarFetchTimeout === undefined) {
           downloadAvatar(updated);
