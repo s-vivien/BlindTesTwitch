@@ -17,13 +17,9 @@ const Podium = ({ onClose }: any) => {
   }
 
   const computePlayer = (player: Player) => {
-    return <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      width: '8rem',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-    }}>
+    return <div
+      key={`podium-avatar-${player.tid}`}
+      style={{ display: 'flex', flexDirection: 'column', width: '8rem', whiteSpace: 'nowrap', overflow: 'hidden' }}>
       <TwitchAvatar tid={player.tid} avatar={player.avatar} className="podium-avatar" />
       <span style={{ textAlign: 'center' }}>{player.nick}</span>
     </div>;
@@ -39,20 +35,11 @@ const Podium = ({ onClose }: any) => {
   ) => {
     return (
       <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          placeContent: 'center',
-          height: heightPercent + '%',
-        }}
+        key={players[0].tid}
+        style={{ display: 'flex', flexDirection: 'column', placeContent: 'center', height: heightPercent + '%' }}
       >
         <motion.div
-          style={{
-            alignSelf: 'center',
-            marginBottom: '.25rem',
-            display: 'flex',
-            alignItems: 'center',
-          }}
+          style={{ alignSelf: 'center', marginBottom: '.25rem', display: 'flex', alignItems: 'center' }}
           initial="hidden"
           animate="visible"
           variants={{
@@ -107,34 +94,30 @@ const Podium = ({ onClose }: any) => {
   };
 
   let podiumContent: PodiumStepContent[] = [];
-  let sortedPlayers = playerStore.getSortedPlayers();
+  let players = Object.values(playerStore.players);
 
-  let lastRankGroup = 1;
-  let currentPodiumStep = new PodiumStepContent();
-  for (let i = 0; i < sortedPlayers.length; i++) {
-    if (i === 0 || sortedPlayers[i].score !== sortedPlayers[i - 1].score) {
-      if (i > 0) {
-        currentPodiumStep.rank = lastRankGroup;
-        currentPodiumStep.score = sortedPlayers[i - 1].score;
-        currentPodiumStep.idx = podiumContent.length;
-        if (podiumContent.length % 2 === 0) {
-          podiumContent.push(currentPodiumStep);
-        } else {
-          podiumContent.unshift(currentPodiumStep);
-        }
-        currentPodiumStep = new PodiumStepContent();
+  for (let rank = 1; rank <= 3; rank++) {
+    const step = new PodiumStepContent();
+    step.players = players.filter((player) => player.rank === rank);
+    if (step.players.length > 0) {
+      step.rank = rank;
+      step.score = step.players[0].score;
+      step.idx = podiumContent.length;
+      if (podiumContent.length % 2 === 0) {
+        podiumContent.push(step);
+      } else {
+        podiumContent.unshift(step);
       }
-      lastRankGroup = i + 1;
-      if (lastRankGroup > 3) break;
     }
-    currentPodiumStep.players.push(sortedPlayers[i]);
   }
 
   const losers = Object.values(playerStore.players).filter(player => player.score > 0 && !podiumContent.find(pc => pc.players.includes(player)));
 
   const pickLoser = () => {
     const loser = losers[Math.floor(Math.random() * losers.length)];
-    setLoser(loser);
+    if (losers.length > 0) {
+      setLoser(loser);
+    }
   };
 
   return (

@@ -3,10 +3,19 @@ import { create } from 'zustand';
 
 const localStorageKey: string = 'blind_test_players';
 
+export type PlayerStats = {
+  answers: number;
+  firsts: number;
+  combos: number;
+  fastestAnswer: number;
+}
+
 export type Player = {
   tid: string;
   nick: string;
   score: number;
+  rank: number;
+  stats: PlayerStats;
   avatar?: string;
 }
 
@@ -18,11 +27,23 @@ type Actions = {
   backup: () => void;
   clear: () => void;
   setScores: (players: Record<string, number>) => void;
+  addAnswerStats: (nick: string, isCombo: boolean, isFirst: boolean, timer: number) => void;
   initPlayer: (nick: string, tid: string) => void;
   addPoints: (nick: string, points: number) => void;
   addMultiplePoints: (points: Record<string, number>) => void;
-  getSortedPlayers: () => Player[];
 }
+
+const recomputeRanks = (players: Record<string, Player>) => {
+  const flat = Object.values(players);
+  flat.sort((a, b) => b.score - a.score);
+  let lastRankGroup = 1;
+  for (let i = 0; i < flat.length; i++) {
+    if (i === 0 || flat[i].score !== flat[i - 1].score) {
+      lastRankGroup = i + 1;
+    }
+    flat[i].rank = lastRankGroup;
+  }
+};
 
 let avatarFetchTimeout: NodeJS.Timeout | undefined = undefined;
 const avatarFetchTimeoutDuration: number = 2500;
@@ -55,6 +76,19 @@ export const usePlayerStore = create<Players & Actions>()(
         return ({ players: updated });
       });
     },
+    addAnswerStats: (nick: string, isCombo: boolean, isFirst: boolean, timer: number) => {
+      set((state) => {
+        const updated = state.players;
+        // if (!updated[nick]) {
+        //   debugger; // TODO remove
+        // }
+        updated[nick].stats.answers++;
+        updated[nick].stats.fastestAnswer = Math.min(updated[nick].stats.fastestAnswer, timer);
+        if (isCombo) { updated[nick].stats.combos++; }
+        if (isFirst) { updated[nick].stats.firsts++; }
+        return ({ players: updated });
+      });
+    },
     initPlayer: (nick: string, tid: string) => {
 
       const downloadAvatar = (current: Record<string, Player>) => {
@@ -81,9 +115,9 @@ export const usePlayerStore = create<Players & Actions>()(
         // if (updated[nick]) {
         //   debugger; // TODO remove
         // }
-        updated[nick] = { tid: tid, score: 0, nick: nick };
+        updated[nick] = { tid: tid, rank: -1, score: 0, nick: nick, stats: { answers: 0, firsts: 0, combos: 0, fastestAnswer: 1e8 } };
 
-        if (avatarFetchTimeout == undefined) {
+        if (avatarFetchTimeout === undefined) {
           downloadAvatar(updated);
           avatarFetchTimeout = setTimeout(() => {
             avatarFetchTimeout = undefined;
@@ -91,6 +125,7 @@ export const usePlayerStore = create<Players & Actions>()(
           }, avatarFetchTimeoutDuration);
         }
 
+        recomputeRanks(updated);
         return ({ players: updated });
       });
     },
@@ -101,6 +136,7 @@ export const usePlayerStore = create<Players & Actions>()(
         //   debugger; // TODO remove
         // }
         updated[nick].score += points;
+        recomputeRanks(updated);
         return ({ players: updated });
       });
     },
@@ -113,11 +149,9 @@ export const usePlayerStore = create<Players & Actions>()(
           // }
           updated[nick].score += points[nick];
         }
+        recomputeRanks(updated);
         return ({ players: updated });
       });
-    },
-    getSortedPlayers: () => {
-      return Object.values(get().players).sort((a, b) => b.score - a.score);
     },
   }),
 );

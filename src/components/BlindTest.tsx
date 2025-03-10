@@ -41,6 +41,7 @@ const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 const BlindTest = () => {
 
   const twitchClient = useRef<Client | null>(null);
+  const trackStart = useRef<number>(-1);
   const delayedPoints = useRef<Record<string, number>[]>([]);
   const scoresBackup = useRef<Record<string, number>>({});
   const settings = useSettingsStore();
@@ -179,17 +180,22 @@ const BlindTest = () => {
           const d = sorensenDiceScore(toGuess, proposition);
           // console.log(`[${toGuess}] [${proposition}] ${d}`);
           if (d >= 0.8) {
-            let points = 1;
-            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) points += 1; // first guess for this item
+            let isCombo = false;
+            let isFirst = false;
+            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) {
+              isFirst = true;
+            } // first guess for this item
             for (let g of guesses) {
               if (g.guessedBy.find((gb) => gb.nick === nick)) {
-                points += 1; // this player already guessed something else on this track
+                isCombo = true; // this player already guessed something else on this track
                 break;
               }
             }
             if (!playerStore.players[nick]) {
               playerStore.initPlayer(nick, tid);
             }
+            playerStore.addAnswerStats(nick, isCombo, isFirst, performance.now() - trackStart.current);
+            const points = 1 + (isCombo ? 1 : 0) + (isFirst ? 1 : 0);
             updateGuessState(i, nick, points);
             matched = true;
             break;
@@ -299,6 +305,7 @@ const BlindTest = () => {
         delayedPoints.current.push({});
         guessTimeouts.current.push(undefined);
       }
+      trackStart.current = performance.now();
       setGuesses(newGuesses);
       setPlaying(true);
       setLoading(false);
