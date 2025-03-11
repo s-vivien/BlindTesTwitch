@@ -1,7 +1,7 @@
 import { getUsers } from 'services/TwitchAPI';
 import { create } from 'zustand';
 
-const localStorageKey: string = 'blind_test_players';
+const localStorageKey: string = 'blind_test_players_v2';
 
 export type PlayerStats = {
   answers: number;
@@ -75,7 +75,6 @@ export const usePlayerStore = create<Players & Actions>()(
       set({ players: {} });
     },
     restorePlayers: (players: Record<string, Player>) => {
-      console.log(players);
       set((state) => {
         const updated = state.players;
         for (const nick of Object.keys(updated)) {

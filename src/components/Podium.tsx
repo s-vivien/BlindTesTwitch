@@ -17,20 +17,19 @@ const Podium = ({ onClose }: any) => {
   }
 
   const computeStatsLine = (leftText: string, rightText: string) => {
-    return <span style={{ display: 'flex', justifyContent: 'space-between', width: '75%', margin: 'auto' }}>
+    return <span style={{ display: 'flex', justifyContent: 'space-between', margin: 'auto' }}>
           <span style={{ textAlign: 'left' }}><strong>{leftText}</strong></span>
           <span style={{ textAlign: 'right' }}>{rightText}</span>
       </span>;
   };
 
   const computePlayerStats = (player: Player) => {
-    return <>
+    return <div style={{ border: '3px dashed #4A4A4AFF', padding: '10px 15px', borderRadius: '.5rem', margin: '5px 5px 14px 0' }}>
       {computeStatsLine('Answers', `${player.stats.answers}`)}
       {computeStatsLine('Firsts', `${player.stats.firsts}`)}
       {computeStatsLine('Combos', `${player.stats.combos}`)}
-      {computeStatsLine('Fastest', `${Math.trunc(player.stats.fastestAnswer) / 1000}s`)}
-      <br />
-    </>;
+      {computeStatsLine('Fastest', `${(player.stats.fastestAnswer / 1000).toFixed(1)} s`)}
+    </div>;
   };
 
   const computePlayer = (player: Player, withStats: boolean) => {

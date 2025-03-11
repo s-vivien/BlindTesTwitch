@@ -75,7 +75,7 @@ const Settings = () => {
             <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked); }} />
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAddEveryUser">
-            <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard" onChange={(e) => { setAddEveryUser(e.target.checked); }} />
+            <Form.Check type="checkbox" checked={addEveryUser} label="Add every speaking viewer in the leaderboard (can impact performance with very large audiences)" onChange={(e) => { setAddEveryUser(e.target.checked); }} />
           </Form.Group>
 
           <br></br>

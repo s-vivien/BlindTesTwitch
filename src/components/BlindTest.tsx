@@ -3,7 +3,7 @@ import { cleanValueLight, sorensenDiceScore } from 'helpers';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
-import { launchTrack } from '../services/SpotifyAPI';
+import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
 import { useAuthStore } from './store/AuthStore';
 import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from './store/BlindTestTracksStore';
 import { useGlobalStore } from './store/GlobalStore';
@@ -376,12 +376,12 @@ const BlindTest = () => {
           </div>
           <div className="col-md-4">
             <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
-              <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
-                <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
-              </Button>
-              &nbsp;
               {!isFinished &&
                 <>
+                  <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
+                    <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
+                  </Button>
+                  &nbsp;
                   <Button className="col-sm" id="nextButton" disabled={loading || btStore.doneTracks >= btStore.tracks.length || (playing && !allGuessed())} type="submit" size="sm" onClick={handleNextSong}>
                     <FontAwesomeIcon icon={['fas', 'step-forward']} color="var(--spot-color)" size="lg" /> <b>NEXT</b>
                   </Button>
@@ -405,7 +405,6 @@ const BlindTest = () => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item onClick={cancelLastTrackPoints} disabled={!playing || !allGuessed()}>Cancel last track points</Dropdown.Item>
-                  <Dropdown.Item onClick={() => setPodiumDisplayed(true)}>Podium</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
 

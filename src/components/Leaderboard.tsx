@@ -13,7 +13,7 @@ type LeaderboardRow = {
   avatar?: string
 };
 
-const DISPLAYED_USER_LIMIT = 150;
+const DISPLAYED_USER_LIMIT = 100;
 
 const Leaderboard = memo(({ addPointFunction }: any) => {
 

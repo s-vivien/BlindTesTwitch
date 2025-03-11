@@ -2,7 +2,7 @@ import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { cleanSpoiler, cleanValue, specialCharactersAlternatives } from 'helpers';
 import { create } from 'zustand';
 
-const localStorageKey: string = 'blind_test_tracks_storage';
+const localStorageKey: string = 'blind_test_tracks_storage_v2';
 
 export enum GuessableState {
   Enabled = 0,
