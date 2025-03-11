@@ -16,10 +16,32 @@ const Podium = ({ onClose }: any) => {
     idx: number = -1;
   }
 
-  const computePlayer = (player: Player) => {
+  const computeStatsLine = (leftText: string, rightText: string) => {
+    return <span style={{ display: 'flex', justifyContent: 'space-between', width: '75%', margin: 'auto' }}>
+          <span style={{ textAlign: 'left' }}><strong>{leftText}</strong></span>
+          <span style={{ textAlign: 'right' }}>{rightText}</span>
+      </span>;
+  };
+
+  const computePlayerStats = (player: Player) => {
+    return <>
+      {computeStatsLine('Answers', `${player.stats.answers}`)}
+      {computeStatsLine('Firsts', `${player.stats.firsts}`)}
+      {computeStatsLine('Combos', `${player.stats.combos}`)}
+      {computeStatsLine('Fastest', `${Math.trunc(player.stats.fastestAnswer) / 1000}s`)}
+      <br />
+    </>;
+  };
+
+  const computePlayer = (player: Player, withStats: boolean) => {
     return <div
       key={`podium-avatar-${player.tid}`}
-      style={{ display: 'flex', flexDirection: 'column', width: '8rem', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+      style={{ display: 'flex', flexDirection: 'column', width: '12rem', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+
+      {withStats &&
+        computePlayerStats(player)
+      }
+
       <TwitchAvatar tid={player.tid} avatar={player.avatar} className="podium-avatar" />
       <span style={{ textAlign: 'center' }}>{player.nick}</span>
     </div>;
@@ -28,6 +50,7 @@ const Podium = ({ onClose }: any) => {
   const computePodiumStep = (
     players: Player[],
     delay: number,
+    withStats: boolean,
     color: string,
     heightPercent: number,
     emoji: string,
@@ -54,7 +77,7 @@ const Podium = ({ onClose }: any) => {
           }}
         >
           {players.map((player) => {
-            return computePlayer(player);
+            return computePlayer(player, withStats);
           })}
         </motion.div>
 
@@ -124,7 +147,6 @@ const Podium = ({ onClose }: any) => {
     <Modal scrollable={true} show={true} centered dialogClassName="podium-modal">
       <Modal.Body>
         <motion.div
-          layout
           style={{
             display: 'grid',
             gridAutoFlow: 'column dense',
@@ -133,7 +155,7 @@ const Podium = ({ onClose }: any) => {
             justifyContent: 'center',
             justifyItems: 'center',
             alignItems: 'flex-end',
-            height: '30rem',
+            height: '35rem',
             width: 'fit-content',
             margin: 'auto',
             paddingLeft: '6rem',
@@ -141,11 +163,12 @@ const Podium = ({ onClose }: any) => {
             paddingTop: '15px',
           }}
         >
-          {loser && computePodiumStep([loser], 0, '#474747FF', 60, '👑', 'Loser')}
+          {loser && computePodiumStep([loser], 0, false, '#474747FF', 50, '👑', 'Loser')}
           {podiumContent.map((step) => {
             return computePodiumStep(
               step.players,
               0.5 * (podiumContent.length - 1 - step.idx),
+              true,
               '#737373FF',
               (100 - 10 * (step.rank - 1)),
               ['🥇', '🥈', '🥉'][step.rank - 1],

@@ -13,7 +13,7 @@ const Changelog = ({ show, onClose }: any) => {
         <img src="/BlindTesTwitch/chglg_3.png" className="border" />
         <br />
         <ul>
-          <li>Podium display at the end of the game</li>
+          <li>Podium display at the end of the game, with stats</li>
         </ul>
         <br />
         <h3><u>16/12/2024</u></h3>
