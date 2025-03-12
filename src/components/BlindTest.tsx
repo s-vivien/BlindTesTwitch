@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cleanValueLight, sorensenDiceScore } from 'helpers';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
 import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
@@ -182,9 +182,9 @@ const BlindTest = () => {
     }
   };
 
-  const addPointToPlayer = useCallback((nick: string, points: number) => {
+  const addPointToPlayer = (nick: string, points: number) => {
     playerStore.addPoints(nick, points);
-  }, []);
+  }
 
   const updateGuessState = (index: number, nick: string, points: number) => {
     setGuesses(guesses => {
@@ -409,7 +409,7 @@ const BlindTest = () => {
               </Dropdown>
 
             </div>
-            <Leaderboard addPointFunction={addPointToPlayer}></Leaderboard>
+            <Leaderboard />
           </div>
         </div>
       </div>

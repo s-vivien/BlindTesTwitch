@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
 import { usePlayerStore } from './store/PlayerStore';
 import TwitchAvatar from './TwitchAvatar';
@@ -15,41 +15,48 @@ type LeaderboardRow = {
 
 const DISPLAYED_USER_LIMIT = 100;
 
-const Leaderboard = memo(({ addPointFunction }: any) => {
+const Leaderboard = memo(() => {
 
   const playerStore = usePlayerStore();
 
-  const [leaderboardRows, setLeaderboardRows] = useState<LeaderboardRow[]>([]);
   const [nickFilter, setNickFilter] = useState('');
 
-  useEffect(() => {
-    let rows: LeaderboardRow[] = [];
-    for (const player of Object.values(playerStore.players)) {
-      rows.push({
-        nick: player.nick,
-        score: player.score,
-        tid: player.tid,
-        avatar: player.avatar,
-        displayedRank: player.rank,
-      });
-    }
-    rows.sort((a, b) => a.nick.localeCompare(b.nick));
-    rows.sort((a, b) => b.score - a.score);
+  const filteredAndSortedLeaderboardRows = useMemo(() => {
+    let rows: LeaderboardRow[] = Object.values(playerStore.players).map(player => ({
+      nick: player.nick,
+      score: player.score,
+      tid: player.tid,
+      avatar: player.avatar,
+      displayedRank: player.rank,
+    }));
+
     if (nickFilter) {
       rows = rows.filter(s => s.nick.toLowerCase().includes(nickFilter));
     }
-    // Display rank only for the first of each group
+
+    rows.sort((a, b) => a.nick.localeCompare(b.nick));
+    rows.sort((a, b) => b.score - a.score);
+
     for (let i = rows.length - 1; i > 0; i--) {
       if (rows[i].score === rows[i - 1].score) {
         rows[i].displayedRank = undefined;
       }
     }
-    setLeaderboardRows(rows);
+
+    return rows;
   }, [nickFilter, playerStore]);
+
+  const addPointToPlayer = (nick: string, points: number) => {
+    playerStore.addPoints(nick, points);
+  };
+
+  const onNickFilterChange = (e: any) => {
+    setNickFilter(e.target.value.toLowerCase());
+  };
 
   return (
     <div id="leaderboard" className="p-3 bt-panel border rounded-3">
-      <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={(e) => setNickFilter(e.target.value.toLowerCase())} />
+      <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={onNickFilterChange} />
       <table className="table-hover bt-t">
         <thead>
         <tr>
@@ -61,7 +68,7 @@ const Leaderboard = memo(({ addPointFunction }: any) => {
         </thead>
         <tbody>
         <AnimatePresence>
-          {leaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
+          {filteredAndSortedLeaderboardRows.slice(0, DISPLAYED_USER_LIMIT).map((sc) => (
             <motion.tr
               key={sc.nick}
               className="leaderboard-row"
@@ -80,10 +87,10 @@ const Leaderboard = memo(({ addPointFunction }: any) => {
               <td style={{ position: 'relative' }}>
                 <span className="leaderboard-nick">{sc.nick}</span>
                 <div className="leaderboard-buttons">
-                  <Button type="submit" size="sm" onClick={() => addPointFunction(sc.nick, -1)}>
+                  <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
                     <FontAwesomeIcon icon={['fas', 'minus']} size="lg" />
                   </Button>
-                  <Button type="submit" size="sm" onClick={() => addPointFunction(sc.nick, 1)}>
+                  <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, 1)}>
                     <FontAwesomeIcon icon={['fas', 'plus']} size="lg" />
                   </Button>
                 </div>
@@ -93,9 +100,9 @@ const Leaderboard = memo(({ addPointFunction }: any) => {
               </td>
             </motion.tr>
           ))}
-          {leaderboardRows.length > DISPLAYED_USER_LIMIT &&
+          {filteredAndSortedLeaderboardRows.length > DISPLAYED_USER_LIMIT &&
             <tr style={{ textAlign: 'center' }}>
-              <td colSpan={4}><span><i>...{leaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
+              <td colSpan={4}><span><i>...{filteredAndSortedLeaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
             </tr>
           }
         </AnimatePresence>

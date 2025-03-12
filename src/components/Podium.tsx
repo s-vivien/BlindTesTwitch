@@ -162,7 +162,7 @@ const Podium = ({ onClose }: any) => {
             paddingTop: '15px',
           }}
         >
-          {loser && computePodiumStep([loser], 0, false, '#474747FF', 50, '👑', 'Loser')}
+          {loser && computePodiumStep([loser], 0, false, '#474747FF', 46, '👑', 'Loser')}
           {podiumContent.map((step) => {
             return computePodiumStep(
               step.players,
