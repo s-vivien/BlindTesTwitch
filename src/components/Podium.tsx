@@ -52,7 +52,7 @@ const Podium = ({ onClose }: any) => {
     withStats: boolean,
     color: string,
     heightPercent: number,
-    emoji: string,
+    svg: string,
     subtext: string,
   ) => {
     return (
@@ -108,8 +108,12 @@ const Podium = ({ onClose }: any) => {
             hidden: { opacity: 0, height: 0 },
           }}
         >
-          <span style={{ fontSize: 'xxx-large' }}>{emoji}</span>
-          <span style={{ fontWeight: 'bold' }}>{subtext}</span>
+          <motion.div
+            animate={{ rotate: [0, 5, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }}
+            transition={{ delay: Math.random() * 2, repeat: Infinity, duration: 2, ease: 'easeInOut' }}>
+            <img style={{ width: '5rem', filter: 'drop-shadow(5px 5px 3px #222)' }} src={`/BlindTesTwitch/${svg}.svg`}></img>
+          </motion.div>
+          <span style={{ fontWeight: 'bold', fontSize: 'larger' }}>{subtext}</span>
         </motion.div>
       </div>
     );
@@ -154,7 +158,7 @@ const Podium = ({ onClose }: any) => {
             justifyContent: 'center',
             justifyItems: 'center',
             alignItems: 'flex-end',
-            height: '35rem',
+            height: '41rem',
             width: 'fit-content',
             margin: 'auto',
             paddingLeft: '6rem',
@@ -162,15 +166,15 @@ const Podium = ({ onClose }: any) => {
             paddingTop: '15px',
           }}
         >
-          {loser && computePodiumStep([loser], 0, false, '#474747FF', 46, '👑', 'Loser')}
+          {loser && computePodiumStep([loser], 0, false, '#656565', 46, 'crown', 'Loser')}
           {podiumContent.map((step) => {
             return computePodiumStep(
               step.players,
               0.5 * (podiumContent.length - 1 - step.idx),
               true,
-              '#737373FF',
+              '#656565',
               (100 - 10 * (step.rank - 1)),
-              ['🥇', '🥈', '🥉'][step.rank - 1],
+              ['gold', 'silver', 'bronze'][step.rank - 1],
               `${step.score} point${step.score > 1 ? 's' : ''}`,
             );
           })}

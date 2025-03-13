@@ -22,6 +22,12 @@ a {
   text-decoration: none
 }
 
+img {
+  user-drag: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
 .btn.btn-xs {
   // line-height: ensure proper height of button next to small input
   @include button-size($btn-padding-y-xs,
@@ -128,7 +134,7 @@ svg {
 
   button {
     font-size: 0.6rem;
-    margin: 1px 0px;
+    margin: 1px 0;
   }
 }
 
@@ -356,16 +362,18 @@ svg {
 
 .podium-modal {
   width: fit-content !important;
-  max-width: none! important;
+  max-width: 90%;
+  overflow-x: auto;
 }
 
 .podium-avatar {
   border-radius: 100%;
-  height: 100px;
-  width: 100px;
+  height: 120px;
+  width: 120px;
   align-self: center;
   border: 6px solid #464646;
   vertical-align: top;
+  box-shadow: 10px 5px 10px rgb(12, 12, 12);
 }
 
 .leaderboard-row {
@@ -565,7 +573,7 @@ svg {
       color: #dee2e6;
       border-left-color: transparent;
       padding-left: 10px;
-      border-radius: 0% 10% 10% 0%;
+      border-radius: 0 10% 10% 0;
     }
 
     .closeIcon,

@@ -10,7 +10,7 @@ const Changelog = ({ show, onClose }: any) => {
         <br />
         <h5 className="h5-with-line">End-game podium</h5>
         <br />
-        <img src="/BlindTesTwitch/chglg_3.png" className="border" />
+        <img src="/BlindTesTwitch/chglg_3.png" className="border" style={{ width: '70%' }} />
         <br />
         <ul>
           <li>Podium display at the end of the game, with stats</li>

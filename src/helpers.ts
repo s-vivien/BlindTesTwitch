@@ -99,7 +99,7 @@ export const sorensenDiceScore = (first: string, second: string) => {
       firstAltBigrams.set(altBigram, altCount);
     }
   }
-  ;
+
 
   let intersectionSize = 0;
   const altRatio = Math.max(0.2, 1.0 - 0.05 * first.length);
