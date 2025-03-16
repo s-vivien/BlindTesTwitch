@@ -26,6 +26,7 @@ let twitchCallback: (nick: string, tid: string, msg: string) => void = () => {};
 
 const DISPLAYED_GUESS_NICK_LIMIT = 5;
 const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
+const SCORE_CMD_DELAY = 2000;
 
 const BlindTest = () => {
 
@@ -33,9 +34,11 @@ const BlindTest = () => {
   const trackStart = useRef<number>(-1);
   const delayedAnswers = useRef<Answer[][]>([]);
   const playersBackup = useRef<Record<string, Player>>({});
-  const settings = useSettingsStore();
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
+  const scoreCommandTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const delayedScoreCommands = useRef<string[]>([]);
 
+  const settingsStore = useSettingsStore();
   const btStore = useBTTracksStore();
   const playerStore = usePlayerStore();
   const twitchNick = useAuthStore((state) => state.twitchNick);
@@ -53,7 +56,7 @@ const BlindTest = () => {
   useEffect(() => {
     if (twitchNick) {
       console.log(`Twitch channel changed to ${twitchNick}`);
-      twitchConnection(twitchNick, settings.chatNotifications);
+      twitchConnection(twitchNick, settingsStore.chatNotifications);
       return () => {
         twitchDisconnection();
       };
@@ -111,22 +114,42 @@ const BlindTest = () => {
     playerStore.backup();
   };
 
+  const flushScoreCommands = () => {
+    const msg = delayedScoreCommands.current
+      .map((nick: string) => playerStore.players[nick])
+      .filter(player => player !== undefined)
+      .map((player: Player) => `${player.nick} is #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`)
+      .join(', ');
+
+    if (msg && twitchNick) {
+      twitchClient.current?.say(twitchNick, msg);
+    }
+
+    delayedScoreCommands.current = [];
+    scoreCommandTimeout.current = undefined;
+  };
+
+  const handleScoreCommand = (nick: string) => {
+    if (settingsStore.scoreCommandMode === TwitchMode.Whisper) {
+      const player = playerStore.players[nick];
+      twitchClient.current?.whisper(nick, `You are #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
+    } else if (settingsStore.scoreCommandMode === TwitchMode.Channel && twitchNick) {
+      if (!scoreCommandTimeout.current) {
+        scoreCommandTimeout.current = setTimeout(flushScoreCommands, SCORE_CMD_DELAY);
+      }
+      if (!delayedScoreCommands.current.includes(nick)) {
+        delayedScoreCommands.current.push(nick);
+      }
+    }
+  };
+
   const onProposition = (nick: string, tid: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
-    if (settings.addEveryUser && !playerStore.players[nick]) {
+    if (settingsStore.addEveryUser && !playerStore.players[nick]) {
       playerStore.initPlayer(nick, tid);
     }
     if (message === '!score') {
-      if (settings.scoreCommandMode !== TwitchMode.Disabled) {
-        const player = playerStore.players[nick];
-        if (player !== undefined) {
-          if (settings.scoreCommandMode === TwitchMode.Whisper) {
-            twitchClient.current?.whisper(nick, `You are #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
-          } else if (twitchNick) {
-            twitchClient.current?.say(twitchNick, `@${nick} is #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
-          }
-        }
-      }
+      handleScoreCommand(nick);
     } else if (playing && currentTrack !== null) {
       const proposition = cleanValueLight(message);
       for (let i = 0; i < currentTrack.guessables.length; i++) {
@@ -141,7 +164,7 @@ const BlindTest = () => {
           if (d >= 0.8) {
             let isCombo = false;
             let isFirst = false;
-            if (settings.acceptanceDelay > 0 && guess.guessedBy.length === 0) {
+            if (settingsStore.acceptanceDelay > 0 && guess.guessedBy.length === 0) {
               isFirst = true;
             } // first guess for this item
             for (let g of guesses) {
@@ -168,7 +191,7 @@ const BlindTest = () => {
     setGuesses(guesses => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
-      if (settings.chatNotifications && twitchNick) {
+      if (settingsStore.chatNotifications && twitchNick) {
         let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
         twitchClient.current?.say(twitchNick, msg);
@@ -185,7 +208,7 @@ const BlindTest = () => {
       const firstGuess = guesses[index].guessedBy.length === 0;
       let newGuesses = [...guesses];
       newGuesses[index].guessedBy.push({ nick: answer.nick, points: answer.getPoints() });
-      if (settings.acceptanceDelay === 0) {
+      if (settingsStore.acceptanceDelay === 0) {
         endGuess(index, false);
         playerStore.recordAnswers([answer]);
       } else {
@@ -193,7 +216,7 @@ const BlindTest = () => {
           const to = setTimeout(() => {
             endGuess(index, true);
             guessTimeouts.current[index] = undefined;
-          }, settings.acceptanceDelay * 1000);
+          }, settingsStore.acceptanceDelay * 1000);
           guessTimeouts.current[index] = to;
         }
         delayedAnswers.current[index].push(answer);
@@ -247,8 +270,8 @@ const BlindTest = () => {
     const track = btStore.getNextTrack(shuffled);
     setPlaying(false);
     setLoading(true);
-    launchTrack(track.track_uri, settings.deviceId).then(() => {
-      setRepeatMode(true, settings.deviceId);
+    launchTrack(track.track_uri, settingsStore.deviceId).then(() => {
+      setRepeatMode(true, settingsStore.deviceId);
       setCurrentTrack(track);
       const newGuesses = [];
       delayedAnswers.current = [];
@@ -295,7 +318,7 @@ const BlindTest = () => {
           </div>
         }
       </div>;
-    } else if (guess.guessedBy.length > 0 && settings.previewGuessNumber) {
+    } else if (guess.guessedBy.length > 0 && settingsStore.previewGuessNumber) {
       return <div className="mb-3">
         {CheckEmoji}
         <div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
