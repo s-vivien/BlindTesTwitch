@@ -7,7 +7,7 @@ import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
 import { useAuthStore } from './store/AuthStore';
 import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from './store/BlindTestTracksStore';
 import { useGlobalStore } from './store/GlobalStore';
-import { Player, usePlayerStore } from './store/PlayerStore';
+import { Answer, Player, usePlayerStore } from './store/PlayerStore';
 import { TwitchMode, useSettingsStore } from './store/SettingsStore';
 import Podium from './Podium';
 import Leaderboard from './Leaderboard';
@@ -31,7 +31,7 @@ const BlindTest = () => {
 
   const twitchClient = useRef<Client | null>(null);
   const trackStart = useRef<number>(-1);
-  const delayedPoints = useRef<Record<string, number>[]>([]);
+  const delayedAnswers = useRef<Answer[][]>([]);
   const playersBackup = useRef<Record<string, Player>>({});
   const settings = useSettingsStore();
   const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
@@ -153,9 +153,7 @@ const BlindTest = () => {
             if (!playerStore.players[nick]) {
               playerStore.initPlayer(nick, tid);
             }
-            playerStore.addAnswerStats(nick, isCombo, isFirst, performance.now() - trackStart.current);
-            const points = 1 + (isCombo ? 1 : 0) + (isFirst ? 1 : 0);
-            updateGuessState(i, nick, points);
+            updateGuessState(i, new Answer(nick, isFirst, isCombo, performance.now() - trackStart.current));
             matched = true;
             break;
           }
@@ -178,22 +176,18 @@ const BlindTest = () => {
       return newGuesses;
     });
     if (delayed) {
-      playerStore.addMultiplePoints(delayedPoints.current[index]);
+      playerStore.recordAnswers(delayedAnswers.current[index]);
     }
   };
 
-  const addPointToPlayer = (nick: string, points: number) => {
-    playerStore.addPoints(nick, points);
-  }
-
-  const updateGuessState = (index: number, nick: string, points: number) => {
+  const updateGuessState = (index: number, answer: Answer) => {
     setGuesses(guesses => {
       const firstGuess = guesses[index].guessedBy.length === 0;
       let newGuesses = [...guesses];
-      newGuesses[index].guessedBy.push({ nick: nick, points: points });
+      newGuesses[index].guessedBy.push({ nick: answer.nick, points: answer.getPoints() });
       if (settings.acceptanceDelay === 0) {
         endGuess(index, false);
-        addPointToPlayer(nick, points);
+        playerStore.recordAnswers([answer]);
       } else {
         if (firstGuess) {
           const to = setTimeout(() => {
@@ -202,7 +196,7 @@ const BlindTest = () => {
           }, settings.acceptanceDelay * 1000);
           guessTimeouts.current[index] = to;
         }
-        delayedPoints.current[index][nick] = (delayedPoints.current[index][nick] || 0) + points;
+        delayedAnswers.current[index].push(answer);
       }
       return newGuesses;
     });
@@ -257,11 +251,11 @@ const BlindTest = () => {
       setRepeatMode(true, settings.deviceId);
       setCurrentTrack(track);
       const newGuesses = [];
-      delayedPoints.current = [];
+      delayedAnswers.current = [];
       guessTimeouts.current = [];
       for (let guessable of track.guessables) {
         newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
-        delayedPoints.current.push({});
+        delayedAnswers.current.push([]);
         guessTimeouts.current.push(undefined);
       }
       trackStart.current = performance.now();

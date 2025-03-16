@@ -10,6 +10,24 @@ export type PlayerStats = {
   fastestAnswer: number;
 }
 
+export class Answer {
+  nick: string;
+  isFirst: boolean;
+  isCombo: boolean;
+  timer: number;
+
+  constructor(nick: string, isFirst: boolean, isCombo: boolean, timer: number) {
+    this.nick = nick;
+    this.isFirst = isFirst;
+    this.isCombo = isCombo;
+    this.timer = timer;
+  }
+
+  getPoints = () => {
+    return 1 + (this.isFirst ? 1 : 0) + (this.isCombo ? 1 : 0);
+  };
+}
+
 export const EMPTY_PLAYER_STATS: PlayerStats = {
   answers: 0,
   firsts: 0,
@@ -34,10 +52,9 @@ type Actions = {
   backup: () => void;
   clear: () => void;
   restorePlayers: (players: Record<string, Player>) => void;
-  addAnswerStats: (nick: string, isCombo: boolean, isFirst: boolean, timer: number) => void;
   initPlayer: (nick: string, tid: string) => void;
   addPoints: (nick: string, points: number) => void;
-  addMultiplePoints: (points: Record<string, number>) => void;
+  recordAnswers: (answers: Answer[]) => void;
 }
 
 const recomputeRanks = (players: Record<string, Player>) => {
@@ -89,23 +106,10 @@ export const usePlayerStore = create<Players & Actions>()(
         return ({ players: updated });
       });
     },
-    addAnswerStats: (nick: string, isCombo: boolean, isFirst: boolean, timer: number) => {
-      set((state) => {
-        const updated = state.players;
-        // if (!updated[nick]) {
-        //   debugger; // TODO remove
-        // }
-        updated[nick].stats.answers++;
-        updated[nick].stats.fastestAnswer = Math.min(updated[nick].stats.fastestAnswer, timer);
-        if (isCombo) { updated[nick].stats.combos++; }
-        if (isFirst) { updated[nick].stats.firsts++; }
-        return ({ players: updated });
-      });
-    },
     initPlayer: (nick: string, tid: string) => {
 
       const downloadAvatar = (current: Record<string, Player>) => {
-        const ids = Object.entries(current).filter(([_, value]) => !value.avatar).map(([_, value]) => value.tid).slice(0, 100);
+        const ids = Object.entries(current).filter(([_, value]) => value.tid && !value.avatar).map(([_, value]) => value.tid).slice(0, 100);
         if (ids.length > 0) {
           getUsers(ids).then((response) => {
             set((state) => {
@@ -153,14 +157,28 @@ export const usePlayerStore = create<Players & Actions>()(
         return ({ players: updated });
       });
     },
-    addMultiplePoints: (points: Record<string, number>) => {
+    recordAnswers: (answers: Answer[]) => {
       set((state) => {
         const updated = state.players;
-        for (const nick of Object.keys(points)) {
-          // if (!updated[nick]) {
+
+        // var nicks: Record<string, string> = {}; // TODO remove
+        // for (const answer of answers) {
+        //   if (nicks[answer.nick]) {
+        //     debugger;
+        //   }
+        //   nicks[answer.nick] = '';
+        // }
+
+        for (const answer of answers) {
+          // if (!updated[answer.nick]) {
           //   debugger; // TODO remove
           // }
-          updated[nick].score += points[nick];
+          const score = answer.getPoints();
+          updated[answer.nick].stats.answers++;
+          updated[answer.nick].stats.fastestAnswer = Math.min(updated[answer.nick].stats.fastestAnswer, answer.timer);
+          if (answer.isCombo) { updated[answer.nick].stats.combos++; }
+          if (answer.isFirst) { updated[answer.nick].stats.firsts++; }
+          updated[answer.nick].score += score;
         }
         recomputeRanks(updated);
         return ({ players: updated });

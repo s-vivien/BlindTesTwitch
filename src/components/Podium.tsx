@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { Player, usePlayerStore } from './store/PlayerStore';
 import TwitchAvatar from './TwitchAvatar';
 import React, { useState } from 'react';
+import { useSettingsStore } from './store/SettingsStore';
 
 const Podium = ({ onClose }: any) => {
 
   const playerStore = usePlayerStore();
+  const settings = useSettingsStore();
   const [loser, setLoser] = useState<Player | null>(null);
 
   class PodiumStepContent {
@@ -26,7 +28,7 @@ const Podium = ({ onClose }: any) => {
   const computePlayerStats = (player: Player) => {
     return <div style={{ border: '3px dashed #4A4A4AFF', padding: '10px 15px', borderRadius: '.5rem', margin: '5px 5px 14px 0' }}>
       {computeStatsLine('Answers', `${player.stats.answers}`)}
-      {computeStatsLine('Firsts', `${player.stats.firsts}`)}
+      {settings.acceptanceDelay > 0 && computeStatsLine('Firsts', `${player.stats.firsts}`)}
       {computeStatsLine('Combos', `${player.stats.combos}`)}
       {computeStatsLine('Fastest', `${(player.stats.fastestAnswer / 1000).toFixed(1)} s`)}
     </div>;
