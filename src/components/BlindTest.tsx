@@ -40,10 +40,17 @@ const BlindTest = () => {
 
   const settingsStore = useSettingsStore();
   const btStore = useBTTracksStore();
-  const playerStore = usePlayerStore();
+  const setSubtitle = useGlobalStore((state) => state.setSubtitle);
+
+  const initPlayer = usePlayerStore((state) => state.initPlayer);
+  const backupPlayers = usePlayerStore((state) => state.backup);
+  const restorePlayers = usePlayerStore((state) => state.restorePlayers);
+  const recordAnswers = usePlayerStore((state) => state.recordAnswers);
+  const getPlayersFromNick = usePlayerStore((state) => state.getPlayers);
+  const getPlayersCopy = usePlayerStore((state) => state.getDeepCopy);
+
   const twitchNick = useAuthStore((state) => state.twitchNick);
   const twitchToken = useAuthStore((state) => state.twitchOauthToken);
-  const globalStore = useGlobalStore();
 
   const [isFinished, setFinished] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,11 +72,11 @@ const BlindTest = () => {
 
   useEffect(() => {
     if (playing && !currentTrack?.done) {
-      globalStore.setSubtitle(`Playing song #${btStore.doneTracks + 1} out of ${btStore.tracks.length}`);
+      setSubtitle(`Playing song #${btStore.doneTracks + 1} out of ${btStore.tracks.length}`);
     } else if (btStore.tracks.length - btStore.doneTracks > 0) {
-      globalStore.setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
+      setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
-      globalStore.setSubtitle('Blind-test is finished !');
+      setSubtitle('Blind-test is finished !');
       setFinished(true);
     }
   }, [btStore.tracks.length, playing, btStore.doneTracks]);
@@ -106,18 +113,16 @@ const BlindTest = () => {
 
   const backupState = () => {
     btStore.backup();
-    playerStore.backup();
+    backupPlayers();
   };
 
   const cancelLastTrackPoints = () => {
-    playerStore.restorePlayers(playersBackup.current);
-    playerStore.backup();
+    restorePlayers(playersBackup.current);
+    backupPlayers();
   };
 
   const flushScoreCommands = () => {
-    const msg = delayedScoreCommands.current
-      .map((nick: string) => playerStore.players[nick])
-      .filter(player => player !== undefined)
+    const msg = getPlayersFromNick(delayedScoreCommands.current)
       .map((player: Player) => `${player.nick} is #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`)
       .join(', ');
 
@@ -131,7 +136,7 @@ const BlindTest = () => {
 
   const handleScoreCommand = (nick: string) => {
     if (settingsStore.scoreCommandMode === TwitchMode.Whisper) {
-      const player = playerStore.players[nick];
+      const player = getPlayersFromNick([nick])[0];
       twitchClient.current?.whisper(nick, `You are #${player.rank} [${player.score} point${player.score > 1 ? 's' : ''}]`);
     } else if (settingsStore.scoreCommandMode === TwitchMode.Channel && twitchNick) {
       if (!scoreCommandTimeout.current) {
@@ -145,8 +150,8 @@ const BlindTest = () => {
 
   const onProposition = (nick: string, tid: string, message: string) => {
     // console.log(`${new Date()} : ${nick} said ${message}`);
-    if (settingsStore.addEveryUser && !playerStore.players[nick]) {
-      playerStore.initPlayer(nick, tid);
+    if (settingsStore.addEveryUser) {
+      initPlayer(nick, tid);
     }
     if (message === '!score') {
       handleScoreCommand(nick);
@@ -173,9 +178,7 @@ const BlindTest = () => {
                 break;
               }
             }
-            if (!playerStore.players[nick]) {
-              playerStore.initPlayer(nick, tid);
-            }
+            initPlayer(nick, tid);
             updateGuessState(i, new Answer(nick, isFirst, isCombo, performance.now() - trackStart.current));
             matched = true;
             break;
@@ -199,7 +202,7 @@ const BlindTest = () => {
       return newGuesses;
     });
     if (delayed) {
-      playerStore.recordAnswers(delayedAnswers.current[index]);
+      recordAnswers(delayedAnswers.current[index]);
     }
   };
 
@@ -210,7 +213,7 @@ const BlindTest = () => {
       newGuesses[index].guessedBy.push({ nick: answer.nick, points: answer.getPoints() });
       if (settingsStore.acceptanceDelay === 0) {
         endGuess(index, false);
-        playerStore.recordAnswers([answer]);
+        recordAnswers([answer]);
       } else {
         if (firstGuess) {
           const to = setTimeout(() => {
@@ -265,7 +268,7 @@ const BlindTest = () => {
 
   const handleNextSong = async () => {
     handleReveal();
-    playersBackup.current = JSON.parse(JSON.stringify(playerStore.players)); // store a deep copy
+    playersBackup.current = getPlayersCopy(); // store a deep copy
     triggerTimeouts();
     const track = btStore.getNextTrack(shuffled);
     setPlaying(false);
@@ -411,7 +414,7 @@ const BlindTest = () => {
               {isFinished &&
                 <>
                   <Button className="col-sm" id="podiumButton" type="submit" size="sm" onClick={() => setPodiumDisplayed(true)}>
-                    <FontAwesomeIcon icon={['fas', 'crown']} color="var(--spot-color)" size="lg" /> <b>SHOW PODIUM</b>
+                    <FontAwesomeIcon icon={['fas', 'crown']} color="var(--spot-color)" size="lg" /> <b>SHOW FINAL PODIUM</b>
                   </Button>
                 </>
               }

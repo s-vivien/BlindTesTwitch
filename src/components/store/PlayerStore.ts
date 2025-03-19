@@ -55,6 +55,8 @@ type Actions = {
   initPlayer: (nick: string, tid: string) => void;
   addPoints: (nick: string, points: number) => void;
   recordAnswers: (answers: Answer[]) => void;
+  getPlayers: (nicks: string[]) => Player[];
+  getDeepCopy: () => Record<string, Player>;
 }
 
 const recomputeRanks = (players: Record<string, Player>) => {
@@ -127,24 +129,26 @@ export const usePlayerStore = create<Players & Actions>()(
         }
       };
 
-      set((state) => {
-        const updated = state.players;
-        // if (updated[nick]) {
-        //   debugger; // TODO remove
-        // }
-        updated[nick] = { tid: tid, rank: -1, score: 0, nick: nick, stats: { ...EMPTY_PLAYER_STATS } };
+      if (!get().players[nick]) {
+        set((state) => {
+          const updated = state.players;
+          // if (updated[nick]) {
+          //   debugger; // TODO remove
+          // }
+          updated[nick] = { tid: tid, rank: -1, score: 0, nick: nick, stats: { ...EMPTY_PLAYER_STATS } };
 
-        if (avatarFetchTimeout === undefined) {
-          downloadAvatar(updated);
-          avatarFetchTimeout = setTimeout(() => {
-            avatarFetchTimeout = undefined;
-            downloadAvatar(get().players);
-          }, avatarFetchTimeoutDuration);
-        }
+          if (avatarFetchTimeout === undefined) {
+            downloadAvatar(updated);
+            avatarFetchTimeout = setTimeout(() => {
+              avatarFetchTimeout = undefined;
+              downloadAvatar(get().players);
+            }, avatarFetchTimeoutDuration);
+          }
 
-        recomputeRanks(updated);
-        return ({ players: updated });
-      });
+          recomputeRanks(updated);
+          return ({ players: updated });
+        });
+      }
     },
     addPoints: (nick: string, points: number) => {
       set((state) => {
@@ -184,5 +188,12 @@ export const usePlayerStore = create<Players & Actions>()(
         return ({ players: updated });
       });
     },
+    getPlayers: (nicks: string[]) => {
+      const players = get().players;
+      return nicks.map((nick: string) => players[nick]).filter(player => player !== undefined);
+    },
+    getDeepCopy: () => {
+      return JSON.parse(JSON.stringify(get().players));
+    }
   }),
 );
