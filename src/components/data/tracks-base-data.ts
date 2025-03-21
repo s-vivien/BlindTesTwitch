@@ -1,15 +1,10 @@
-import { getPlaylistTracks } from 'services/SpotifyAPI';
+import { getPlaylistTracks } from 'services/spotify-api';
 
 class TracksBaseData {
   playlist: any;
 
   constructor(playlist: any) {
     this.playlist = playlist;
-  }
-
-  async trackItems() {
-    await this.getPlaylistItems();
-    return this.playlistItems;
   }
 
   // Memoization supporting multiple calls

@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import TracksBaseData from './data/TracksBaseData';
-import { useBTTracksStore } from './store/BlindTestTracksStore';
-import { usePlayerStore } from './store/PlayerStore';
+import TracksBaseData from './data/tracks-base-data';
+import { useBTTracksStore } from './store/blind-test-tracks-store';
+import { usePlayerStore } from './store/player-store';
 
 const PlaylistSelectionRow = (props: any) => {
 

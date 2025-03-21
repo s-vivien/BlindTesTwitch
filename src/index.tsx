@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.scss';
-import App from './App';
+import App from './app';
 import { BrowserRouter } from 'react-router-dom';
 
 // https://caniuse.com/mdn-javascript_builtins_array_flatmap

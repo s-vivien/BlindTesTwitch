@@ -2,10 +2,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Form, FormControl, InputGroup } from 'react-bootstrap';
 
-import { useGlobalStore } from './store/GlobalStore';
-import PlaylistsData from './data/PlaylistsData';
-import Paginator from './Paginator';
-import PlaylistSelectionRow from './PlaylistSelectionRow';
+import { useGlobalStore } from './store/global-store';
+import PlaylistsData from './data/playlists-data';
+import Paginator from './paginator';
+import PlaylistSelectionRow from './playlist-selection-row';
 
 const PlaylistSelection = () => {
   const PAGE_SIZE = 20;

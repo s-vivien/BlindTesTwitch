@@ -1,19 +1,19 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import GlobalMenu from 'components/GlobalMenu';
-import Playlist from 'components/Playlist';
-import { useAuthStore } from 'components/store/AuthStore';
-import { useBTTracksStore } from 'components/store/BlindTestTracksStore';
-import { useGlobalStore } from 'components/store/GlobalStore';
-import { useSettingsStore } from 'components/store/SettingsStore';
+import GlobalMenu from 'components/global-menu';
+import Playlist from 'components/playlist';
+import { useAuthStore } from 'components/store/auth-store';
+import { useBTTracksStore } from 'components/store/blind-test-tracks-store';
+import { useGlobalStore } from 'components/store/global-store';
+import { useSettingsStore } from 'components/store/settings-store';
 import { useEffect, useState } from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import BlindTest from './components/BlindTest';
-import Login from './components/Login';
-import LoginCallback from './components/LoginCallback';
-import Settings from './components/Settings';
+import BlindTest from './components/blind-test';
+import Login from './components/login';
+import LoginCallback from './components/login-callback';
+import Settings from './components/settings';
 import './icons';
-import { setAxiosErrorCallback } from './services/SpotifyAPI';
+import { setAxiosErrorCallback } from './services/spotify-api';
 
 function App() {
   const navigate = useNavigate();

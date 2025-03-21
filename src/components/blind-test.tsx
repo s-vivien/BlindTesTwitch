@@ -3,28 +3,18 @@ import { cleanValueLight, sorensenDiceScore } from 'helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
-import { launchTrack, setRepeatMode } from '../services/SpotifyAPI';
-import { useAuthStore } from './store/AuthStore';
-import { BlindTestTrack, getGuessables, Guessable, GuessableState, GuessableType, mapGuessables, useBTTracksStore } from './store/BlindTestTracksStore';
-import { useGlobalStore } from './store/GlobalStore';
-import { Answer, Player, usePlayerStore } from './store/PlayerStore';
-import { TwitchMode, useSettingsStore } from './store/SettingsStore';
-import Podium from './Podium';
-import Leaderboard from './Leaderboard';
-
-type Guesser = {
-  nick: string,
-  points: number
-}
-
-type Guess = {
-  guessed: boolean,
-  guessedBy: Guesser[]
-};
+import { launchTrack, setRepeatMode } from '../services/spotify-api';
+import { useAuthStore } from './store/auth-store';
+import { BlindTestTrack, GuessableState, GuessableType, useBTTracksStore } from './store/blind-test-tracks-store';
+import { useGlobalStore } from './store/global-store';
+import { Answer, Player, usePlayerStore } from './store/player-store';
+import { TwitchMode, useSettingsStore } from './store/settings-store';
+import Podium from './podium';
+import Leaderboard from './leaderboard';
+import GuessView, { Guess } from './guessable-view';
 
 let twitchCallback: (nick: string, tid: string, msg: string) => void = () => {};
 
-const DISPLAYED_GUESS_NICK_LIMIT = 5;
 const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 const SCORE_CMD_DELAY = 2000;
 
@@ -195,7 +185,7 @@ const BlindTest = () => {
       let newGuesses = [...guesses];
       newGuesses[index].guessed = true;
       if (settingsStore.chatNotifications && twitchNick) {
-        let msg = `✅ [${currentTrack?.guessables[index].toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
+        let msg = `✅ [${newGuesses[index].guessable.toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
         if (guesses[index].guessedBy.length > DISPLAYED_GUESS_NICK_CHAT_LIMIT) msg += `, and ${guesses[index].guessedBy.length - DISPLAYED_GUESS_NICK_CHAT_LIMIT} more`;
         twitchClient.current?.say(twitchNick, msg);
       }
@@ -276,11 +266,11 @@ const BlindTest = () => {
     launchTrack(track.track_uri, settingsStore.deviceId).then(() => {
       setRepeatMode(true, settingsStore.deviceId);
       setCurrentTrack(track);
-      const newGuesses = [];
+      const newGuesses: Guess[] = [];
       delayedAnswers.current = [];
       guessTimeouts.current = [];
       for (let guessable of track.guessables) {
-        newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [] });
+        newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [], guessable: guessable });
         delayedAnswers.current.push([]);
         guessTimeouts.current.push(undefined);
       }
@@ -295,43 +285,6 @@ const BlindTest = () => {
 
   const toggleShuffle = () => {
     setShuffled(!shuffled);
-  };
-
-  const CrossEmoji = <FontAwesomeIcon color="#de281b" icon={['fas', 'times']} size="lg" />;
-  const BubbleEmoji = <FontAwesomeIcon icon={['far', 'comment']} size="lg" />;
-  const CheckEmoji = <FontAwesomeIcon color="var(--icon-green-color)" icon={['fas', 'check']} size="lg" />;
-  const LockEmoji = <FontAwesomeIcon color="var(--icon-blue-color)" icon={['fas', 'lock']} size="lg" />;
-
-  const GuessableView = (props: any) => {
-    const guessable: Guessable = props.guessable;
-    const guess: Guess = props.guess;
-    if (guess.guessed) {
-      return <div className="mb-3">
-        <div className="bt-guess" title={guessable.toGuess[0]}>{guess.guessedBy.length > 0 ? CheckEmoji : (guessable.state != GuessableState.Enabled ? LockEmoji : CrossEmoji)} {guessable.original}</div>
-        {guess.guessedBy.length > 0 &&
-          <div className="bt-gb">
-            {BubbleEmoji}&nbsp;
-            {guess.guessedBy.slice(0, DISPLAYED_GUESS_NICK_LIMIT).map((gb, i) => {
-              return <span key={'gb_' + i}>
-                {i > 0 && <>, </>}
-                {gb.nick} <b>[+{gb.points}]</b>
-              </span>;
-            })}
-            {guess.guessedBy.length > DISPLAYED_GUESS_NICK_LIMIT && <span>, and {guess.guessedBy.length - DISPLAYED_GUESS_NICK_LIMIT} more</span>}
-          </div>
-        }
-      </div>;
-    } else if (guess.guessedBy.length > 0 && settingsStore.previewGuessNumber) {
-      return <div className="mb-3">
-        {CheckEmoji}
-        <div className="bt-guess">&nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}</div>
-      </div>;
-    } else {
-      return <div className="mb-3">
-        {CrossEmoji}
-        <div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
-      </div>;
-    }
   };
 
   return (
@@ -353,39 +306,11 @@ const BlindTest = () => {
               </div>
               {playing && currentTrack !== null &&
                 <div style={{ flex: 1 }}>
-                  {getGuessables(currentTrack, GuessableType.Title).length > 0 &&
-                    <div className="px-3 pb-3">
-                      <div className="bt-h">
-                        <h2>TITLE</h2>
-                      </div>
-                      <div>
-                        <GuessableView key="guess_0" guessable={currentTrack.guessables[0]} guess={guesses[0]} />
-                      </div>
-                    </div>
-                  }
-                  {getGuessables(currentTrack, GuessableType.Artist).length > 0 &&
-                    <div className="px-3 pb-3">
-                      <div className="bt-h">
-                        <h2>ARTIST(S)</h2>
-                      </div>
-                      <div>
-                        {mapGuessables(currentTrack, GuessableType.Artist, (guessable: Guessable, index: number) => {
-                          return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
-                        })}
-                      </div>
-                    </div>
-                  }
-                  {getGuessables(currentTrack, GuessableType.Misc).length > 0 &&
-                    <div className="px-3 mb-2">
-                      <div className="bt-h">
-                        <h2>MISC</h2>
-                      </div>
-                      <div>
-                        {mapGuessables(currentTrack, GuessableType.Misc, (guessable: Guessable, index: number) => {
-                          return <GuessableView key={'guess_' + index} guessable={guessable} guess={guesses[index]} />;
-                        })}
-                      </div>
-                    </div>
+                  {
+                    [GuessableType.Title, GuessableType.Artist, GuessableType.Misc].map(type => {
+                      const filteredGuesses = guesses.filter(g => g.guessable.type === type && g.guessable.state !== GuessableState.DisabledHidden) || [];
+                      return <GuessView key={`guessview_${type}`} type={type} guesses={filteredGuesses} previewGuessNumber={settingsStore.previewGuessNumber} />;
+                    })
                   }
                 </div>
               }

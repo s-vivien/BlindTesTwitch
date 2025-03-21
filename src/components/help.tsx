@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Modal } from 'react-bootstrap';
-import { useSettingsStore } from './store/SettingsStore';
+import { useSettingsStore } from './store/settings-store';
 
 const Help = ({ show, onClose }: any) => {
 

@@ -1,9 +1,9 @@
 import { Button, Modal } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import { Player, usePlayerStore } from './store/PlayerStore';
-import TwitchAvatar from './TwitchAvatar';
+import { Player, usePlayerStore } from './store/player-store';
+import TwitchAvatar from './twitch-avatar';
 import React, { useState } from 'react';
-import { useSettingsStore } from './store/SettingsStore';
+import { useSettingsStore } from './store/settings-store';
 
 const Podium = ({ onClose }: any) => {
 
@@ -18,29 +18,29 @@ const Podium = ({ onClose }: any) => {
     idx: number = -1;
   }
 
-  const computeStatsLine = (leftText: string, rightText: string) => {
+  const renderStatsLine = (leftText: string, rightText: string) => {
     return <span style={{ display: 'flex', justifyContent: 'space-between', margin: 'auto' }}>
           <span style={{ textAlign: 'left' }}><strong>{leftText}</strong></span>
           <span style={{ textAlign: 'right' }}>{rightText}</span>
       </span>;
   };
 
-  const computePlayerStats = (player: Player) => {
+  const renderPlayerStats = (player: Player) => {
     return <div style={{ border: '3px dashed #4A4A4AFF', padding: '10px 15px', borderRadius: '.5rem', margin: '5px 5px 14px 0' }}>
-      {computeStatsLine('Answers', `${player.stats.answers}`)}
-      {settings.acceptanceDelay > 0 && computeStatsLine('Firsts', `${player.stats.firsts}`)}
-      {computeStatsLine('Combos', `${player.stats.combos}`)}
-      {computeStatsLine('Fastest', `${(player.stats.fastestAnswer / 1000).toFixed(1)} s`)}
+      {renderStatsLine('Answers', `${player.stats.answers}`)}
+      {settings.acceptanceDelay > 0 && renderStatsLine('Firsts', `${player.stats.firsts}`)}
+      {renderStatsLine('Combos', `${player.stats.combos}`)}
+      {renderStatsLine('Fastest', `${(player.stats.fastestAnswer / 1000).toFixed(1)} s`)}
     </div>;
   };
 
-  const computePlayer = (player: Player, withStats: boolean) => {
+  const renderPlayer = (player: Player, withStats: boolean) => {
     return <div
       key={`podium-avatar-${player.tid}`}
       style={{ display: 'flex', flexDirection: 'column', width: '12rem', whiteSpace: 'nowrap', overflow: 'hidden' }}>
 
       {withStats &&
-        computePlayerStats(player)
+        renderPlayerStats(player)
       }
 
       <TwitchAvatar tid={player.tid} avatar={player.avatar} className="podium-avatar" />
@@ -48,7 +48,7 @@ const Podium = ({ onClose }: any) => {
     </div>;
   };
 
-  const computePodiumStep = (
+  const renderPodiumStep = (
     players: Player[],
     delay: number,
     withStats: boolean,
@@ -78,7 +78,7 @@ const Podium = ({ onClose }: any) => {
           }}
         >
           {players.map((player) => {
-            return computePlayer(player, withStats);
+            return renderPlayer(player, withStats);
           })}
         </motion.div>
 
@@ -168,9 +168,9 @@ const Podium = ({ onClose }: any) => {
             paddingTop: '15px',
           }}
         >
-          {loser && computePodiumStep([loser], 0, false, '#656565', 46, 'crown', 'Loser')}
+          {loser && renderPodiumStep([loser], 0, false, '#656565', 46, 'crown', 'Loser')}
           {podiumContent.map((step) => {
-            return computePodiumStep(
+            return renderPodiumStep(
               step.players,
               0.5 * (podiumContent.length - 1 - step.idx),
               true,

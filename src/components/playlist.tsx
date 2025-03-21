@@ -1,6 +1,6 @@
-import PlaylistEdition from './PlaylistEdition';
-import PlaylistSelection from './PlaylistSelection';
-import { useBTTracksStore } from './store/BlindTestTracksStore';
+import PlaylistEdition from './playlist-edition';
+import PlaylistSelection from './playlist-selection';
+import { useBTTracksStore } from './store/blind-test-tracks-store';
 
 const Playlist = () => {
 
@@ -15,7 +15,7 @@ const Playlist = () => {
     <div>
       <div id="playlists">
         {btStoreTotalTracks > 0 && <PlaylistEdition onRestart={restart} />}
-        {btStoreTotalTracks == 0 && <PlaylistSelection />}
+        {btStoreTotalTracks === 0 && <PlaylistSelection />}
       </div>
     </div>
   );

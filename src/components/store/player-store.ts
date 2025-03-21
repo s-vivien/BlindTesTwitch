@@ -1,4 +1,4 @@
-import { getUsers } from 'services/TwitchAPI';
+import { getUsers } from 'services/twitch-api';
 import { create } from 'zustand';
 
 const localStorageKey: string = 'blind_test_players_v2';
@@ -194,6 +194,6 @@ export const usePlayerStore = create<Players & Actions>()(
     },
     getDeepCopy: () => {
       return JSON.parse(JSON.stringify(get().players));
-    }
+    },
   }),
 );

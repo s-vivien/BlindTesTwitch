@@ -1,9 +1,7 @@
-import { getPlaylists } from 'services/SpotifyAPI';
+import { getPlaylists } from 'services/spotify-api';
 
 // Handles cached loading of all or subsets of playlist data
 class PlaylistsData {
-  PAGE_SIZE = 20;
-
   data: any[];
   pageSize: number;
   dataInitialized = false;
@@ -38,7 +36,7 @@ class PlaylistsData {
     await this.loadSlice();
 
     // Get the rest of them if necessary
-    for (var offset = this.pageSize; offset < this.data.length; offset = offset + this.pageSize) {
+    for (let offset = this.pageSize; offset < this.data.length; offset = offset + this.pageSize) {
       await this.loadSlice(offset, offset + this.pageSize);
     }
   }

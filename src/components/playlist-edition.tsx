@@ -4,8 +4,8 @@ import { cleanValue } from 'helpers';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, OverlayTrigger, Popover, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { BlindTestTrack, computeGuessable, getGuessables, Guessable, GuessableState, GuessableType, useBTTracksStore } from './store/BlindTestTracksStore';
-import { useGlobalStore } from './store/GlobalStore';
+import { BlindTestTrack, computeGuessable, Guessable, GuessableState, GuessableType, useBTTracksStore } from './store/blind-test-tracks-store';
+import { useGlobalStore } from './store/global-store';
 
 type EditedGuessable = {
   value: string,
@@ -56,10 +56,7 @@ const PlaylistEdition = (props: any) => {
   const startEdit = (index: number) => {
     setSelectedIndex(index);
     setEdition(true);
-    let editedGuessables: EditedGuessable[] = [];
-    btStore.tracks[index].guessables.forEach(g => {
-      editedGuessables.push({ value: g.original, type: g.type, state: g.state });
-    });
+    const editedGuessables = btStore.tracks[index].guessables.map(g => ({ value: g.original, type: g.type, state: g.state }));
     setEditedValues(editedGuessables);
   };
 
@@ -142,17 +139,13 @@ const PlaylistEdition = (props: any) => {
     );
   };
 
-  const CleanedGuess = ({ guessable }: { guessable: Guessable }) => {
-    const value = guessable.toGuess[0];
-    return <span>{guessable.state !== GuessableState.Enabled ? <del>{value}</del> : <>{value}</>}</span>;
-  };
-
   const renderGuessables = (track: BlindTestTrack, trackIndex: number, type: GuessableType, cleanedValue: boolean) => {
-    const guessables = getGuessables(track, type, false);
+    const guessables = track.guessables.filter(e => e.type === type) || [];
     if (guessables.length === 0) return <></>;
     return guessables.map<React.ReactNode>((g, i) => {
       if (cleanedValue) {
-        return <CleanedGuess guessable={g} key={track.track_uri + i + '_cleaned'} />;
+        const value = g.toGuess[0];
+        return <span key={track.track_uri + i + '_cleaned'}>{g.state !== GuessableState.Enabled ? <del>{value}</del> : <>{value}</>}</span>;
       } else {
         return <EditableGuess guessable={g} key={track.track_uri + i} onTypeClick={(state: string) => {
           g.state = +state;

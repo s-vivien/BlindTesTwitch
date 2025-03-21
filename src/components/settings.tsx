@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
-import { getDevices } from 'services/SpotifyAPI';
-import { useGlobalStore } from './store/GlobalStore';
-import { TwitchMode, useSettingsStore } from './store/SettingsStore';
+import { getDevices } from 'services/spotify-api';
+import { useGlobalStore } from './store/global-store';
+import { TwitchMode, useSettingsStore } from './store/settings-store';
 
 const Settings = () => {
 

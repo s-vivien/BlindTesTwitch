@@ -101,21 +101,6 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
   }),
 );
 
-export const mapGuessables = <U>(track: BlindTestTrack, type: GuessableType, callbackfn: (value: Guessable, index: number) => U): U[] => {
-  let values: U[] = [];
-  for (let i = 0; i < track.guessables.length; ++i) {
-    const elt = track.guessables[i];
-    if (type && elt.type === type && elt.state !== GuessableState.DisabledHidden) {
-      values.push(callbackfn(elt, i));
-    }
-  }
-  return values;
-};
-
-export const getGuessables = (track: BlindTestTrack, type: GuessableType, filterDisabled: boolean = true): Guessable[] => {
-  return (track.guessables.filter(e => e.type === type && (!filterDisabled || e.state !== GuessableState.DisabledHidden)) || []);
-};
-
 export const computeGuessable = (value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled): Guessable => {
   let cleaned = [cleanValue(value)];
   specialCharactersAlternatives.forEach((replacements: string[], regexp: RegExp) => {

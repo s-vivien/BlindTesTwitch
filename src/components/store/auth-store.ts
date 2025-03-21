@@ -1,4 +1,4 @@
-import { getUsers, setDefaultAuth, validateToken } from 'services/TwitchAPI';
+import { getUsers, setDefaultAuth, validateToken } from 'services/twitch-api';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

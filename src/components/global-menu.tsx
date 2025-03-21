@@ -2,12 +2,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import Changelog from './Changelog';
-import Help from './Help';
-import { useAuthStore } from './store/AuthStore';
-import { useBTTracksStore } from './store/BlindTestTracksStore';
-import { usePlayerStore } from './store/PlayerStore';
-import { useSettingsStore } from './store/SettingsStore';
+import Changelog from './changelog';
+import Help from './help';
+import { useAuthStore } from './store/auth-store';
+import { useBTTracksStore } from './store/blind-test-tracks-store';
+import { usePlayerStore } from './store/player-store';
+import { useSettingsStore } from './store/settings-store';
 
 const GlobalMenu = () => {
 

@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { computePkcePair, getAppHomeURL } from '../helpers';
-import { useAuthStore } from './store/AuthStore';
-import { useGlobalStore } from './store/GlobalStore';
+import { useAuthStore } from './store/auth-store';
+import { useGlobalStore } from './store/global-store';
 
 const Login = () => {
 
@@ -39,12 +39,19 @@ const Login = () => {
   const spotifyIcon = <FontAwesomeIcon icon={['fab', 'spotify']} color="#1ED760" />;
   const twitchIcon = <FontAwesomeIcon icon={['fab', 'twitch']} color="#6441A4" />;
 
-  const LoginButton = (props: any) => {
+  type LoginButtonProps = {
+    loggedIn: boolean;
+    appName: string;
+    onClick: () => Promise<void>;
+    icon: React.JSX.Element;
+  };
+
+  const LoginButton = (props: LoginButtonProps) => {
     return (
-      <Button id={props.appName + 'LoginButton'} disabled={props.flag} style={{ display: 'block', margin: '5px auto', width: '20rem' }} variant={props.flag ? 'outline-success' : 'secondary'} size="lg" onClick={props.onClick}>
+      <Button id={props.appName + 'LoginButton'} disabled={props.loggedIn} style={{ display: 'block', margin: '5px auto', width: '20rem' }} variant={props.loggedIn ? 'outline-success' : 'secondary'} size="lg" onClick={props.onClick}>
         <>
-          {!props.flag && <>Log in {props.appName}</>}
-          {props.flag && <><FontAwesomeIcon icon={['far', 'check-circle']} /> Logged in {props.appName}</>}
+          {!props.loggedIn && <>Log in {props.appName}</>}
+          {props.loggedIn && <><FontAwesomeIcon icon={['far', 'check-circle']} /> Logged in {props.appName}</>}
           &nbsp;{props.icon}
         </>
       </Button>
@@ -53,8 +60,8 @@ const Login = () => {
 
   return (
     <>
-      <LoginButton flag={authStore.spotifyRefreshToken !== undefined} appName="Spotify" onClick={spotifyLogin} icon={spotifyIcon}></LoginButton>
-      <LoginButton flag={authStore.twitchOauthToken !== undefined} appName="Twitch" onClick={twitchLogin} icon={twitchIcon}></LoginButton>
+      <LoginButton loggedIn={authStore.spotifyRefreshToken !== undefined} appName="Spotify" onClick={spotifyLogin} icon={spotifyIcon}></LoginButton>
+      <LoginButton loggedIn={authStore.twitchOauthToken !== undefined} appName="Twitch" onClick={twitchLogin} icon={twitchIcon}></LoginButton>
     </>
   );
 };

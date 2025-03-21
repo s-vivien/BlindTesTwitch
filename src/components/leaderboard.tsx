@@ -2,8 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { memo, useMemo, useState } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
-import { usePlayerStore } from './store/PlayerStore';
-import TwitchAvatar from './TwitchAvatar';
+import { usePlayerStore } from './store/player-store';
+import TwitchAvatar from './twitch-avatar';
 
 type LeaderboardRow = {
   nick: string,
