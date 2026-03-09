@@ -2,6 +2,7 @@
   "name": "blindtestwitch",
   "packageManager": "yarn@4.12.0",
   "version": "0.1.0",
+  "type": "module",
   "homepage": "https://s-vivien.github.io/BlindTesTwitch/",
   "private": true,
   "dependencies": {
@@ -10,52 +11,39 @@
     "@fortawesome/free-regular-svg-icons": "^6.2.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
-    "@types/tmi.js": "^1.8.2",
-    "axios": "^1.13.2",
-    "bootstrap": "^5.3.3",
+    "axios": "^1.13.6",
+    "bootstrap": "^5.3.8",
     "class-transformer": "^0.5.1",
-    "framer-motion": "^11.9.0",
+    "framer-motion": "^12.35.2",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.6",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
-    "react-scripts": "^5.0.1",
     "reflect-metadata": "^0.1.13",
     "tmi.js": "^1.8.5",
-    "typescript": "^4.9.5",
     "zustand": "^5.0.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:https": "host=127.0.0.1 https=true react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint src",
+    "deploy": "yarn build && gh-pages -d build"
   },
   "devDependencies": {
-    "eslint": "^8.6.0",
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/tmi.js": "^1.8.2",
+    "@vitejs/plugin-basic-ssl": "^2.1.4",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^10.0.3",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
     "gh-pages": "^6.1.1",
-    "sass": "^1.58.3"
+    "sass": "^1.77.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.57.0",
+    "vite": "^7.3.1"
   }
 }

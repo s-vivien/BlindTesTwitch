@@ -23,7 +23,7 @@ const PlaylistSelectionRow = (props: any) => {
     if (!keepScores) {
       playerStore.clear();
     }
-    let tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
+    const tracks = await new TracksBaseData(props.playlist).getPlaylistItems();
     btStore.setTracksFromRaw(tracks.filter(t => t.track.is_playable));
     btStore.backup();
   };
@@ -38,7 +38,7 @@ const PlaylistSelectionRow = (props: any) => {
 
   const MusicIcon = <FontAwesomeIcon icon={['fas', 'music']} />;
 
-  let playlist = props.playlist;
+  const playlist = props.playlist;
 
   if (playlist.uri == null) return (
     <tr key={playlist.name}>

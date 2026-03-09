@@ -2,7 +2,7 @@ import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { createPKCECodes, PKCECodePair } from 'pkce';
 
 export const getAppHomeURL = () => {
-  return new URL(window.location.href).origin + process.env.PUBLIC_URL;
+  return new URL(window.location.href).origin + import.meta.env.BASE_URL.replace(/\/$/, '');
 };
 
 export const getQueryParam = (name: string) => {
@@ -15,7 +15,7 @@ export const getHashParam = (name: string) => {
 
 const getParam = (name: string, value: string) => {
   name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-  var regex = new RegExp('[\\?&#]' + name + '=([^&#]*)'),
+  const regex = new RegExp('[\\?&#]' + name + '=([^&#]*)'),
     results = regex.exec(value);
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
@@ -50,7 +50,7 @@ export const cleanValueLight = (value: string) => {
     .replaceAll(/^[!?]+/g, '')
     .replaceAll(/ [!?]+/g, ' ')
     .replaceAll(/[!?]+ /g, ' ')
-    .replaceAll(/[¿¡*,.’':_\/-]/g, '')
+    .replaceAll(/[¿¡*,.’':_/-]/g, '')
     .replaceAll('œ', 'oe')
     .replaceAll(/[$]/g, 's')
     .replaceAll(/[ø]/g, 'o')
@@ -65,9 +65,9 @@ export const specialCharactersAlternatives = new Map<RegExp, string[]>([
 
 export const cleanSpoiler = (title: string, artists: string[]) => {
   let cleaned = title;
-  for (let artist of artists) {
-    var escapedArtist = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    var regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, 'gi');
+  for (const artist of artists) {
+    const escapedArtist = artist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regExp = new RegExp(` \\(.*${escapedArtist}.*\\)| \\[.*${escapedArtist}.*\\]| - .*${escapedArtist}.*`, 'gi');
     cleaned = cleaned.replaceAll(regExp, '').trim();
   }
   return cleaned;
@@ -81,9 +81,9 @@ export const sorensenDiceScore = (first: string, second: string) => {
   if (first === second) return 1;
   if ((first.length < 2 && second.length >= 2) || second.length > 100) return 0;
 
-  let firstBigrams = new Map();
-  let firstReverseBigrams = new Map();
-  let firstAltBigrams = new Map();
+  const firstBigrams = new Map();
+  const firstReverseBigrams = new Map();
+  const firstAltBigrams = new Map();
   for (let i = 0; i < first.length - 1; i++) {
     const bigram = first[i] + first[i + 1];
     const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1;

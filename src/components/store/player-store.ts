@@ -71,7 +71,7 @@ const recomputeRanks = (players: Record<string, Player>) => {
   }
 };
 
-let avatarFetchTimeout: NodeJS.Timeout | undefined = undefined;
+let avatarFetchTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
 const avatarFetchTimeoutDuration: number = 2500;
 
 // storage is triggered manually because the store might be large and we want to avoid writing it everytime it changes (i.e. very often)
@@ -116,7 +116,7 @@ export const usePlayerStore = create<Players & Actions>()(
           getUsers(ids).then((response) => {
             set((state) => {
               const updated = state.players;
-              for (let u of response.data.data) {
+              for (const u of response.data.data) {
                 const nick = u.display_name;
                 // if (!updated[nick]) {
                 //   debugger; // TODO remove

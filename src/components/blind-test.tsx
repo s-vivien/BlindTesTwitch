@@ -3,7 +3,7 @@ import { cleanValueLight, sorensenDiceScore } from 'helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
-import { launchTrack, setRepeatMode } from '../services/spotify-api';
+import { launchTrack } from '../services/spotify-api';
 import { useAuthStore } from './store/auth-store';
 import { BlindTestTrack, GuessableState, GuessableType, useBTTracksStore } from './store/blind-test-tracks-store';
 import { useGlobalStore } from './store/global-store';
@@ -24,8 +24,8 @@ const BlindTest = () => {
   const trackStart = useRef<number>(-1);
   const delayedAnswers = useRef<Answer[][]>([]);
   const playersBackup = useRef<Record<string, Player>>({});
-  const guessTimeouts = useRef<(NodeJS.Timeout | undefined)[]>([]);
-  const scoreCommandTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const guessTimeouts = useRef<(ReturnType<typeof setTimeout> | undefined)[]>([]);
+  const scoreCommandTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const delayedScoreCommands = useRef<string[]>([]);
 
   const settingsStore = useSettingsStore();
@@ -79,7 +79,7 @@ const BlindTest = () => {
   };
 
   const twitchConnection = (chan: string, chatNotifications: boolean) => {
-    let opts: Options = {
+    const opts: Options = {
       options: {
         skipUpdatingEmotesets: true,
       },
@@ -162,7 +162,7 @@ const BlindTest = () => {
             if (settingsStore.acceptanceDelay > 0 && guess.guessedBy.length === 0) {
               isFirst = true;
             } // first guess for this item
-            for (let g of guesses) {
+            for (const g of guesses) {
               if (g.guessedBy.find((gb) => gb.nick === nick)) {
                 isCombo = true; // this player already guessed something else on this track
                 break;
@@ -182,7 +182,7 @@ const BlindTest = () => {
 
   const endGuess = (index: number, delayed: boolean) => {
     setGuesses(guesses => {
-      let newGuesses = [...guesses];
+      const newGuesses = [...guesses];
       newGuesses[index].guessed = true;
       if (settingsStore.chatNotifications && twitchNick) {
         let msg = `✅ [${newGuesses[index].guessable.toGuess[0]}] correctly guessed by ${guesses[index].guessedBy.slice(0, DISPLAYED_GUESS_NICK_CHAT_LIMIT).map((gb) => `${gb.nick} [+${gb.points}]`).join(', ')}`;
@@ -199,7 +199,7 @@ const BlindTest = () => {
   const updateGuessState = (index: number, answer: Answer) => {
     setGuesses(guesses => {
       const firstGuess = guesses[index].guessedBy.length === 0;
-      let newGuesses = [...guesses];
+      const newGuesses = [...guesses];
       newGuesses[index].guessedBy.push({ nick: answer.nick, points: answer.getPoints() });
       if (settingsStore.acceptanceDelay === 0) {
         endGuess(index, false);
@@ -232,12 +232,6 @@ const BlindTest = () => {
     }
   };
 
-  useEffect(() => {
-    if (currentTrack && !currentTrack.done && allGuessed()) {
-      endSong();
-    }
-  }, [playing, guesses, currentTrack]);
-
   const endSong = () => {
     if (currentTrack && !currentTrack.done) {
       currentTrack.done = true;
@@ -246,10 +240,16 @@ const BlindTest = () => {
     }
   };
 
+  useEffect(() => {
+    if (currentTrack && !currentTrack.done && allGuessed()) {
+      endSong();
+    }
+  }, [playing, guesses, currentTrack]);
+
   const handleReveal = () => {
     if (currentTrack && !currentTrack.done) {
       triggerTimeouts();
-      let newGuesses = [...guesses];
+      const newGuesses = [...guesses];
       guesses.forEach((g: Guess) => { g.guessed = true; });
       setGuesses(newGuesses);
       endSong();
@@ -264,12 +264,11 @@ const BlindTest = () => {
     setPlaying(false);
     setLoading(true);
     launchTrack(track.track_uri, settingsStore.deviceId).then(() => {
-      setRepeatMode(true, settingsStore.deviceId);
       setCurrentTrack(track);
       const newGuesses: Guess[] = [];
       delayedAnswers.current = [];
       guessTimeouts.current = [];
-      for (let guessable of track.guessables) {
+      for (const guessable of track.guessables) {
         newGuesses.push({ guessed: guessable.state !== GuessableState.Enabled, guessedBy: [], guessable: guessable });
         delayedAnswers.current.push([]);
         guessTimeouts.current.push(undefined);

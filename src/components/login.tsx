@@ -17,7 +17,7 @@ const Login = () => {
 
   const twitchLogin = async () => {
     window.location.href = 'https://id.twitch.tv/oauth2/authorize' +
-      '?client_id=' + process.env.REACT_APP_TWITCH_CLIENT_ID +
+      '?client_id=' + import.meta.env.VITE_TWITCH_CLIENT_ID +
       '&redirect_uri=' + getAppHomeURL() + '/callback' +
       '&scope=chat:read+chat:edit+whispers:edit' +
       '&force_verify=true' +
@@ -27,7 +27,7 @@ const Login = () => {
   const spotifyLogin = async () => {
     const pkcePair = computePkcePair();
     window.location.href = 'https://accounts.spotify.com/authorize' +
-      '?client_id=' + process.env.REACT_APP_SPOTIFY_CLIENT_ID +
+      '?client_id=' + import.meta.env.VITE_SPOTIFY_CLIENT_ID +
       '&redirect_uri=' + getAppHomeURL() + '/callback' +
       '&scope=playlist-read-private%20user-modify-playback-state%20user-read-playback-state%20user-read-private' +
       '&response_type=code' +

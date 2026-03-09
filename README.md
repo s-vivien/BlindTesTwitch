@@ -23,8 +23,8 @@ BlindTesTwitch is a all-in-one webapp: it controls your Spotify to launch the tr
 ## Configuration (if you want to deploy it yourself)
 
 A few environment variables must be set in the `.env` file :
-- REACT_APP_SPOTIFY_CLIENT_ID : (mandatory) Your Spotify app clientId
-- REACT_APP_TWITCH_CLIENT_ID : (mandatory) Your Twitch app clientId
+- VITE_SPOTIFY_CLIENT_ID : (mandatory) Your Spotify app clientId
+- VITE_TWITCH_CLIENT_ID : (mandatory) Your Twitch app clientId
 
 Both Spotify and Twitch apps are mandatory (set redirect URI to `https://<domain>/BlindTesTwitch/callback` for both) :
 - https://developer.spotify.com/dashboard/

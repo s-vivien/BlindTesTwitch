@@ -71,10 +71,10 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
     },
     setTracksFromRaw: (spotTracks: any[]) => {
       const tracks: BlindTestTrack[] = [];
-      for (let spotTrack of spotTracks) {
-        let t = spotTrack.track;
-        let artists = t.artists.map((a: any) => a.name);
-        let title = cleanSpoiler(t.name, artists);
+      for (const spotTrack of spotTracks) {
+        const t = spotTrack.track;
+        const artists = t.artists.map((a: any) => a.name);
+        const title = cleanSpoiler(t.name, artists);
         tracks.push({
           done: false,
           guessables: [computeGuessable(title, GuessableType.Title), ...t.artists.map((a: { name: string }) => computeGuessable(a.name, GuessableType.Artist))],
@@ -102,7 +102,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
 );
 
 export const computeGuessable = (value: string, type: GuessableType, state: GuessableState = GuessableState.Enabled): Guessable => {
-  let cleaned = [cleanValue(value)];
+  const cleaned = [cleanValue(value)];
   specialCharactersAlternatives.forEach((replacements: string[], regexp: RegExp) => {
     if (value.toLowerCase().match(regexp)) {
       for (const replacement of replacements) {

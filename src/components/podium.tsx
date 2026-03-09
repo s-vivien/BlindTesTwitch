@@ -121,8 +121,8 @@ const Podium = ({ onClose }: any) => {
     );
   };
 
-  let podiumContent: PodiumStepContent[] = [];
-  let players = Object.values(playerStore.players);
+  const podiumContent: PodiumStepContent[] = [];
+  const players = Object.values(playerStore.players);
 
   for (let rank = 1; rank <= 3; rank++) {
     const step = new PodiumStepContent();

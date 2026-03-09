@@ -26,10 +26,6 @@ const PlaylistSelection = () => {
     globalStore.setSubtitle(`${min}-${max} of ${playlistCount} playlists`);
   }, [currentPage, playlistCount]);
 
-  useEffect(() => {
-    loadCurrentPlaylistPage();
-  }, [currentPage]);
-
   const playlistSearch = async () => {
     if (query.length === 0) {
       playlistSearchCancel();
@@ -67,6 +63,10 @@ const PlaylistSelection = () => {
     const count = await playlistsData.total();
     setPlaylistCount(count);
   };
+
+  useEffect(() => {
+    loadCurrentPlaylistPage();
+  }, [currentPage]);
 
   const handleSearchKeyDown = (event: any) => {
     event.stopPropagation();

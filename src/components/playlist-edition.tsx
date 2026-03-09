@@ -61,13 +61,13 @@ const PlaylistEdition = (props: any) => {
   };
 
   const addExtraGuessable = () => {
-    let newEditedValues = [...editedValues];
+    const newEditedValues = [...editedValues];
     newEditedValues.push({ value: '', type: GuessableType.Misc, state: GuessableState.Enabled });
     setEditedValues(newEditedValues);
   };
 
   const removeExtraGuessable = (index: number) => {
-    let newEditedValues = [...editedValues];
+    const newEditedValues = [...editedValues];
     newEditedValues.splice(index, 1);
     setEditedValues(newEditedValues);
   };
@@ -79,13 +79,13 @@ const PlaylistEdition = (props: any) => {
   };
 
   const updateState = (index: number, state: string) => {
-    let newEditedValues = [...editedValues];
+    const newEditedValues = [...editedValues];
     newEditedValues[index].state = +state;
     setEditedValues(newEditedValues);
   };
 
   const updateValue = (index: number, value: string) => {
-    let newEditedValues = [...editedValues];
+    const newEditedValues = [...editedValues];
     newEditedValues[index].value = value;
     setEditedValues(newEditedValues);
   };

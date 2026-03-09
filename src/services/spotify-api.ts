@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { useAuthStore } from 'components/store/auth-store';
 import { consumePkcePair, getAppHomeURL } from 'helpers';
+import axios from 'axios';
 
 const authStore = useAuthStore;
 
@@ -33,7 +33,7 @@ instance.interceptors.response.use(
           const params = new URLSearchParams();
           params.append('grant_type', 'refresh_token');
           params.append('refresh_token', authStore.getState().spotifyRefreshToken || '');
-          params.append('client_id', process.env.REACT_APP_SPOTIFY_CLIENT_ID || '');
+          params.append('client_id', import.meta.env.VITE_SPOTIFY_CLIENT_ID || '');
           const rs = await instance.post('https://accounts.spotify.com/api/token',
             params, {
               headers: {
@@ -67,7 +67,7 @@ export const retrieveAccessToken = (access_code: string) => {
   params.append('redirect_uri', getAppHomeURL() + '/callback');
   params.append('grant_type', 'authorization_code');
   params.append('code_verifier', pkcePair.codeVerifier);
-  params.append('client_id', process.env.REACT_APP_SPOTIFY_CLIENT_ID || '');
+  params.append('client_id', import.meta.env.VITE_SPOTIFY_CLIENT_ID || '');
 
   return instance.post('https://accounts.spotify.com/api/token',
     params, {
@@ -93,10 +93,6 @@ export const getPlaylists = (offset: number, limit: number) => {
 export const getPlaylistTracks = (playlist_id: string, offset: number, limit: number) => {
   const market = authStore.getState().spotifyUserCountry;
   return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),uri,album(images)))`);
-};
-
-export const setRepeatMode = (enabled: boolean, device_id: string) => {
-  return instance.put(`https://api.spotify.com/v1/me/player/repeat?device_id=${device_id}&state=${enabled ? 'track' : 'off'}`);
 };
 
 export const launchTrack = (track_uri: string, device_id: string) => {

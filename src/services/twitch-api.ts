@@ -8,7 +8,7 @@ const instance = axios.create({
 
 export const setDefaultAuth = (accessToken: string) => {
   instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-  instance.defaults.headers.common['Client-Id'] = process.env.REACT_APP_TWITCH_CLIENT_ID || '';
+  instance.defaults.headers.common['Client-Id'] = import.meta.env.VITE_TWITCH_CLIENT_ID || '';
 };
 
 export const validateToken = (token: string) => {
