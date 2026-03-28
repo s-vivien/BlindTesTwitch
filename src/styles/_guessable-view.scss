@@ -1,0 +1,33 @@
+.blindtest-section-header {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 2px;
+  letter-spacing: 0.9px;
+
+  h2 {
+    font-weight: inherit;
+    display: inline-block;
+    margin: 0;
+    font-size: inherit;
+  }
+}
+
+.blindtest-guess,
+.blindtest-guessed-by {
+  letter-spacing: 0.6px;
+}
+
+.blindtest-guessed-by {
+  color: var(--alt-text-color);
+  line-height: 22px;
+}
+
+.blindtest-guess {
+  display: inline-block;
+}
+
+.blindtest-guess-unknown {
+  font-weight: bold;
+}

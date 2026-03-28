@@ -13,7 +13,7 @@ const Playlist = () => {
 
   return (
     <div>
-      <div id="playlists">
+      <div className="playlists">
         {btStoreTotalTracks > 0 && <PlaylistEdition onRestart={restart} />}
         {btStoreTotalTracks === 0 && <PlaylistSelection />}
       </div>

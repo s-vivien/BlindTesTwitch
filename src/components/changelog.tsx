@@ -10,7 +10,7 @@ const Changelog = ({ show, onClose }: any) => {
         <br />
         <h5 className="h5-with-line">End-game podium</h5>
         <br />
-        <img src="/BlindTesTwitch/chglg_3.png" className="border" style={{ width: '70%' }} />
+        <img src="/BlindTesTwitch/chglg_3.png" className="border changelog-img-medium" />
         <br />
         <ul>
           <li>Podium display at the end of the game, with stats</li>
@@ -62,7 +62,7 @@ const Changelog = ({ show, onClose }: any) => {
         <h5 className="h5-with-line">Various bug fixes</h5>
       </Modal.Body>
       <Modal.Footer>
-        <Button size="sm" style={{ color: 'white', width: '60px' }} onClick={() => onClose()}>
+        <Button size="sm" className="btn-modal-close" onClick={() => onClose()}>
           <b>Ok</b>
         </Button>
       </Modal.Footer>

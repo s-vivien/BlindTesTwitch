@@ -107,7 +107,7 @@ const PlaylistEdition = (props: any) => {
   const EditableGuess = ({ guessable, onTypeClick }: { guessable: Guessable, onTypeClick: any }) => {
     const [showMenu, setShowMenu] = useState(false);
     const value = guessable.original;
-    const icon = <FontAwesomeIcon style={{ width: '20px' }} icon={['fas', iconPerState[guessable.state].icon as IconName]} color={iconPerState[guessable.state].color} />;
+    const icon = <FontAwesomeIcon className="edition-icon" icon={['fas', iconPerState[guessable.state].icon as IconName]} color={iconPerState[guessable.state].color} />;
 
     return (
       <OverlayTrigger
@@ -121,7 +121,7 @@ const PlaylistEdition = (props: any) => {
           >
             <Popover.Body>
               {Object.entries(iconPerState).map(([key, value]) =>
-                <div key={`icon-${key}-${guessable.original}`} className={'guessable-state-icon' + (guessable.state === +key ? ' active' : '')} style={{ height: '35px', width: '35px' }}>
+                <div key={`icon-${key}-${guessable.original}`} className={'guessable-state-icon' + (guessable.state === +key ? ' active' : '')}>
                   <FontAwesomeIcon title={value.explanation} icon={['fas', value.icon as IconName]} color={value.color} size="xl" onClick={() => {
                     onTypeClick(key);
                   }} />
@@ -208,10 +208,10 @@ const PlaylistEdition = (props: any) => {
           <i>All modifications will be lost</i> (scores won't be affected)
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={restart}>
+          <Button className="btn-modal mr-2" size="sm" onClick={restart}>
             <b>Yes</b>
           </Button>
-          <Button style={{ width: '65px' }} variant="secondary" size="sm" onClick={() => setRestartModal(false)}>
+          <Button className="btn-modal" variant="secondary" size="sm" onClick={() => setRestartModal(false)}>
             <b>Cancel</b>
           </Button>
         </Modal.Footer>
@@ -222,18 +222,18 @@ const PlaylistEdition = (props: any) => {
           Do you really want to remove this track ?
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={() => remove(selectedIndex, true)}>
+          <Button className="btn-modal mr-2" size="sm" onClick={() => remove(selectedIndex, true)}>
             <b>Yes</b>
           </Button>
-          <Button style={{ width: '65px' }} variant="secondary" size="sm" onClick={() => setRemoveTrackModal(false)}>
+          <Button className="btn-modal" variant="secondary" size="sm" onClick={() => setRemoveTrackModal(false)}>
             <b>Cancel</b>
           </Button>
         </Modal.Footer>
       </Modal>
 
       <Modal show={edition} centered size="lg">
-        <Form noValidate validated={validated} onSubmit={validateEdit} style={{ flex: 1 }}>
-          <Modal.Body style={{ paddingTop: 0 }}>
+        <Form noValidate validated={validated} onSubmit={validateEdit} className="edition-modal-form">
+          <Modal.Body className="edition-modal-body">
             <Form.Group as={Row} controlId="formHeader">
               <Form.Label column sm={2}>
               </Form.Label>
@@ -252,11 +252,11 @@ const PlaylistEdition = (props: any) => {
               return <Form.Group as={Row} className="mt-2 edition-form-row" key={index}>
                 <Form.Label column sm={2}>
                   {guessable.type === GuessableType.Misc &&
-                    <Button style={{ width: '100%' }} size="sm" variant="danger" onClick={() => removeExtraGuessable(index)}>Delete</Button>
+                    <Button className="edition-btn-full" size="sm" variant="danger" onClick={() => removeExtraGuessable(index)}>Delete</Button>
                   }
                   {guessable.type !== GuessableType.Misc &&
                     Object.entries(iconPerState).map(([key, value]) =>
-                      <div key={`icon-edit-${key}-${index}`} className={'guessable-state-icon' + (guessable.state === +key ? ' active' : '')} style={{ height: '35px', width: '35px' }}>
+                      <div key={`icon-edit-${key}-${index}`} className={'guessable-state-icon' + (guessable.state === +key ? ' active' : '')}>
                         <FontAwesomeIcon title={value.explanation} icon={['fas', value.icon as IconName]} color={value.color} size="xl" onClick={() => {
                           updateState(index, key);
                         }} />
@@ -272,27 +272,27 @@ const PlaylistEdition = (props: any) => {
                     updateValue(index, e.target.value);
                   }} type="text" placeholder="Enter value" />
                 </Col>
-                <Form.Label className="code" column sm={5}>
+                <Form.Label className="monospace-text" column sm={5}>
                   {cleanValue(guessable.value)}
                 </Form.Label>
               </Form.Group>;
             })}
           </Modal.Body>
-          <Modal.Footer style={{ paddingTop: 0 }}>
+          <Modal.Footer className="edition-modal-footer">
             <OverlayTrigger
               placement="right"
               delay={{ show: 100, hide: 250 }}
               overlay={popoverHelp}
             >
-              <FontAwesomeIcon icon={['fas', 'circle-info']} style={{ fontSize: '1.95rem' }} />
+              <FontAwesomeIcon icon={['fas', 'circle-info']} className="edition-info-icon" />
             </OverlayTrigger>
             <Button size="sm" className="mr-2 edition-form-left-buttons" variant="primary" onClick={addExtraGuessable}>
               <b>Add value</b>
             </Button>
-            <Button style={{ width: '65px' }} size="sm" className="mr-2" variant="primary" type="submit">
+            <Button className="btn-modal mr-2" size="sm" variant="primary" type="submit">
               <b>Save</b>
             </Button>
-            <Button style={{ width: '65px' }} size="sm" className="mr-2" variant="secondary" onClick={endEdit}>
+            <Button className="btn-modal mr-2" size="sm" variant="secondary" onClick={endEdit}>
               <b>Cancel</b>
             </Button>
           </Modal.Footer>
@@ -300,10 +300,10 @@ const PlaylistEdition = (props: any) => {
       </Modal>
 
       <div className="playlist-load-button mb-2">
-        <Button id="selectList" type="submit" className="mx-1" onClick={() => navigate('/')} style={{ gridColumnStart: '2', width: '400px' }}>
+        <Button id="selectList" type="submit" className="mx-1 edition-play-btn" onClick={() => navigate('/')}>
           <b>Play</b>
         </Button>
-        <Button id="selectList" type="submit" className="mx-1" variant="danger" onClick={() => setRestartModal(true)} style={{ width: '100px' }}>
+        <Button id="selectList" type="submit" className="mx-1 edition-clear-btn" variant="danger" onClick={() => setRestartModal(true)}>
           <b>Clear</b>
         </Button>
       </div>
@@ -311,17 +311,17 @@ const PlaylistEdition = (props: any) => {
       <table className="table-hover edition-table">
         <thead>
         <tr>
-          <th style={{ width: '6%' }}></th>
-          <th style={{ width: '7%', textAlign: 'center' }}>Cover</th>
-          <th style={{ width: '36%' }} className={'px-3'}>Values</th>
-          <th style={{ width: '36%' }} className={'px-3'}>Cleaned values <OverlayTrigger
+          <th className="edition-col-number"></th>
+          <th className="edition-col-cover">Cover</th>
+          <th className="edition-col-values px-3">Values</th>
+          <th className="edition-col-values px-3">Cleaned values <OverlayTrigger
             placement="right"
             delay={{ show: 100, hide: 250 }}
             overlay={popoverCleanedValues}
           >
             <FontAwesomeIcon icon={['fas', 'circle-info']} className="ml-2" />
           </OverlayTrigger></th>
-          <th style={{ width: '15%', textAlign: 'center' }}>Actions</th>
+          <th className="edition-col-actions">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -331,7 +331,7 @@ const PlaylistEdition = (props: any) => {
               <td className="edition-row-number">
                 #{1 + index}
               </td>
-              <td id="cover" style={{ textAlign: 'center' }}>
+              <td id="cover" className="edition-cover-cell">
                 <img className="edition-cover" id="cover-image" src={track.img} alt="cover" />
               </td>
               <td className={'px-3'}>
@@ -345,7 +345,7 @@ const PlaylistEdition = (props: any) => {
                   {renderGuessables(track, index, GuessableType.Misc, false)}
                 </div>
               </td>
-              <td className={'px-3 code'}>
+              <td className={'px-3 monospace-text'}>
                 <div>
                   <b>{renderGuessables(track, index, GuessableType.Title, true)}</b>
                 </div>

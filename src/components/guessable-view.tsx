@@ -37,7 +37,7 @@ const GuessView = (props: GuessViewProps) => {
     return null;
   }
   return <div className="px-3 pb-3">
-    <div className="bt-h">
+    <div className="blindtest-section-header">
       <h2>{labelPerType[props.type]}</h2>
     </div>
     <div>
@@ -50,11 +50,11 @@ const GuessView = (props: GuessViewProps) => {
           if (guess.guessed) {
             guessContent = (
               <>
-                <div className="bt-guess" title={guessable.toGuess[0]}>
+                <div className="blindtest-guess" title={guessable.toGuess[0]}>
                   {guess.guessedBy.length > 0 ? checkEmoji : (guessable.state !== GuessableState.Enabled ? lockEmoji : crossEmoji)} {guessable.original}
                 </div>
                 {guess.guessedBy.length > 0 && (
-                  <div className="bt-gb">
+                  <div className="blindtest-guessed-by">
                     {bubbleEmoji}&nbsp;
                     {guess.guessedBy.slice(0, DISPLAYED_GUESS_NICK_LIMIT).map((gb, i) => (
                       <span key={`gb_${i}`}>{i > 0 && <>, </>}{gb.nick} <b>[+{gb.points}]</b></span>
@@ -70,7 +70,7 @@ const GuessView = (props: GuessViewProps) => {
             guessContent = (
               <>
                 {checkEmoji}
-                <div className="bt-guess">
+                <div className="blindtest-guess">
                   &nbsp;Guessed by <b>{guess.guessedBy.length}</b> player{guess.guessedBy.length > 1 ? 's' : ''}
                 </div>
               </>
@@ -79,7 +79,7 @@ const GuessView = (props: GuessViewProps) => {
             guessContent = (
               <>
                 {crossEmoji}
-                <div className="bt-guess" style={{ fontWeight: 'bold' }}>&nbsp;?</div>
+                <div className="blindtest-guess blindtest-guess-unknown">&nbsp;?</div>
               </>
             );
           }

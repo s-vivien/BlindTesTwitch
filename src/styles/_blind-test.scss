@@ -1,0 +1,45 @@
+.blindtest-panel {
+  background-color: var(--panel-bg);
+  border-radius: 0.3rem;
+}
+
+.blindtest-left-panel {
+  @extend .blindtest-panel;
+  display: flex;
+  position: sticky;
+  top: 60px;
+}
+
+.blindtest-guesses {
+  flex: 1;
+}
+
+.blindtest-idle-message {
+  margin: auto;
+  color: grey;
+}
+
+.player-bar {
+  display: flex;
+}
+
+.cover {
+  color: var(--cover-text-color);
+  height: 400px;
+  width: 400px;
+  background-color: var(--cover-bg-color);
+  border: solid black 1px;
+  line-height: 400px;
+  text-align: center;
+  font-size: 80px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+  }
+}
+
+.no-caret-dropdown::after {
+  display: none !important;
+}

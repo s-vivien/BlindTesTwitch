@@ -89,8 +89,8 @@ const PlaylistSelection = () => {
     const className = query.length > 0 ? 'search queryPresent' : 'search';
 
     return (
-      <div id="playlists">
-        <div id="playlistsHeader">
+      <div className="playlists">
+        <div className="playlists-header">
           <Paginator currentPage={currentPage} pageLimit={PAGE_SIZE} totalRecords={playlistCount} onPageChanged={handlePageChanged} />
           <Form className={className}>
             <InputGroup>
@@ -104,12 +104,12 @@ const PlaylistSelection = () => {
         <table className="table table-hover table-sm">
           <thead>
           <tr>
-            <th style={{ width: '30px' }}></th>
+            <th className="playlists-col-icon"></th>
             <th>Name</th>
-            <th style={{ width: '150px' }}>Owner</th>
-            <th style={{ width: '100px' }}>Tracks</th>
-            <th style={{ width: '120px' }}>Private</th>
-            <th style={{ width: '100px' }}></th>
+            <th className="playlists-col-owner">Owner</th>
+            <th className="playlists-col-tracks">Tracks</th>
+            <th className="playlists-col-private">Private</th>
+            <th className="playlists-col-actions"></th>
           </tr>
           </thead>
           <tbody>
@@ -121,7 +121,7 @@ const PlaylistSelection = () => {
           })}
           </tbody>
         </table>
-        <div id="playlistsFooter" className="mb-5">
+        <div className="playlists-footer mb-5">
           <Paginator currentPage={currentPage} pageLimit={PAGE_SIZE} totalRecords={playlistCount} onPageChanged={handlePageChanged} />
         </div>
       </div>

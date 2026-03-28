@@ -1,0 +1,105 @@
+// Small button styles
+$btn-padding-x-xs: 0.35rem !default;
+$btn-padding-y-xs: 0.12rem !default;
+$input-btn-line-height-xs: 1.3 !default;
+
+input[type=checkbox] {
+  accent-color: $primary;
+  vertical-align: middle;
+}
+
+a {
+  text-decoration: none
+}
+
+img {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.btn.btn-xs {
+  // line-height: ensure proper height of button next to small input
+  @include button-size($btn-padding-y-xs,
+          $btn-padding-x-xs,
+          $font-size-sm,
+          $btn-border-radius-sm);
+}
+
+.btn {
+  border-radius: 999rem;
+}
+
+body {
+  user-select: none;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px $input-bg inset !important;
+  -webkit-text-fill-color: $input-color !important;
+}
+
+svg {
+  vertical-align: -0.125em;
+}
+
+.was-validated .form-control:invalid {
+  border-color: red;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.spinner:before {
+  content: "Loading…";
+  position: absolute;
+  top: 240px;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+}
+
+.spinner:not(:required):before {
+  content: "";
+  border-radius: 50%;
+  border: 4px solid rgba(236, 235, 232, 1);
+  border-top-color: rgba(130, 130, 130, 1);
+  animation: spinner 1s linear infinite;
+}
+
+.monospace-text {
+  font-family: 'consolas';
+}
+
+// Shared button sizes for modals and forms
+.btn-modal {
+  width: 65px;
+}
+
+.btn-modal-close {
+  color: white;
+  width: 60px;
+}
+
+.btn-square-sm {
+  width: 35px;
+}

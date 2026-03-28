@@ -30,9 +30,9 @@ const PlaylistSelectionRow = (props: any) => {
 
   const renderTickCross = (condition: boolean) => {
     if (condition) {
-      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" style={{ color: 'green' }} />;
+      return <FontAwesomeIcon icon={['far', 'check-circle']} size="1x" color="var(--icon-green-color)" />;
     } else {
-      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" style={{ color: 'red' }} />;
+      return <FontAwesomeIcon icon={['far', 'times-circle']} size="1x" color="var(--icon-red-color)" />;
     }
   };
 
@@ -57,13 +57,13 @@ const PlaylistSelectionRow = (props: any) => {
           Do you want to reset the leaderboard scores ?
         </Modal.Body>
         <Modal.Footer>
-          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={() => loadPlaylist(false)}>
+          <Button className="btn-modal mr-2" size="sm" onClick={() => loadPlaylist(false)}>
             <b>Yes</b>
           </Button>
-          <Button style={{ width: '65px' }} size="sm" className="mr-2" onClick={() => loadPlaylist(true)}>
+          <Button className="btn-modal mr-2" size="sm" onClick={() => loadPlaylist(true)}>
             <b>No</b>
           </Button>
-          <Button style={{ width: '65px' }} size="sm" variant="secondary" onClick={() => setConfirmationDisplayed(false)}>
+          <Button className="btn-modal" size="sm" variant="secondary" onClick={() => setConfirmationDisplayed(false)}>
             <b>Cancel</b>
           </Button>
         </Modal.Footer>

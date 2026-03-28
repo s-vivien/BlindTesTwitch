@@ -1,0 +1,98 @@
+.playlists {
+  animation: fadeIn 1s;
+
+  table {
+    thead {
+      th {
+        border-top-width: 0;
+      }
+    }
+
+    &.table-sm {
+
+      td,
+      th {
+        padding: 8px;
+      }
+    }
+  }
+}
+
+.playlists-header {
+  display: flex;
+  flex-direction: row-reverse;
+
+  .btn {
+    &:focus {
+      background-color: $primary;
+    }
+  }
+
+  form {
+    margin-left: 20px;
+  }
+
+  form.search {
+    input {
+      width: 64px;
+      transition: width 250ms ease-in-out;
+
+      &:focus {
+        border-color: $input-border-color;
+        width: 200px;
+      }
+    }
+
+    &.queryPresent {
+      input {
+        width: 200px;
+      }
+    }
+
+    .input-group {
+      background-color: $input-bg;
+    }
+
+    .input-group-text {
+      color: var(--search-icon-color);
+      border-left-color: transparent;
+      padding-left: 10px;
+      border-radius: 0 10% 10% 0;
+    }
+
+    .closeIcon,
+    .searchIcon {
+      cursor: pointer;
+    }
+  }
+}
+
+.playlists-footer {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 20px;
+}
+
+.btn-paginator {
+  height: 100%;
+}
+
+.playlists-col-icon {
+  width: 30px;
+}
+
+.playlists-col-owner {
+  width: 150px;
+}
+
+.playlists-col-tracks {
+  width: 100px;
+}
+
+.playlists-col-private {
+  width: 120px;
+}
+
+.playlists-col-actions {
+  width: 100px;
+}

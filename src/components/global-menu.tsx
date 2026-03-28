@@ -55,16 +55,16 @@ const GlobalMenu = () => {
       <div ref={ref} onClick={(e) => {
         e.preventDefault();
         onClick(e);
-      }} style={{ fontSize: 'large', backgroundColor: 'var(--global-menu-color)', borderRadius: '35px', display: 'inline-block' }}>
-        <FontAwesomeIcon icon={['fas', 'bars']} style={{ margin: '0 0.5rem 0 0.75rem', verticalAlign: 'middle' }} />
-        <img src={twitchAvatar} style={{ height: '35px', borderRadius: '100%' }} />
+      }} className="global-menu-toggle">
+        <FontAwesomeIcon icon={['fas', 'bars']} className="global-menu-icon" />
+        <img src={twitchAvatar} className="global-menu-avatar" />
       </div>
     ),
   );
 
   return (
     <>
-      <Dropdown style={{ display: 'inline-block' }} className="mx-2">
+      <Dropdown className="global-menu mx-2">
         <Dropdown.Toggle as={CustomToggle} />
         <Dropdown.Menu>
           <Dropdown.Item as="button" onClick={onPlaylistClick}><FontAwesomeIcon icon={['fas', 'list']} size="lg" /> Playlist</Dropdown.Item>
@@ -76,7 +76,7 @@ const GlobalMenu = () => {
           <Dropdown.Item as="button" onClick={onHelpClick}><FontAwesomeIcon icon={['fas', 'question-circle']} size="lg" /> Help</Dropdown.Item>
           <Dropdown.Divider />
           <Dropdown.Item as="button" onClick={onChangelogClick}><FontAwesomeIcon icon={['fas', 'book']} size="lg" /> Changelog</Dropdown.Item>
-          <Dropdown.Item as="button"><a style={{ color: 'inherit' }} href="https://ko-fi.com/neum4nn" target="_blank"><FontAwesomeIcon icon={['fas', 'heart']} color="red" size="lg" /> Support me</a></Dropdown.Item>
+          <Dropdown.Item as="button"><a className="support-link" href="https://ko-fi.com/neum4nn" target="_blank"><FontAwesomeIcon icon={['fas', 'heart']} color="red" size="lg" /> Support me</a></Dropdown.Item>
           <Dropdown.Item as="button" onClick={onLogoutClick}><FontAwesomeIcon icon={['fas', 'sign-out-alt']} size="lg" /> Logout</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

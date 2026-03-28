@@ -1,0 +1,129 @@
+.blindtest-table {
+  td:first-child {
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+  }
+
+  td:last-child {
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+  }
+
+  font-weight: 700;
+  width: 100%;
+  table-layout: fixed;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  letter-spacing: 0.9px;
+  line-height: 1.2;
+
+  th {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  td {
+    text-transform: none;
+    font-weight: initial;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  button {
+    font-size: 0.6rem;
+    margin: 1px 0;
+  }
+}
+
+.leaderboard-row {
+  position: relative;
+  border-radius: 100%;
+
+  span,
+  div {
+    display: inline-block;
+    line-height: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .leaderboard-avatar {
+    border-radius: 100%;
+    height: 35px;
+    width: 35px;
+    border: 1.5px solid black;
+    vertical-align: top;
+  }
+
+  .leaderboard-nick {
+    max-width: 100%;
+  }
+
+  .leaderboard-buttons {
+    button {
+      vertical-align: sub
+    }
+  }
+
+  &:hover {
+    background-color: var(--bs-body-bg);
+
+    .leaderboard-buttons {
+      right: 0;
+    }
+
+    .leaderboard-nick {
+      max-width: calc(100% - 65px);
+    }
+  }
+}
+
+.leaderboard-buttons {
+  position: absolute;
+  top: 0;
+  right: -80px;
+
+  button {
+    width: 1.5rem;
+    text-align: center;
+    padding: 0;
+    line-height: 1.4rem;
+    margin-right: 5px;
+
+    svg {
+      margin-left: 0.04rem;
+    }
+  }
+}
+
+.leaderboard-col-rank {
+  width: 10%;
+  text-align: center;
+}
+
+.leaderboard-col-avatar {
+  width: 12%;
+}
+
+.leaderboard-col-nick {
+  width: 61%;
+}
+
+.leaderboard-col-score {
+  width: 17%;
+  text-align: center;
+}
+
+.leaderboard-cell-center {
+  text-align: center;
+}
+
+.leaderboard-cell-nick {
+  position: relative;
+}
+
+.leaderboard-overflow-row {
+  text-align: center;
+}

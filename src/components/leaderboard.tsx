@@ -55,15 +55,15 @@ const Leaderboard = memo(() => {
   };
 
   return (
-    <div id="leaderboard" className="p-3 bt-panel border rounded-3">
+    <div id="leaderboard" className="p-3 blindtest-panel border rounded-3">
       <FormControl value={nickFilter} className={'mb-2'} type="text" role="searchbox" placeholder="Nick filter" size="sm" onChange={onNickFilterChange} />
-      <table className="table-hover bt-t">
+      <table className="table-hover blindtest-table">
         <thead>
         <tr>
-          <th style={{ width: '10%', textAlign: 'center' }}>#</th>
-          <th style={{ width: '12%' }}></th>
-          <th style={{ width: '61%' }}>Nick</th>
-          <th style={{ width: '17%', textAlign: 'center' }}>Score</th>
+          <th className="leaderboard-col-rank">#</th>
+          <th className="leaderboard-col-avatar"></th>
+          <th className="leaderboard-col-nick">Nick</th>
+          <th className="leaderboard-col-score">Score</th>
         </tr>
         </thead>
         <tbody>
@@ -78,13 +78,13 @@ const Leaderboard = memo(() => {
               transition={{ duration: 0.3 }}
               layout="position"
             >
-              <td style={{ textAlign: 'center' }}>
+              <td className="leaderboard-cell-center">
                 <span>{sc.displayedRank}</span>
               </td>
               <td>
                 <TwitchAvatar tid={sc.tid} avatar={sc.avatar} className="leaderboard-avatar" />
               </td>
-              <td style={{ position: 'relative' }}>
+              <td className="leaderboard-cell-nick">
                 <span className="leaderboard-nick">{sc.nick}</span>
                 <div className="leaderboard-buttons">
                   <Button type="submit" size="sm" onClick={() => addPointToPlayer(sc.nick, -1)}>
@@ -95,13 +95,13 @@ const Leaderboard = memo(() => {
                   </Button>
                 </div>
               </td>
-              <td style={{ textAlign: 'center' }}>
+              <td className="leaderboard-cell-center">
                 <span>{sc.score}</span>
               </td>
             </motion.tr>
           ))}
           {filteredAndSortedLeaderboardRows.length > DISPLAYED_USER_LIMIT &&
-            <tr style={{ textAlign: 'center' }}>
+            <tr className="leaderboard-overflow-row">
               <td colSpan={4}><span><i>...{filteredAndSortedLeaderboardRows.length - DISPLAYED_USER_LIMIT} more players</i></span></td>
             </tr>
           }

@@ -1,0 +1,94 @@
+.podium-modal {
+  &.modal-dialog {
+    width: fit-content;
+  }
+  max-width: 90%;
+  overflow-x: auto;
+}
+
+.podium-avatar {
+  border-radius: 100%;
+  height: 120px;
+  width: 120px;
+  align-self: center;
+  border: 6px solid var(--podium-border-color);
+  vertical-align: top;
+  box-shadow: 10px 5px 10px rgb(12, 12, 12);
+}
+
+.podium-grid {
+  display: grid;
+  grid-auto-flow: column dense;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  justify-content: center;
+  justify-items: center;
+  align-items: flex-end;
+  height: 41rem;
+  width: fit-content;
+  margin: auto;
+  padding-left: 6rem;
+  padding-right: 6rem;
+  padding-top: 15px;
+}
+
+.podium-step {
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+}
+
+.podium-step-header {
+  align-self: center;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.podium-player {
+  display: flex;
+  flex-direction: column;
+  width: 12rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.podium-name {
+  text-align: center;
+}
+
+.podium-stats {
+  border: 3px dashed #4a4a4a;
+  padding: 10px 15px;
+  border-radius: 0.5rem;
+  margin: 5px 5px 14px 0;
+}
+
+.podium-stats-line {
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+}
+
+.podium-bar {
+  place-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #656565;
+  margin-bottom: -1px;
+  justify-content: end;
+  padding-bottom: 1.5rem;
+}
+
+.podium-medal {
+  width: 5rem;
+  filter: drop-shadow(5px 5px 3px #222);
+}
+
+.podium-subtext {
+  font-weight: bold;
+  font-size: larger;
+}

@@ -19,14 +19,14 @@ const Podium = ({ onClose }: any) => {
   }
 
   const renderStatsLine = (leftText: string, rightText: string) => {
-    return <span style={{ display: 'flex', justifyContent: 'space-between', margin: 'auto' }}>
-          <span style={{ textAlign: 'left' }}><strong>{leftText}</strong></span>
-          <span style={{ textAlign: 'right' }}>{rightText}</span>
+    return <span className="podium-stats-line">
+          <span><strong>{leftText}</strong></span>
+          <span>{rightText}</span>
       </span>;
   };
 
   const renderPlayerStats = (player: Player) => {
-    return <div style={{ border: '3px dashed #4A4A4AFF', padding: '10px 15px', borderRadius: '.5rem', margin: '5px 5px 14px 0' }}>
+    return <div className="podium-stats">
       {renderStatsLine('Answers', `${player.stats.answers}`)}
       {settings.acceptanceDelay > 0 && renderStatsLine('Firsts', `${player.stats.firsts}`)}
       {renderStatsLine('Combos', `${player.stats.combos}`)}
@@ -37,14 +37,14 @@ const Podium = ({ onClose }: any) => {
   const renderPlayer = (player: Player, withStats: boolean) => {
     return <div
       key={`podium-avatar-${player.tid}`}
-      style={{ display: 'flex', flexDirection: 'column', width: '12rem', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+      className="podium-player">
 
       {withStats &&
         renderPlayerStats(player)
       }
 
       <TwitchAvatar tid={player.tid} avatar={player.avatar} className="podium-avatar" />
-      <span style={{ textAlign: 'center' }}>{player.nick}</span>
+      <span className="podium-name">{player.nick}</span>
     </div>;
   };
 
@@ -52,7 +52,6 @@ const Podium = ({ onClose }: any) => {
     players: Player[],
     delay: number,
     withStats: boolean,
-    color: string,
     heightPercent: number,
     svg: string,
     subtext: string,
@@ -60,10 +59,11 @@ const Podium = ({ onClose }: any) => {
     return (
       <div
         key={players[0].tid}
-        style={{ display: 'flex', flexDirection: 'column', placeContent: 'center', height: heightPercent + '%' }}
+        className="podium-step"
+        style={{ height: heightPercent + '%' }}
       >
         <motion.div
-          style={{ alignSelf: 'center', marginBottom: '.25rem', display: 'flex', alignItems: 'center' }}
+          className="podium-step-header"
           initial="hidden"
           animate="visible"
           variants={{
@@ -83,18 +83,7 @@ const Podium = ({ onClose }: any) => {
         </motion.div>
 
         <motion.div
-          style={{
-            placeContent: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            overflow: 'hidden',
-            borderRadius: '.5rem',
-            backgroundColor: color,
-            marginBottom: -1,
-            justifyContent: 'end',
-            paddingBottom: '1.5rem',
-          }}
+          className="podium-bar"
           initial="hidden"
           animate="visible"
           variants={{
@@ -113,9 +102,9 @@ const Podium = ({ onClose }: any) => {
           <motion.div
             animate={{ rotate: [0, 5, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }}
             transition={{ delay: Math.random() * 2, repeat: Infinity, duration: 2, ease: 'easeInOut' }}>
-            <img style={{ width: '5rem', filter: 'drop-shadow(5px 5px 3px #222)' }} src={`/BlindTesTwitch/${svg}.svg`}></img>
+            <img className="podium-medal" src={`/BlindTesTwitch/${svg}.svg`}></img>
           </motion.div>
-          <span style={{ fontWeight: 'bold', fontSize: 'larger' }}>{subtext}</span>
+          <span className="podium-subtext">{subtext}</span>
         </motion.div>
       </div>
     );
@@ -152,29 +141,14 @@ const Podium = ({ onClose }: any) => {
     <Modal scrollable={true} show={true} centered dialogClassName="podium-modal">
       <Modal.Body>
         <motion.div
-          style={{
-            display: 'grid',
-            gridAutoFlow: 'column dense',
-            gap: '.5rem',
-            marginTop: '2rem',
-            justifyContent: 'center',
-            justifyItems: 'center',
-            alignItems: 'flex-end',
-            height: '41rem',
-            width: 'fit-content',
-            margin: 'auto',
-            paddingLeft: '6rem',
-            paddingRight: '6rem',
-            paddingTop: '15px',
-          }}
+          className="podium-grid"
         >
-          {loser && renderPodiumStep([loser], 0, false, '#656565', 46, 'crown', 'Loser')}
+          {loser && renderPodiumStep([loser], 0, false, 46, 'crown', 'Loser')}
           {podiumContent.map((step) => {
             return renderPodiumStep(
               step.players,
               0.5 * (podiumContent.length - 1 - step.idx),
               true,
-              '#656565',
               (100 - 10 * (step.rank - 1)),
               ['gold', 'silver', 'bronze'][step.rank - 1],
               `${step.score} point${step.score > 1 ? 's' : ''}`,
@@ -188,7 +162,7 @@ const Podium = ({ onClose }: any) => {
             <b>Pick random loser</b>
           </Button>
         }
-        <Button size="sm" style={{ color: 'white', width: '60px' }} onClick={() => onClose()}>
+        <Button size="sm" className="btn-modal-close" onClick={() => onClose()}>
           <b>Close</b>
         </Button>
       </Modal.Footer>

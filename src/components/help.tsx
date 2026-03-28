@@ -23,7 +23,7 @@ const Help = ({ show, onClose }: any) => {
             </ul>
           </li>
         </ul>
-        <p style={{ border: 'dashed black', padding: '10px' }}>
+        <p className="help-warning-box">
           <FontAwesomeIcon icon={['fas', 'exclamation-triangle']} size="lg" /> <i><b>Each proposition must contain a single artist/title</b></i> <FontAwesomeIcon icon={['fas', 'exclamation-triangle']} size="lg" />
           <br />
           <i>i.e. if your message contains both the artist and the title, or two artists, it won't be acknowledged...</i>
@@ -43,7 +43,7 @@ const Help = ({ show, onClose }: any) => {
         </ul>
       </Modal.Body>
       <Modal.Footer>
-        <Button size="sm" style={{ color: 'white', width: '60px' }} onClick={() => onClose()}>
+        <Button size="sm" className="btn-modal-close" onClick={() => onClose()}>
           <b>Ok</b>
         </Button>
       </Modal.Footer>

@@ -54,7 +54,7 @@ const Settings = () => {
 
   if (initialized) {
     return (
-      <div style={{ width: '600px', margin: 'auto' }} className="mb-3">
+      <div className="settings-container mb-3">
         <Form noValidate validated={validated} onSubmit={submit}>
 
           <h3>Global</h3>
@@ -68,8 +68,8 @@ const Settings = () => {
           </Form.Group>
           <Form.Group className="mb-3" controlId="formGroupAcceptance">
             <Form.Label>Answer acceptance delay</Form.Label>
-            <Form.Range onChange={(e) => setAcceptanceDelay(e.target.valueAsNumber)} value={acceptanceDelay} style={{ width: '100%' }} min={0} max={20} />
-            <Form.Label style={{ width: '100%', textAlign: 'center', marginTop: '-10px' }}><i>{acceptanceDelay} second{acceptanceDelay > 1 ? 's' : ''}</i></Form.Label>
+            <Form.Range onChange={(e) => setAcceptanceDelay(e.target.valueAsNumber)} value={acceptanceDelay} className="settings-range" min={0} max={20} />
+            <Form.Label className="settings-range-label"><i>{acceptanceDelay} second{acceptanceDelay > 1 ? 's' : ''}</i></Form.Label>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formPreviewGuessNumber">
             <Form.Check disabled={acceptanceDelay === 0} type="checkbox" checked={previewGuessNumber && acceptanceDelay > 0} label="Preview the number of guesses during the acceptance delay" onChange={(e) => { setPreviewGuessNumber(e.target.checked); }} />
@@ -93,10 +93,10 @@ const Settings = () => {
             <Form.Check type="checkbox" checked={chatNotifications} label="Channel notifications (display guesses in the chat)" onChange={(e) => { setChatNotifications(e.target.checked); }} />
           </Form.Group>
 
-          <Button style={{ width: '80px' }} size="sm" className="mr-2" variant="primary" type="submit">
+          <Button className="btn-settings mr-2" size="sm" variant="primary" type="submit">
             <b>Save</b>
           </Button>
-          <Button disabled={!settingsStore.isInitialized()} style={{ width: '80px' }} size="sm" className="mx-2" variant="secondary" onClick={() => navigate('/')}>
+          <Button disabled={!settingsStore.isInitialized()} className="btn-settings mx-2" size="sm" variant="secondary" onClick={() => navigate('/')}>
             <b>Cancel</b>
           </Button>
         </Form>

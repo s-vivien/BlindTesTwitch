@@ -11,17 +11,17 @@ $btn-transition: none;
   --icon-red-color: #f34a4a;
 }
 
+.dropdown-menu {
+  --bs-dropdown-link-active-color: none;
+  --bs-dropdown-link-active-bg: none;
+}
+
 // ==================================== light
 
 @include color-mode(light) {
 
   --bs-border-color: #adadad;
   --bs-dropdown-link-active-bg: #3c3e41;
-
-  .dropdown-menu {
-    --bs-dropdown-link-active-color: none;
-    --bs-dropdown-link-active-bg: none;
-  }
 
   $button-color: #747474;
 
@@ -35,6 +35,12 @@ $btn-transition: none;
   --disabled-text: #b1b1b1;
   --panel-bg: #e4e4e4;
   --global-menu-color: #8d8d8d;
+  --border-subtle: #989898;
+  --cover-text-color: rgb(49, 49, 49);
+  --cover-bg-color: rgb(167, 167, 167);
+  --podium-border-color: #464646;
+  --changelog-line-color: #353535;
+  --search-icon-color: #dee2e6;
 }
 
 // ==================================== dark
@@ -42,11 +48,6 @@ $btn-transition: none;
 @include color-mode(dark) {
   --bs-body-bg: #18191a;
   --bs-border-color: #413c3c;
-
-  .dropdown-menu {
-    --bs-dropdown-link-active-color: none;
-    --bs-dropdown-link-active-bg: none;
-  }
 
   $button-color: #5e5e5e;
 
@@ -60,6 +61,12 @@ $btn-transition: none;
   --disabled-text: #686868;
   --panel-bg: #242526;
   --global-menu-color: #363636;
+  --border-subtle: #989898;
+  --cover-text-color: rgb(49, 49, 49);
+  --cover-bg-color: rgb(167, 167, 167);
+  --podium-border-color: #464646;
+  --changelog-line-color: #555555;
+  --search-icon-color: #dee2e6;
 }
 
 @import "global.scss";

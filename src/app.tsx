@@ -58,11 +58,11 @@ function App() {
   return (
     <>
       <header className="app-header">
-        <div style={{ position: 'absolute', left: 0, fontSize: '1.3333rem', padding: '4px' }}>
+        <div className="app-header-left">
           <FontAwesomeIcon icon={['fab', 'spotify']} color="var(--spot-color)" size="sm" />
-          <a className="btt" href={import.meta.env.BASE_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
+          <a className="app-brand" href={import.meta.env.BASE_URL}> <b>B</b>lind<b>T</b>es<b>T</b>witch</a>
         </div>
-        <div style={{ position: 'absolute', right: 0 }}>
+        <div className="app-header-right">
           {loggedIn &&
             <GlobalMenu />
           }

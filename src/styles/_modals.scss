@@ -1,0 +1,68 @@
+.popover {
+  background-color: $input-bg;
+  border: 2px solid $input-border-color;
+}
+
+.modal-footer {
+  border: none;
+}
+
+.btn-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 1.25rem 1rem;
+}
+
+.changelog-modal {
+  padding-top: calc(var(--bs-modal-margin) * 2);
+  justify-content: center;
+  margin: auto;
+  align-items: center;
+
+  .h5-with-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .h5-with-line::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background-color: var(--changelog-line-color);
+    margin-left: 10px;
+  }
+
+  img {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .img-caption {
+    padding-top: 10px;
+    text-align: center;
+    font-style: italic;
+  }
+}
+
+.help-modal {
+  justify-content: center;
+  margin: auto;
+  align-items: center;
+  text-align: center;
+
+  li {
+    text-align: left;
+  }
+}
+
+.help-warning-box {
+  border: dashed black;
+  padding: 10px;
+}
+
+.changelog-img-medium {
+  width: 70%;
+}

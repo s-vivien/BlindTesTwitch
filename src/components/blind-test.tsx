@@ -291,7 +291,7 @@ const BlindTest = () => {
       <div id="blindtest">
         <div className="row mb-4">
           <div className="col-md-8">
-            <div className="p-3 mb-2 bt-left-panel border rounded-3">
+            <div className="p-3 mb-2 blindtest-left-panel border rounded-3">
               <div id="cover" className="cover ">
                 {allGuessed() &&
                   <img id="cover-image" src={currentTrack?.img} alt="cover" />
@@ -304,7 +304,7 @@ const BlindTest = () => {
                 }
               </div>
               {playing && currentTrack !== null &&
-                <div style={{ flex: 1 }}>
+                <div className="blindtest-guesses">
                   {
                     [GuessableType.Title, GuessableType.Artist, GuessableType.Misc].map(type => {
                       const filteredGuesses = guesses.filter(g => g.guessable.type === type && g.guessable.state !== GuessableState.DisabledHidden) || [];
@@ -314,15 +314,15 @@ const BlindTest = () => {
                 </div>
               }
               {!playing && !loading &&
-                <div style={{ margin: 'auto', color: 'grey' }}><i>Click NEXT to start playing</i></div>
+                <div className="blindtest-idle-message"><i>Click NEXT to start playing</i></div>
               }
             </div>
           </div>
           <div className="col-md-4">
-            <div id="player" className="mb-2 player" style={{ display: 'flex' }}>
+            <div id="player" className="mb-2 player player-bar">
               {!isFinished &&
                 <>
-                  <Button id="shuffleButton" type="submit" size="sm" onClick={toggleShuffle} style={{ width: '35px' }}>
+                  <Button id="shuffleButton" type="submit" size="sm" className="btn-square-sm" onClick={toggleShuffle}>
                     <FontAwesomeIcon icon={['fas', 'shuffle']} color={shuffled ? 'var(--spot-color)' : '#242526'} size="lg" />
                   </Button>
                   &nbsp;
@@ -344,7 +344,7 @@ const BlindTest = () => {
               }
               &nbsp;
               <Dropdown>
-                <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown" variant="primary" style={{ width: '35px' }}>
+                <Dropdown.Toggle size="sm" id="miscButton" className="no-caret-dropdown btn-square-sm" variant="primary">
                   <FontAwesomeIcon icon={['fas', 'ellipsis']} color="var(--spot-color)" size="lg" />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
