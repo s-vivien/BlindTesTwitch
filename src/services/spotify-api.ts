@@ -10,6 +10,17 @@ const instance = axios.create({
   },
 });
 
+// Dedicated instance for the Spotify token endpoint. It must NEVER carry an
+// `Authorization: Bearer` header: on /api/token Spotify uses that header to
+// authenticate the client, and a bearer token is not valid client auth, which
+// results in `invalid_client`. Keeping it separate from `instance` avoids the
+// persisted default Authorization header leaking into the token exchange.
+const authInstance = axios.create({
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+});
+
 let axiosErrorCallback: (msg: string) => void = () => { };
 
 export const setAxiosErrorCallback = (callback: (msg: string) => void) => {
@@ -34,12 +45,7 @@ instance.interceptors.response.use(
           params.append('grant_type', 'refresh_token');
           params.append('refresh_token', authStore.getState().spotifyRefreshToken || '');
           params.append('client_id', import.meta.env.VITE_SPOTIFY_CLIENT_ID || '');
-          const rs = await instance.post('https://accounts.spotify.com/api/token',
-            params, {
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-            });
+          const rs = await authInstance.post('https://accounts.spotify.com/api/token', params);
           const accessToken = rs.data.access_token;
           authStore.setState({ spotifyRefreshToken: rs.data.refresh_token, spotifyAccessToken: accessToken });
           instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
@@ -69,12 +75,7 @@ export const retrieveAccessToken = (access_code: string) => {
   params.append('code_verifier', pkcePair.codeVerifier);
   params.append('client_id', import.meta.env.VITE_SPOTIFY_CLIENT_ID || '');
 
-  return instance.post('https://accounts.spotify.com/api/token',
-    params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+  return authInstance.post('https://accounts.spotify.com/api/token', params);
 };
 
 const accessToken = authStore.getState().spotifyAccessToken;
