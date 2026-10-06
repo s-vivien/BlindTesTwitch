@@ -47,7 +47,7 @@ instance.interceptors.response.use(
           params.append('client_id', import.meta.env.VITE_SPOTIFY_CLIENT_ID || '');
           const rs = await authInstance.post('https://accounts.spotify.com/api/token', params);
           const accessToken = rs.data.access_token;
-          authStore.setState({ spotifyRefreshToken: rs.data.refresh_token, spotifyAccessToken: accessToken });
+          authStore.setState({ spotifyAccessToken: accessToken });
           instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
           config.headers.Authorization = `Bearer ${accessToken}`;
           return instance(config);
