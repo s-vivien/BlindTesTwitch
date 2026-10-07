@@ -26,8 +26,9 @@ const Settings = () => {
   useEffect(() => {
     globalStore.setSubtitle('Settings');
     getDevices().then(response => {
-      setDevices(response.data.devices);
-      const found = response.data.devices.find((d: any) => d.id === settingsStore.deviceId);
+      const webPlayerDevices = response.data.devices.filter((d: any) => d.name.toLowerCase().includes('web player'));
+      setDevices(webPlayerDevices);
+      const found = webPlayerDevices.find((d: any) => d.id === settingsStore.deviceId);
       if (found) {
         setSelectedDevice(found.id);
       }
@@ -61,6 +62,11 @@ const Settings = () => {
 
           <Form.Group className="mb-3" controlId="formGroupDevice">
             <Form.Label>Spotify playing device</Form.Label>
+            <div className="alert alert-warning" role="alert">
+              Due to an ongoing Spotify bug, you must use the <b>Web Player</b> as the playing device.
+              You can open it here: <a href="https://open.spotify.com/" target="_blank" rel="noreferrer">https://open.spotify.com/</a>.
+              It must stay open during the whole game, and OBS must therefore capture the browser audio so that viewers can hear the music.
+            </div>
             <Form.Select required className="form-control" value={selectedDevice} onChange={(e) => { setSelectedDevice(e.target.value); }}>
               <option value="">Select device...</option>
               {devices.map((d) => <option key={d.id} value={d.id}>{d.name} ({d.type})</option>)}
