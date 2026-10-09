@@ -12,7 +12,7 @@ class TracksBaseData {
 
   async getPlaylistItems() {
     if (this.playlistItems.length === 0) {
-      const limit = 100;
+      const limit = 50;
       for (let offset = 0; offset < this.playlist.tracks.total; offset = offset + limit) {
         const tracks = await getPlaylistTracks(this.playlist.id, offset, limit);
         if (tracks) this.playlistItems.push(...tracks.data.items.filter((i: any) => i.track));

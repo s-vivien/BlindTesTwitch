@@ -3,7 +3,7 @@ import { cleanValueLight, sorensenDiceScore } from 'helpers';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Client, Options } from 'tmi.js';
-import { launchTrack } from '../services/spotify-api';
+import { launchTrack, setRepeatMode } from '../services/spotify-api';
 import { useAuthStore } from './store/auth-store';
 import { BlindTestTrack, GuessableState, GuessableType, useBTTracksStore } from './store/blind-test-tracks-store';
 import { useGlobalStore } from './store/global-store';
@@ -49,6 +49,10 @@ const BlindTest = () => {
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
   const [podiumDisplayed, setPodiumDisplayed] = useState(false);
+
+  useEffect(() => {
+    setRepeatMode(true, settingsStore.deviceId);
+  }, []);
 
   useEffect(() => {
     if (twitchNick) {
@@ -263,7 +267,7 @@ const BlindTest = () => {
     const track = btStore.getNextTrack(shuffled);
     setPlaying(false);
     setLoading(true);
-    launchTrack(track.track_uri, settingsStore.deviceId).then(() => {
+    launchTrack(track, settingsStore.deviceId).then(() => {
       setCurrentTrack(track);
       const newGuesses: Guess[] = [];
       delayedAnswers.current = [];

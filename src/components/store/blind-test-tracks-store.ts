@@ -28,6 +28,7 @@ export type BlindTestTrack = {
   guessables: Guessable[];
   img: string;
   track_uri: string;
+  album_uri: string;
 }
 
 export class BlindTestTracks {
@@ -79,6 +80,7 @@ export const useBTTracksStore = create<BlindTestTracks & Actions>()(
           done: false,
           guessables: [computeGuessable(title, GuessableType.Title), ...t.artists.map((a: { name: string }) => computeGuessable(a.name, GuessableType.Artist))],
           track_uri: t.uri,
+          album_uri: t.album.uri,
           img: t.album.images[0]?.url || '',
         });
       }

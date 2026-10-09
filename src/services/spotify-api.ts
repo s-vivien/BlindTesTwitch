@@ -1,6 +1,7 @@
 import { useAuthStore } from 'components/store/auth-store';
 import { consumePkcePair, getAppHomeURL } from 'helpers';
 import axios from 'axios';
+import { BlindTestTrack } from '../components/store/blind-test-tracks-store';
 
 const authStore = useAuthStore;
 
@@ -93,13 +94,18 @@ export const getPlaylists = (offset: number, limit: number) => {
 
 export const getPlaylistTracks = (playlist_id: string, offset: number, limit: number) => {
   const market = authStore.getState().spotifyUserCountry;
-  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),uri,album(images)))`);
+  return instance.get(`https://api.spotify.com/v1/playlists/${playlist_id}/items?offset=${offset}&limit=${limit}&market=${market}&fields=items(track(is_playable,name,artists(name),uri,album(uri,images)))`);
 };
 
-export const launchTrack = (track_uri: string, device_id: string) => {
+export const launchTrack = (track: BlindTestTrack, device_id: string) => {
   return instance.put(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
-    uris: [track_uri],
+    context_uri: track.album_uri,
+    offset: { uri: track.track_uri },
   });
+};
+
+export const setRepeatMode = (enabled: boolean, device_id: string) => {
+  return instance.put(`https://api.spotify.com/v1/me/player/repeat?device_id=${device_id}&state=${enabled ? 'track' : 'off'}`);
 };
 
 export const getDevices = () => {
