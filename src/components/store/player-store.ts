@@ -26,6 +26,10 @@ export class Answer {
   getPoints = () => {
     return 1 + (this.isFirst ? 1 : 0) + (this.isCombo ? 1 : 0);
   };
+
+  static sinceStart = (nick: string, isFirst: boolean, isCombo: boolean, start: number) => {
+    return new Answer(nick, isFirst, isCombo, performance.now() - start);
+  };
 }
 
 export const EMPTY_PLAYER_STATS: PlayerStats = {
@@ -111,7 +115,7 @@ export const usePlayerStore = create<Players & Actions>()(
     initPlayer: (nick: string, tid: string) => {
 
       const downloadAvatar = (current: Record<string, Player>) => {
-        const ids = Object.entries(current).filter(([_, value]) => value.tid && !value.avatar).map(([_, value]) => value.tid).slice(0, 100);
+        const ids = Object.values(current).filter((value) => value.tid && !value.avatar).map((value) => value.tid).slice(0, 100);
         if (ids.length > 0) {
           getUsers(ids).then((response) => {
             set((state) => {

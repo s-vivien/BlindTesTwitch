@@ -98,6 +98,9 @@ export const getPlaylistTracks = (playlist_id: string, offset: number, limit: nu
 };
 
 export const launchTrack = (track: BlindTestTrack, device_id: string) => {
+  // normally we'd use `uris: [track_uri]` as a payload to start a single track,
+  // but there is a bug in Spotify's API that forces us to rely on the album_uri+offset,
+  // which then requires to manually set the repeat mode...
   return instance.put(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
     context_uri: track.album_uri,
     offset: { uri: track.track_uri },

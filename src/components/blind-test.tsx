@@ -13,14 +13,13 @@ import Podium from './podium';
 import Leaderboard from './leaderboard';
 import GuessView, { Guess } from './guessable-view';
 
-let twitchCallback: (nick: string, tid: string, msg: string) => void = () => {};
-
 const DISPLAYED_GUESS_NICK_CHAT_LIMIT = 20;
 const SCORE_CMD_DELAY = 2000;
 
 const BlindTest = () => {
 
   const twitchClient = useRef<Client | null>(null);
+  const twitchCallback = useRef<(nick: string, tid: string, msg: string) => void>(() => {});
   const trackStart = useRef<number>(-1);
   const delayedAnswers = useRef<Answer[][]>([]);
   const playersBackup = useRef<Record<string, Player>>({});
@@ -42,24 +41,44 @@ const BlindTest = () => {
   const twitchNick = useAuthStore((state) => state.twitchNick);
   const twitchToken = useAuthStore((state) => state.twitchOauthToken);
 
-  const [isFinished, setFinished] = useState(false);
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [shuffled, setShuffled] = useState(false);
   const [guesses, setGuesses] = useState<Guess[]>([]);
-  const [currentTrack, setCurrentTrack] = useState<BlindTestTrack | null>(null);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(-1);
   const [podiumDisplayed, setPodiumDisplayed] = useState(false);
 
-  useEffect(() => {
-    setRepeatMode(true, settingsStore.deviceId);
-  }, []);
+  const currentTrack: BlindTestTrack | null = currentTrackIndex >= 0 ? btStore.tracks[currentTrackIndex] : null;
+  const isFinished = btStore.tracks.length - btStore.doneTracks <= 0 && !(playing && !currentTrack?.done);
 
   useEffect(() => {
     if (twitchNick) {
       console.log(`Twitch channel changed to ${twitchNick}`);
-      twitchConnection(twitchNick, settingsStore.chatNotifications);
+      const opts: Options = {
+        options: {
+          skipUpdatingEmotesets: true,
+        },
+        channels: [twitchNick],
+      };
+      if (settingsStore.chatNotifications) {
+        opts.identity = {
+          username: 'foo',
+          password: twitchToken || '',
+        };
+      }
+      const client = new Client(opts);
+      twitchClient.current = client;
+      client.connect();
+      client.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
+        if (_self) return;
+        if (_tags['message-type'] !== 'whisper') {
+          return twitchCallback.current(_tags['display-name'], _tags['user-id'], _message);
+        }
+      });
       return () => {
-        twitchDisconnection();
+        console.log('Disconnecting from Twitch...');
+        client.disconnect();
+        twitchClient.current = null;
       };
     }
   }, [twitchNick]);
@@ -71,39 +90,8 @@ const BlindTest = () => {
       setSubtitle(`${btStore.tracks.length - btStore.doneTracks} tracks left`);
     } else {
       setSubtitle('Blind-test is finished !');
-      setFinished(true);
     }
   }, [btStore.tracks.length, playing, btStore.doneTracks]);
-
-  const twitchDisconnection = () => {
-    console.log('Disconnecting from Twitch...');
-    if (twitchClient.current !== null) {
-      twitchClient.current.disconnect();
-    }
-  };
-
-  const twitchConnection = (chan: string, chatNotifications: boolean) => {
-    const opts: Options = {
-      options: {
-        skipUpdatingEmotesets: true,
-      },
-      channels: [chan],
-    };
-    if (chatNotifications) {
-      opts.identity = {
-        username: 'foo',
-        password: twitchToken || '',
-      };
-    }
-    twitchClient.current = new Client(opts);
-    twitchClient.current.connect();
-    twitchClient.current.on('message', (_channel: any, _tags: any, _message: any, _self: any) => {
-      if (_self) return;
-      if (_tags['message-type'] !== 'whisper') {
-        return twitchCallback(_tags['display-name'], _tags['user-id'], _message);
-      }
-    });
-  };
 
   const backupState = () => {
     btStore.backup();
@@ -173,7 +161,7 @@ const BlindTest = () => {
               }
             }
             initPlayer(nick, tid);
-            updateGuessState(i, new Answer(nick, isFirst, isCombo, performance.now() - trackStart.current));
+            updateGuessState(i, Answer.sinceStart(nick, isFirst, isCombo, trackStart.current));
             matched = true;
             break;
           }
@@ -182,7 +170,6 @@ const BlindTest = () => {
       }
     }
   };
-  twitchCallback = onProposition;
 
   const endGuess = (index: number, delayed: boolean) => {
     setGuesses(guesses => {
@@ -222,6 +209,10 @@ const BlindTest = () => {
     });
   };
 
+  useEffect(() => {
+    twitchCallback.current = onProposition;
+  });
+
   const allGuessed = () => {
     return playing && guesses.reduce((prev, curr) => prev && curr.guessed, true);
   };
@@ -238,7 +229,7 @@ const BlindTest = () => {
 
   const endSong = () => {
     if (currentTrack && !currentTrack.done) {
-      currentTrack.done = true;
+      btStore.updateTrack({ ...currentTrack, done: true }, currentTrackIndex);
       btStore.incrementDoneTracks();
       backupState();
     }
@@ -268,7 +259,8 @@ const BlindTest = () => {
     setPlaying(false);
     setLoading(true);
     launchTrack(track, settingsStore.deviceId).then(() => {
-      setCurrentTrack(track);
+      setTimeout(() => setRepeatMode(true, settingsStore.deviceId), 2000); // ugly, but Spotify's API sucks...
+      setCurrentTrackIndex(btStore.tracks.indexOf(track));
       const newGuesses: Guess[] = [];
       delayedAnswers.current = [];
       guessTimeouts.current = [];
